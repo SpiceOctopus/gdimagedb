@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://da2ycb4o4vxr3"]
+
+[ext_resource type="Script" path="res://media_viewer/video_player_controls/time_display.gd" id="1_i7mrp"]
+
+[node name="TimeDisplay" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_i7mrp")
+
+[node name="TimeCurrent" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+vertical_alignment = 1
+
+[node name="Divider" type="Label" parent="."]
+layout_mode = 2
+text = " / "
+vertical_alignment = 1
+
+[node name="TimeTotal" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+vertical_alignment = 1

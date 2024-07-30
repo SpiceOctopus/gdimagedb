@@ -1,0 +1,122 @@
+[gd_scene load_steps=7 format=3 uid="uid://cdmjabh7kaqnd"]
+
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_o5tsc"]
+[ext_resource type="Script" path="res://ui/menu_bar/main_menu.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://duqp5jb7muyp2" path="res://ui/delete_tag_dlg/delete_tag_dialog.tscn" id="3_i6lpa"]
+[ext_resource type="PackedScene" uid="uid://datbrq8xuommo" path="res://ui/add_tag_dlg/add_tag_dialog.tscn" id="3_ler4g"]
+[ext_resource type="PackedScene" uid="uid://ds4otlse3cu13" path="res://ui/grid_image_size/grid_image_size_dlg.tscn" id="4_4ex34"]
+[ext_resource type="PackedScene" uid="uid://d0fnkvx35hyhg" path="res://ui/help/help.tscn" id="6_gfo7c"]
+
+[node name="MenuBar" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -548.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("3")
+
+[node name="Background" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(1024, 40)
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+texture = ExtResource("2_o5tsc")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="SettingsMenu" type="MenuButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Settings"
+item_count = 2
+popup/item_0/text = "Grid Image Size"
+popup/item_0/id = 0
+popup/item_1/text = "Hide images in collections"
+popup/item_1/checkable = 1
+popup/item_1/id = 2
+
+[node name="TagsMenu" type="MenuButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Tags"
+item_count = 2
+popup/item_0/text = "Add Tag"
+popup/item_0/id = 0
+popup/item_1/text = "Delete Tag"
+popup/item_1/id = 1
+
+[node name="SortMenu" type="MenuButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+visible = false
+layout_mode = 2
+disabled = true
+text = "Sort"
+item_count = 2
+popup/item_0/text = "Unsorted"
+popup/item_0/id = 0
+popup/item_1/text = "By Position"
+popup/item_1/id = 1
+
+[node name="FavoritesCheckBox" type="CheckButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Favorites"
+
+[node name="UntaggedCheckBox" type="CheckButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Untagged"
+
+[node name="RefreshButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="HelpButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer2"]
+layout_mode = 2
+text = "Help"
+
+[node name="SwitchGridsButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer2"]
+layout_mode = 2
+text = "Switch to Collections"
+
+[node name="AddTagDialog" parent="." instance=ExtResource("3_ler4g")]
+visible = false
+
+[node name="DeleteTagDialog" parent="." instance=ExtResource("3_i6lpa")]
+visible = false
+
+[node name="GridImageSizeCtrl" parent="." instance=ExtResource("4_4ex34")]
+visible = false
+
+[node name="Help" parent="." instance=ExtResource("6_gfo7c")]
+visible = false
+
+[connection signal="toggled" from="MarginContainer/HBoxContainer2/HBoxContainer/FavoritesCheckBox" to="." method="_on_FavoritesCheckBox_toggled"]
+[connection signal="toggled" from="MarginContainer/HBoxContainer2/HBoxContainer/UntaggedCheckBox" to="." method="_on_untagged_check_box_toggled"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer2/HBoxContainer/RefreshButton" to="." method="_on_RefreshButton_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer2/HBoxContainer2/HelpButton" to="." method="_on_help_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer2/HBoxContainer2/SwitchGridsButton" to="." method="_on_btn_switch_grids_pressed"]
+[connection signal="refresh_grid" from="GridImageSizeCtrl" to="." method="_on_grid_image_size_ctrl_refresh_grid"]

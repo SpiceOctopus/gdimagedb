@@ -1,0 +1,96 @@
+[gd_scene load_steps=10 format=3 uid="uid://c76rpt4liwntk"]
+
+[ext_resource type="Script" path="res://main_view.gd" id="1_1xrw4"]
+[ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="2_qxw27"]
+[ext_resource type="PackedScene" uid="uid://cdmjabh7kaqnd" path="res://ui/menu_bar/main_menu.tscn" id="2_v12bk"]
+[ext_resource type="PackedScene" uid="uid://b5u3ncjp2ptt7" path="res://ui/import_log/import_log.tscn" id="3_2vkq6"]
+[ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_072ji"]
+[ext_resource type="PackedScene" uid="uid://86emblidbalh" path="res://ui/image_grid/image_grid.tscn" id="4_ck5lf"]
+[ext_resource type="PackedScene" uid="uid://s3cqe7hw7f1n" path="res://collections/collections_grid/collections_grid.tscn" id="5_mfqte"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pl8um"]
+bg_color = Color(0.223529, 0.239216, 0.25098, 1)
+
+[sub_resource type="Theme" id="Theme_dmqth"]
+PopupMenu/styles/panel = SubResource("StyleBoxFlat_pl8um")
+
+[node name="MainView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_dmqth")
+script = ExtResource("1_1xrw4")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_qxw27")
+
+[node name="ImportLog" parent="." instance=ExtResource("3_2vkq6")]
+visible = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="MenuBar" parent="VBoxContainer" instance=ExtResource("2_v12bk")]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 1
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 1
+
+[node name="SideBar" parent="VBoxContainer/HBoxContainer/MarginContainer" instance=ExtResource("3_072ji")]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+
+[node name="Content" type="Panel" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 1
+theme_override_constants/margin_bottom = 1
+
+[node name="ImageGrid" parent="VBoxContainer/HBoxContainer/Content/MarginContainer" instance=ExtResource("4_ck5lf")]
+layout_mode = 2
+
+[node name="CollectionsGrid" parent="VBoxContainer/HBoxContainer/Content/MarginContainer" instance=ExtResource("5_mfqte")]
+visible = false
+layout_mode = 2
+
+[connection signal="refresh_grid" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_refresh_grid"]
+[connection signal="sort_mode_changed" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_sort_mode_changed"]
+[connection signal="switch_grids" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_switch_grids"]
+[connection signal="file_replaced" from="VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid" to="." method="_on_image_grid_file_replaced"]
+[connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid" to="." method="_on_grid_grid_updated"]
+[connection signal="tag_edit" from="VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid" to="." method="_on_grid_tag_edit"]
+[connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/MarginContainer/CollectionsGrid" to="." method="_on_grid_grid_updated"]

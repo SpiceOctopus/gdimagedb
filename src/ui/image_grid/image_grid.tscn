@@ -1,0 +1,138 @@
+[gd_scene load_steps=11 format=3 uid="uid://86emblidbalh"]
+
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1"]
+[ext_resource type="Script" path="res://ui/image_grid/image_grid.gd" id="2"]
+[ext_resource type="Script" path="res://ui/image_grid/popup_menu.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://c6wroaqhgwlbv" path="res://collections/add_to_collection_dialog/add_to_collection.tscn" id="5_inbqb"]
+[ext_resource type="PackedScene" uid="uid://cf1sh28pl8bbu" path="res://ui/media_properties/media_properties.tscn" id="6_ge5n3"]
+[ext_resource type="Script" path="res://ui/image_grid/replace_file_window.gd" id="7_0wxrp"]
+[ext_resource type="PackedScene" uid="uid://b5u3ncjp2ptt7" path="res://ui/import_log/import_log.tscn" id="8_bn58o"]
+[ext_resource type="PackedScene" uid="uid://v8t6vwawua50" path="res://ui/delete_file/delete_file.tscn" id="8_l7y63"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ygfgn"]
+bg_color = Color(0.156863, 0.180392, 0.2, 1)
+
+[sub_resource type="Theme" id="Theme_wq5nu"]
+AcceptDialog/styles/panel = SubResource("StyleBoxFlat_ygfgn")
+
+[node name="Grid" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1")
+expand_mode = 1
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+size = Vector2i(253, 178)
+hide_on_checkable_item_selection = false
+item_count = 9
+item_0/text = "Favorite"
+item_0/checkable = 1
+item_0/id = 0
+item_1/text = "Add to Collection"
+item_1/id = 6
+item_2/text = "Add to last"
+item_2/id = 7
+item_2/disabled = true
+item_3/text = ""
+item_3/id = 1
+item_3/separator = true
+item_4/text = "Tags"
+item_4/id = 2
+item_5/text = "Properties"
+item_5/id = 3
+item_6/text = ""
+item_6/id = 4
+item_6/separator = true
+item_7/text = "Replace File"
+item_7/id = 8
+item_8/text = "Delete"
+item_8/id = 5
+script = ExtResource("3")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+horizontal_scroll_mode = 3
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="DropFilesLabel" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -130.0
+offset_top = -13.0
+offset_right = 130.0
+offset_bottom = 13.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Drop files here to start importing."
+
+[node name="AddToCollectionWindow" type="Window" parent="."]
+title = "Add to Collection"
+visible = false
+
+[node name="AddToCollection" parent="AddToCollectionWindow" instance=ExtResource("5_inbqb")]
+
+[node name="MediaPropertiesWindow" type="Window" parent="."]
+title = "Properties"
+visible = false
+
+[node name="MediaProperties" parent="MediaPropertiesWindow" instance=ExtResource("6_ge5n3")]
+
+[node name="ReplaceFileWindow" type="FileDialog" parent="."]
+size = Vector2i(678, 400)
+theme = SubResource("Theme_wq5nu")
+ok_button_text = "Open"
+mode_overrides_title = false
+file_mode = 0
+access = 2
+script = ExtResource("7_0wxrp")
+
+[node name="ImportLog" parent="." instance=ExtResource("8_bn58o")]
+visible = false
+
+[node name="DeleteFile" parent="." instance=ExtResource("8_l7y63")]
+size = Vector2i(500, 100)
+visible = false
+
+[connection signal="add_to_collection" from="PopupMenu" to="." method="_on_popup_menu_add_to_collection"]
+[connection signal="delete" from="PopupMenu" to="." method="_on_popup_menu_delete"]
+[connection signal="favorite_changed" from="PopupMenu" to="." method="_on_PopupMenu_favorite_changed"]
+[connection signal="id_pressed" from="PopupMenu" to="PopupMenu" method="_on_PopupMenu_id_pressed"]
+[connection signal="properties" from="PopupMenu" to="." method="_on_PopupMenu_properties"]
+[connection signal="replace_file" from="PopupMenu" to="." method="_on_popup_menu_replace_file"]
+[connection signal="tag_edit" from="PopupMenu" to="." method="_on_PopupMenu_tag_edit"]
+[connection signal="confirmed" from="ReplaceFileWindow" to="." method="_on_replace_file_window_confirmed"]

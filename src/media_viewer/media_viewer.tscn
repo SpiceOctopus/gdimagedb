@@ -1,0 +1,73 @@
+[gd_scene load_steps=5 format=3 uid="uid://bejhnh5pkveek"]
+
+[ext_resource type="Script" path="res://media_viewer/media_viewer.gd" id="1_b4iwg"]
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_1ojl6"]
+[ext_resource type="PackedScene" uid="uid://dglqvqfg50bfm" path="res://media_viewer/media_viewer_top_menu.tscn" id="3_wk0n5"]
+[ext_resource type="PackedScene" uid="uid://b4p0ep42wesi1" path="res://media_viewer/video_player_controls/video_player_controls.tscn" id="4_4014u"]
+
+[node name="MediaViewer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_b4iwg")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_1ojl6")
+expand_mode = 1
+
+[node name="ImageDisplay" type="TextureRect" parent="."]
+layout_mode = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+layout_mode = 0
+offset_right = 1024.0
+offset_bottom = 600.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MediaViewerTopMenu" parent="VBoxContainer" instance=ExtResource("3_wk0n5")]
+visible = false
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="InputWorkaround" type="ReferenceRect" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+border_width = 0.0
+editor_only = false
+
+[node name="VideoPlayerControls" parent="." instance=ExtResource("4_4014u")]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+grow_vertical = 0
+
+[node name="GIFDisplay" type="AnimatedSprite2D" parent="."]
+visible = false
+
+[node name="VideoTimeUpdate" type="Timer" parent="."]
+wait_time = 0.5
+
+[connection signal="resized" from="." to="." method="_on_MediaViewer_resized"]
+[connection signal="finished" from="VideoStreamPlayer" to="." method="_on_video_stream_player_finished"]
+[connection signal="fit_to_window" from="VBoxContainer/MediaViewerTopMenu" to="." method="_on_media_viewer_top_menu_fit_to_window"]
+[connection signal="original_size" from="VBoxContainer/MediaViewerTopMenu" to="." method="_on_media_viewer_top_menu_original_size"]
+[connection signal="stretch_mode_changed" from="VBoxContainer/MediaViewerTopMenu" to="." method="_on_media_viewer_top_menu_stretch_mode_changed"]
+[connection signal="play_pause" from="VideoPlayerControls" to="." method="_on_video_player_controls_play_pause"]
+[connection signal="time_selected" from="VideoPlayerControls" to="." method="_on_video_player_controls_time_selected"]
+[connection signal="timeout" from="VideoTimeUpdate" to="." method="_on_video_timer_tick"]

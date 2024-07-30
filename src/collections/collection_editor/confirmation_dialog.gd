@@ -1,0 +1,3 @@
+extends ConfirmationDialog
+
+var image

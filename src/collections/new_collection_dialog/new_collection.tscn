@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2cc6h6qxov7y"]
+
+[ext_resource type="Script" path="res://collections/new_collection_dialog/new_collection.gd" id="1_28b35"]
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_0d811"]
+
+[node name="NewCollection" type="Control"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_28b35")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_0d811")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Collection name:"
+
+[node name="NameEdit" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AcceptButton" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "Accept"
+
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/NameEdit" to="." method="_on_txt_name_text_changed"]
+[connection signal="text_submitted" from="MarginContainer/VBoxContainer/NameEdit" to="." method="_on_txt_name_text_submitted"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/AcceptButton" to="." method="_on_btn_accept_pressed"]

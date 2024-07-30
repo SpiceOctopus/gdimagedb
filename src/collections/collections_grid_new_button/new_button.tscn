@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://odtwa3ah5qra"]
+
+[ext_resource type="Script" path="res://collections/collections_grid_new_button/new_button.gd" id="1_wljcj"]
+
+[node name="NewButton" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_wljcj")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "New Collection"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

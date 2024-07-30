@@ -1,0 +1,3 @@
+extends FileDialog
+
+var file

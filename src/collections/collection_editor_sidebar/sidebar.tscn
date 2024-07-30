@@ -1,0 +1,124 @@
+[gd_scene load_steps=5 format=3 uid="uid://dtvf0wi0e2xn8"]
+
+[ext_resource type="Script" path="res://collections/collection_editor_sidebar/sidebar.gd" id="1_742sj"]
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_dm8pw"]
+[ext_resource type="PackedScene" uid="uid://datbrq8xuommo" path="res://ui/add_tag_dlg/add_tag_dialog.tscn" id="3_diuis"]
+[ext_resource type="PackedScene" uid="uid://duqp5jb7muyp2" path="res://ui/delete_tag_dlg/delete_tag_dialog.tscn" id="3_giqru"]
+
+[node name="Sidebar" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_742sj")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_dm8pw")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="MainContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="NameContainer" type="HBoxContainer" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="MarginContainer/MainContainer/NameContainer"]
+layout_mode = 2
+text = "Name:"
+
+[node name="NameEdit" type="LineEdit" parent="MarginContainer/MainContainer/NameContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ApplyNameButton" type="Button" parent="MarginContainer/MainContainer/NameContainer"]
+layout_mode = 2
+text = "Apply"
+
+[node name="AllTagsLabel" type="Label" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+text = "All Tags:"
+
+[node name="TagFilterContainer" type="HBoxContainer" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MarginContainer/MainContainer/TagFilterContainer"]
+layout_mode = 2
+text = "Filter:"
+
+[node name="FilterEdit" type="LineEdit" parent="MarginContainer/MainContainer/TagFilterContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AllTagsList" type="ItemList" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TagButtons" type="HBoxContainer" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+
+[node name="RemoveButton" type="Button" parent="MarginContainer/MainContainer/TagButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Remove"
+
+[node name="AssignButton" type="Button" parent="MarginContainer/MainContainer/TagButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Assign"
+
+[node name="AssignedTagsLabel" type="Label" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+text = "Assigned Tags:"
+
+[node name="AssignedTagsList" type="ItemList" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TagManagementContainer" type="HBoxContainer" parent="MarginContainer/MainContainer"]
+layout_mode = 2
+
+[node name="DeleteTagButton" type="Button" parent="MarginContainer/MainContainer/TagManagementContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Delete Tag"
+
+[node name="NewTagBbutton" type="Button" parent="MarginContainer/MainContainer/TagManagementContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "New Tag"
+
+[node name="AddTagDialog" parent="." instance=ExtResource("3_diuis")]
+visible = false
+
+[node name="DeleteTagDialog" parent="." instance=ExtResource("3_giqru")]
+visible = false
+
+[connection signal="text_changed" from="MarginContainer/MainContainer/NameContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
+[connection signal="text_submitted" from="MarginContainer/MainContainer/NameContainer/NameEdit" to="." method="_on_name_edit_text_submitted"]
+[connection signal="pressed" from="MarginContainer/MainContainer/NameContainer/ApplyNameButton" to="." method="_on_apply_name_button_pressed"]
+[connection signal="gui_input" from="MarginContainer/MainContainer/TagFilterContainer/FilterEdit" to="." method="_on_filter_edit_gui_input"]
+[connection signal="text_changed" from="MarginContainer/MainContainer/TagFilterContainer/FilterEdit" to="." method="_on_filter_edit_text_changed"]
+[connection signal="text_submitted" from="MarginContainer/MainContainer/TagFilterContainer/FilterEdit" to="." method="_on_filter_edit_text_submitted"]
+[connection signal="pressed" from="MarginContainer/MainContainer/TagButtons/RemoveButton" to="." method="_on_remove_button_pressed"]
+[connection signal="pressed" from="MarginContainer/MainContainer/TagButtons/AssignButton" to="." method="_on_assign_button_pressed"]
+[connection signal="pressed" from="MarginContainer/MainContainer/TagManagementContainer/DeleteTagButton" to="." method="_on_delete_tag_button_pressed"]
+[connection signal="pressed" from="MarginContainer/MainContainer/TagManagementContainer/NewTagBbutton" to="." method="_on_new_tag_button_pressed"]

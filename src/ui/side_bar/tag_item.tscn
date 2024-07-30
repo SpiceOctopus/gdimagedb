@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://cjdylhovhhgwk"]
+
+[ext_resource type="Script" path="res://ui/side_bar/tag_item.gd" id="1_r37uv"]
+[ext_resource type="Theme" uid="uid://cjoymj7qrcnmm" path="res://ui/side_bar/tag_item.tres" id="2_3t1x0"]
+
+[node name="TagItem" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_r37uv")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Tag" type="Label" parent="HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme = ExtResource("2_3t1x0")
+text = "tag name here"
+vertical_alignment = 1
+clip_text = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 2
+
+[node name="Remove" type="Button" parent="HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "-"
+
+[node name="Add" type="Button" parent="HBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "+"
+
+[node name="X" type="Button" parent="HBoxContainer2/HBoxContainer"]
+visible = false
+layout_mode = 2
+text = "x"
+
+[connection signal="pressed" from="HBoxContainer2/HBoxContainer/Remove" to="." method="_on_remove_pressed"]
+[connection signal="pressed" from="HBoxContainer2/HBoxContainer/Add" to="." method="_on_add_pressed"]
+[connection signal="pressed" from="HBoxContainer2/HBoxContainer/X" to="." method="_on_x_pressed"]

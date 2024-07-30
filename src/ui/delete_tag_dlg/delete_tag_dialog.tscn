@@ -1,0 +1,140 @@
+[gd_scene load_steps=4 format=3 uid="uid://duqp5jb7muyp2"]
+
+[ext_resource type="Script" path="res://ui/delete_tag_dlg/delete_tag_dialog.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_xirsn"]
+[ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="3_nkicc"]
+
+[node name="DeleteTagDialog" type="Window"]
+position = Vector2i(0, 36)
+size = Vector2i(800, 500)
+script = ExtResource("1")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_xirsn")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Filter:"
+
+[node name="FilterEdit" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TagList" type="ItemList" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+alignment = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Images with selected tag:"
+horizontal_alignment = 1
+
+[node name="TopContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Preview1" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/TopContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="Preview2" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/TopContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="Preview3" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/TopContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="MiddleContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Preview4" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/MiddleContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="Preview5" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/MiddleContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="Preview6" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/MiddleContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="BottomContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Preview7" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/BottomContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="Preview8" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/BottomContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="Preview9" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/BottomContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("3_nkicc")
+stretch_mode = 5
+
+[node name="DeleteButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Delete Tag"
+
+[connection signal="about_to_popup" from="." to="." method="_on_about_to_popup"]
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="text_changed" from="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer/FilterEdit" to="." method="_on_filter_edit_text_changed"]
+[connection signal="item_selected" from="MarginContainer/HBoxContainer/VBoxContainer2/TagList" to="." method="_on_tag_list_item_selected"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/VBoxContainer/DeleteButton" to="." method="_on_DeleteButton_pressed"]

@@ -1,0 +1,81 @@
+[gd_scene load_steps=6 format=3 uid="uid://dse3yrjipspu5"]
+
+[ext_resource type="Script" path="res://collections/collection_editor/collection_editor.gd" id="1_h34lx"]
+[ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="2_njylg"]
+[ext_resource type="PackedScene" uid="uid://dtvf0wi0e2xn8" path="res://collections/collection_editor_sidebar/sidebar.tscn" id="2_vpjgr"]
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="3_nwi1d"]
+[ext_resource type="Script" path="res://collections/collection_editor/confirmation_dialog.gd" id="4_mwxed"]
+
+[node name="CollectionEditor" type="Control"]
+custom_minimum_size = Vector2(640, 320)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_h34lx")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_njylg")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SideBar" parent="HBoxContainer" instance=ExtResource("2_vpjgr")]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_nwi1d")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="HBoxContainer/Panel/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+title = "Remove?"
+size = Vector2i(207, 100)
+dialog_text = "Remove from collection?"
+script = ExtResource("4_mwxed")
+
+[connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_confirmation_dialog_confirmed"]
