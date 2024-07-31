@@ -8,7 +8,6 @@ signal click
 signal multi_select
 
 var current_image
-var load_thread = Thread.new()
 var selected = false
 
 func _ready():
@@ -17,8 +16,6 @@ func _ready():
 
 func _exit_tree():
 	texture = null
-	if load_thread != null && load_thread.is_started():
-		load_thread.wait_to_finish()
 
 # param is a row of image data from the db
 func set_image(image):
@@ -27,7 +24,7 @@ func set_image(image):
 	if CacheManager.thumb_cache.has(current_image["id"]):
 		texture = CacheManager.thumb_cache[current_image["id"]]
 	else:
-		load_thread.start(Callable(self,"async_load"))
+		WorkerThreadPool.add_task(async_load)
 
 func async_load():
 	var thumb_path = DB.db_path_to_full_thumb_path(current_image["path"])
