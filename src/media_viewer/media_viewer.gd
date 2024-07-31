@@ -17,33 +17,68 @@ var dragging : bool = false
 var drag_offset
 var zoom_min_size : Vector2 = Vector2(10, 10)
 var zoom_min_scale : Vector2 = Vector2(0.05, 0.05)
+var preload_next_id : int = -1
+var preload_previous_id : int = -1
 
 @onready var input_workaround = $VBoxContainer/InputWorkaround
 @onready var top_menu = $VBoxContainer/MediaViewerTopMenu
 @onready var video_player_controls = $VideoPlayerControls
 @onready var video_time_update_timer = $VideoTimeUpdate
 @onready var gif_display = $GIFDisplay
+@onready var loading_label = $LoadingLabel
 
 func _ready():
 	if images != null && images.size() > 0:
 		set_display(images[current_image])
-		_on_MediaViewer_resized()
+		if images.size() > 1:
+			var preload_id = current_image + 1
+			if preload_id > images.size() - 1:
+				print("hi")
+				preload_id = 0
+			if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
+				preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+		if images.size() > 2:
+			var preload_id = current_image - 1
+			if preload_id < 0:
+				preload_id = images.size() - 1
+			if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
+				preload_previous_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
 
 func _input(event):
 	if !hotkeys_active:
 		return
 	
 	if Input.is_action_just_pressed("ui_right"):
+		if preload_next_id > 0:
+			WorkerThreadPool.wait_for_task_completion(preload_next_id)
+			preload_next_id = -1
+		
 		current_image += 1
 		if current_image > images.size() - 1:
 			current_image = 0
 		set_display(images[current_image])
+		
+		var preload_id = current_image + 1
+		if preload_id > images.size() - 1:
+			preload_id = 0
+		if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
+			preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
 	elif Input.is_action_just_pressed("ui_left"):
+		if preload_previous_id > 0:
+			WorkerThreadPool.wait_for_task_completion(preload_previous_id)
+			preload_previous_id = -1
+		
 		if current_image == 0:
 			current_image = images.size() - 1
 		else:
 			current_image -= 1
 		set_display(images[current_image])
+		
+		var preload_id = current_image - 1
+		if preload_id < 0:
+			preload_id = images.size() - 1
+		if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
+			preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
 	elif Input.is_action_pressed("ui_cancel"):
 		emit_signal("closing")
 		queue_free()
@@ -173,17 +208,10 @@ func set_display(file):
 	set_mode(current_mode)
 	
 	if current_mode == MODE.Picture:
-		if CacheManager.image_cache.has(file["id"]):
-			$ImageDisplay.texture = CacheManager.image_cache[file["id"]]
-			_on_MediaViewer_resized()
-			return
-		
-		var texture = ImageUtil.TextureFromFile(DB.db_path_to_full_path(file["path"]))
-		$ImageDisplay.texture = texture
-		CacheManager.image_mutex.lock()
-		CacheManager.image_cache[file["id"]] = texture
-		CacheManager.image_mutex.unlock()
+		loading_label.show()
+		WorkerThreadPool.add_task(Callable(self, "async_load_display").bind(file))
 	elif current_mode == MODE.Video:
+		loading_label.show()
 		$VideoStreamPlayer.stream = null # Solves a hard crash.
 		$VideoStreamPlayer.stream = load(DB.db_path_to_full_path(file["path"]))
 		video_player_controls.set_time_total($VideoStreamPlayer.get_stream_length())
@@ -192,9 +220,34 @@ func set_display(file):
 		video_time_update_timer.start()
 		video_playing = true
 		video_size = Vector2($VideoStreamPlayer.get_video_texture().get_width(), $VideoStreamPlayer.get_video_texture().get_height())
+		loading_label.hide()
+		_on_MediaViewer_resized()
 	elif current_mode == MODE.gif:
+		loading_label.show()
 		gif_display.sprite_frames = GifManager.sprite_frames_from_file(DB.db_path_to_full_path(file["path"]))
+		loading_label.hide()
 		gif_display.play("gif")
+		_on_MediaViewer_resized()
+
+func async_load_display(file):
+	if CacheManager.image_cache.has(file["id"]):
+			call_deferred("set_image_internal", CacheManager.image_cache[file["id"]])
+	else:
+		var texture = ImageUtil.TextureFromFile(DB.db_path_to_full_path(file["path"]))
+		call_deferred("set_image_internal", texture)
+		CacheManager.image_mutex.lock()
+		CacheManager.image_cache[file["id"]] = texture
+		CacheManager.image_mutex.unlock()
+
+func preload_image(file):
+	var texture = ImageUtil.TextureFromFile(DB.db_path_to_full_path(file["path"]))
+	CacheManager.image_mutex.lock()
+	CacheManager.image_cache[file["id"]] = texture
+	CacheManager.image_mutex.unlock()
+
+func set_image_internal(img):
+	loading_label.hide()
+	$ImageDisplay.texture = img
 	_on_MediaViewer_resized()
 
 func set_mode(mode):

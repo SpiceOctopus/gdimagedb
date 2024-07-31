@@ -63,6 +63,18 @@ visible = false
 [node name="VideoTimeUpdate" type="Timer" parent="."]
 wait_time = 0.5
 
+[node name="LoadingLabel" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Loading..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [connection signal="resized" from="." to="." method="_on_MediaViewer_resized"]
 [connection signal="finished" from="VideoStreamPlayer" to="." method="_on_video_stream_player_finished"]
 [connection signal="fit_to_window" from="VBoxContainer/MediaViewerTopMenu" to="." method="_on_media_viewer_top_menu_fit_to_window"]
