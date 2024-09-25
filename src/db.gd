@@ -270,6 +270,13 @@ func get_all_collections():
 	query("SELECT * FROM collections")
 	return query_result
 
+func get_all_collection_names():
+	query("SELECT collection FROM collections")
+	var collection_names : Array
+	for entry in query_result:
+		collection_names.append(entry["collection"])
+	return collection_names
+
 func get_collection_by_name(collection_name : String):
 	query_with_bindings("SELECT * FROM collections WHERE collection=?", [collection_name])
 	return query_result

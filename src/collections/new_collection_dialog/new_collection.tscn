@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_0d811"]
 
 [node name="NewCollection" type="Control"]
-custom_minimum_size = Vector2(300, 100)
+custom_minimum_size = Vector2(320, 100)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,9 +37,18 @@ theme_override_constants/margin_bottom = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Collection name:"
+
+[node name="duplicate_name_warning_label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "(Name already exists)"
 
 [node name="NameEdit" type="LineEdit" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
