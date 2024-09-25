@@ -2,11 +2,11 @@ extends Control
 
 signal create_new
 
+var collections : Array
+
 @onready var txt_name = $MarginContainer/VBoxContainer/NameEdit
 @onready var btn_accept = $MarginContainer/VBoxContainer/AcceptButton
 @onready var duplicate_label = $MarginContainer/VBoxContainer/HBoxContainer/duplicate_name_warning_label
-
-var collections : Array
 
 func refresh():
 	collections = DB.get_all_collection_names()
