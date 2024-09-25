@@ -33,7 +33,6 @@ func _ready():
 		if images.size() > 1:
 			var preload_id = current_image + 1
 			if preload_id > images.size() - 1:
-				print("hi")
 				preload_id = 0
 			if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
 				preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))

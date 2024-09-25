@@ -15,6 +15,8 @@ var previews = {}
 var viewer_scene = load("res://media_viewer/media_viewer.tscn")
 var sort_mode : SortMode = SortMode.none : set=set_sort_mode
 
+var previews_mutex = Mutex.new()
+
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
 @onready var add_to_collection_window = $AddToCollectionWindow
@@ -36,6 +38,7 @@ func _ready():
 	GlobalData.connect("tags_changed", tags_changed)
 	GlobalData.connect("db_tags_changed", tags_changed)
 	GlobalData.connect("db_images_changed", _on_db_images_changed)
+	GlobalData.connect("media_deleted", _on_media_deleted)
 	db_images = DB.get_all_images()
 	refresh_grid()
 	add_to_collection_window.connect('close_requested', Callable(add_to_collection_window,'hide'))
@@ -76,7 +79,9 @@ func refresh_grid(hard : bool = false):
 	current_images.clear()
 	
 	if hard:
+		previews_mutex.lock()
 		previews.clear()
+		previews_mutex.unlock()
 		for grid_image in grid_container.get_children():
 			grid_image.free()
 	
@@ -97,7 +102,9 @@ func refresh_grid(hard : bool = false):
 			gridImageInstance.connect("multi_select", _on_grid_image_multi_select)
 			gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 			gridImageInstance.visible = false
+			previews_mutex.lock()
 			previews[image["id"]] = gridImageInstance
+			previews_mutex.unlock()
 	
 	var images_without_tags = []
 	if GlobalData.show_untagged: # no need to run this if it's not in use
@@ -210,3 +217,9 @@ func _on_replace_file_window_confirmed():
 func _on_popup_menu_delete(image):
 	delete_file.image = image
 	delete_file.popup_centered()
+
+func _on_media_deleted(id):
+	previews[id].queue_free()
+	previews_mutex.lock()
+	previews.erase(id)
+	previews_mutex.unlock()

@@ -6,6 +6,7 @@ signal untagged_changed
 signal tags_changed
 signal db_images_changed
 signal db_tags_changed
+signal media_deleted
 signal help
 signal last_used_collection_changed
 
@@ -98,3 +99,6 @@ func notify_help_called():
 
 func notify_db_tags_changed():
 	emit_signal("db_tags_changed")
+
+func notify_media_deleted(id):
+	emit_signal("media_deleted", id)

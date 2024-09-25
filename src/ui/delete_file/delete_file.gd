@@ -16,6 +16,13 @@ func _on_ok_button_pressed():
 	dir.remove(DB.db_path_to_full_thumb_path(image["path"])) # thumbnail
 	dir.remove(DB.db_path_to_full_path(image["path"])) # image
 	DB.delete_image(image["id"])
+	CacheManager.image_mutex.lock()
+	CacheManager.image_cache.erase(image["id"]) # Does not fail if entry does not exists. Just returns false.
+	CacheManager.image_mutex.unlock()
+	CacheManager.thumb_mutex.lock()
+	CacheManager.thumb_cache.erase(image["id"])
+	CacheManager.thumb_mutex.unlock()
+	GlobalData.notify_media_deleted(image["id"])
 	GlobalData.notify_db_images_changed()
 	hide()
 
