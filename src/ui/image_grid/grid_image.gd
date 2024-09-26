@@ -32,9 +32,7 @@ func async_load():
 	if dir.file_exists(thumb_path):
 		var tmp = ImageUtil.TextureFromFile(thumb_path)
 		call_deferred("set_image_internal", tmp)
-		CacheManager.thumb_mutex.lock()
-		CacheManager.thumb_cache[current_image["id"]] = tmp
-		CacheManager.thumb_mutex.unlock()
+		CacheManager.call_deferred("add_thumbnail", current_image["id"], tmp)
 	elif current_image["path"].get_extension() in Settings.supported_video_files:
 		call_deferred("set_image_internal", load("res://gfx/video_placeholder.png"))
 

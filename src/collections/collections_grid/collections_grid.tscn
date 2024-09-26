@@ -65,6 +65,8 @@ anchor_right = 0.0
 anchor_bottom = 0.0
 offset_right = 320.0
 offset_bottom = 100.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [connection signal="delete" from="PopupMenu" to="." method="_on_popup_menu_delete"]
 [connection signal="edit" from="PopupMenu" to="." method="_on_popup_menu_edit"]

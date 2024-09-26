@@ -16,6 +16,7 @@ var show_only_untagged : bool = GlobalData.show_untagged
 @onready var delete_dialog = $DeleteCollection
 @onready var popup_menu = $PopupMenu
 @onready var new_collection_dialog = $NewCollectionDialog
+@onready var grid_tile_instance = grid_tile_scene.instantiate()
 
 func _ready():
 	reset_grid()
@@ -61,13 +62,13 @@ func reset_grid():
 		if GlobalData.show_untagged && DB.get_tags_for_collection(collection["id"]).size() > 0:
 			continue
 		
-		var grid_tile_instance = grid_tile_scene.instantiate()
-		grid_tile_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-		grid_tile_instance.connect("double_click", tile_double_click)
-		grid_tile_instance.connect("right_click", tile_right_click)
-		grid_tile_instance.add_to_group("collections_grid_tiles")
-		$ScrollContainer/GridContainer.add_child(grid_tile_instance)
-		grid_tile_instance.collection = collection
+		var instance = grid_tile_instance.duplicate()
+		instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
+		instance.connect("double_click", tile_double_click)
+		instance.connect("right_click", tile_right_click)
+		instance.add_to_group("collections_grid_tiles")
+		$ScrollContainer/GridContainer.add_child(instance)
+		instance.collection = collection
 	
 	var new_button_instance = new_button_scene.instantiate()
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
