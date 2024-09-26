@@ -47,7 +47,7 @@ func _on_settings_menu_selection(id):
 	elif id == 2: # hide images in collections
 		Settings.hide_images_collections = !Settings.hide_images_collections
 		settings_menu.get_popup().set_item_checked(1, Settings.hide_images_collections)
-		emit_signal("refresh_grid")
+		refresh_grid.emit()
 
 func _on_tags_menu_selection(id):
 	if id == 0: # add tag
@@ -57,9 +57,9 @@ func _on_tags_menu_selection(id):
 
 func _on_sort_menu_selection(id):
 	if id == 0:
-		emit_signal("sort_mode_changed", ImageGrid.SortMode.none)
+		sort_mode_changed.emit(ImageGrid.SortMode.none)
 	elif id == 1:
-		emit_signal("sort_mode_changed", ImageGrid.SortMode.pos)
+		sort_mode_changed.emit(ImageGrid.SortMode.pos)
 
 func _on_untagged_check_box_toggled(button_pressed):
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
@@ -71,10 +71,10 @@ func _on_FavoritesCheckBox_toggled(button_pressed):
 	GlobalData.show_favorites = button_pressed
 
 func _on_RefreshButton_pressed():
-	emit_signal("refresh_grid")
+	refresh_grid.emit()
 
 func _on_btn_switch_grids_pressed():
-	emit_signal("switch_grids")
+	switch_grids.emit()
 
 func _on_help_button_pressed():
 	help.popup_centered()

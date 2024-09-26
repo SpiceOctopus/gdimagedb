@@ -79,7 +79,7 @@ func _input(event):
 		if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
 			preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
 	elif Input.is_action_pressed("ui_cancel"):
-		emit_signal("closing")
+		closing.emit()
 		queue_free()
 	elif Input.is_action_pressed("video_play_pause"):
 		if current_mode == MODE.Video && $VideoStreamPlayer.is_playing():

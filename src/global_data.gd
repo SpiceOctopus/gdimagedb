@@ -35,7 +35,7 @@ func set_show_favorites(fav : bool):
 		internal_show_favorites_images = fav
 	elif current_display_mode == DisplayMode.Collections:
 		internal_show_favorites_collections = fav
-	emit_signal("favorites_changed")
+	favorites_changed.emit()
 
 func get_show_favorites():
 	if current_display_mode == DisplayMode.Images:
@@ -48,7 +48,7 @@ func set_show_untagged(untagged : bool):
 		internal_show_untagged_images = untagged
 	elif current_display_mode == DisplayMode.Collections:
 		internal_show_untagged_collections = untagged
-	emit_signal("untagged_changed")
+		untagged_changed.emit()
 
 func get_show_untagged():
 	if current_display_mode == DisplayMode.Images:
@@ -58,7 +58,7 @@ func get_show_untagged():
 
 func set_current_display_mode(mode : DisplayMode):
 	current_display_mode = mode
-	emit_signal("display_mode_changed")
+	display_mode_changed.emit()
 
 func set_included_tags(tags):
 	if current_display_mode == DisplayMode.Images:
@@ -86,19 +86,19 @@ func get_excluded_tags():
 
 func set_last_used_collection(collection):
 	last_used_collection = collection
-	emit_signal("last_used_collection_changed", last_used_collection)
+	last_used_collection_changed.emit(last_used_collection)
 
 func notify_tags_changed():
-	emit_signal("tags_changed")
+	tags_changed.emit()
 
 func notify_db_images_changed():
-	emit_signal("db_images_changed")
+	db_images_changed.emit()
 
 func notify_help_called():
-	emit_signal("help")
+	help.emit()
 
 func notify_db_tags_changed():
-	emit_signal("db_tags_changed")
+	db_tags_changed.emit()
 
 func notify_media_deleted(id):
-	emit_signal("media_deleted", id)
+	media_deleted.emit(id)

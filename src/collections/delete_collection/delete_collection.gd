@@ -15,7 +15,7 @@ func _on_cancel_button_pressed():
 
 func _on_ok_button_pressed():
 	DB.delete_collection(collection["id"])
-	emit_signal("deleted")
+	deleted.emit()
 	hide()
 
 func _on_close_requested():

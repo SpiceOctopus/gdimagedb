@@ -21,15 +21,15 @@ func _ready():
 	tag_label.text = tag["tag"]
 
 func _on_add_pressed():
-	emit_signal("add", tag)
+	add.emit(tag)
 	hide()
 
 func _on_remove_pressed():
-	emit_signal("remove", tag)
+	remove.emit(tag)
 	hide()
 
 func _on_x_pressed():
-	emit_signal("x", tag)
+	x.emit(tag)
 	hide()
 
 func set_selected(value : bool):

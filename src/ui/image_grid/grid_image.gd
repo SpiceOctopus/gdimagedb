@@ -39,13 +39,13 @@ func async_load():
 func _gui_input(ev):
 	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
 		if ev.shift_pressed:
-			emit_signal("multi_select", self)
+			multi_select.emit(self)
 		else:
-			emit_signal("click", self)
+			click.emit(self)
 	elif ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and ev.double_click:
-		emit_signal("double_click", current_image)
+		double_click.emit(current_image)
 	elif ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_RIGHT:
-		emit_signal("right_click", current_image)
+		right_click.emit(current_image)
 
 func set_selected(is_selected):
 	selected = is_selected

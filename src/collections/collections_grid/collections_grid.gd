@@ -76,7 +76,7 @@ func reset_grid():
 	new_button_instance.add_to_group("collections_grid_tiles")
 	$ScrollContainer/GridContainer.add_child(new_button_instance)
 	
-	emit_signal("grid_updated")
+	grid_updated.emit()
 
 func tile_double_click(collection):
 	var viewer_instance = viewer_scene.instantiate()

@@ -22,24 +22,24 @@ func update_last_used_collection(collection):
 # It's translation save and get_text() is confusing since it uses order instead of ID.
 func _on_PopupMenu_id_pressed(id):
 	if id == 5: # delete
-		emit_signal("delete", image)
+		delete.emit(image)
 	elif id == 2: # edit tags
-		emit_signal("tag_edit", DB.get_image(image["id"]))
+		tag_edit.emit(DB.get_image(image["id"]))
 	elif id == 0: # favorite
 		self.set_item_checked(0, !self.is_item_checked(0))
 		DB.set_fav(image["id"], int(self.is_item_checked(0)))
-		emit_signal("favorite_changed", image["id"], int(self.is_item_checked(0)))
+		favorite_changed.emit(image["id"], int(self.is_item_checked(0)))
 	elif id == 3: # properties
-		emit_signal("properties", image)
+		properties.emit(image)
 	elif id == 6: # add to collection
-		emit_signal("add_to_collection", DB.get_image(image["id"]))
+		add_to_collection.emit(DB.get_image(image["id"]))
 	elif id == 7: # add to last used collection
 		var collection = DB.get_collection_by_name(last_used_collection["collection"])[0]
 		if !DB.is_image_in_collection(image["id"], collection["id"]):
 			DB.add_image_to_collection(collection["id"], image["id"])
 			GlobalData.notify_tags_changed() # not technically correct but will cause the grid to refresh
 	elif id == 8: # replace file
-		emit_signal("replace_file", image)
+		replace_file.emit(image)
 
 func _set_image(img):
 	image = img

@@ -24,9 +24,9 @@ func _input(event):
 	
 	if event.double_click:
 		if DB.get_all_images_in_collection(collection["id"]).size() > 0:
-			emit_signal("double_click", collection)
+			double_click.emit(collection)
 	elif event.is_pressed() and event.button_index == MOUSE_BUTTON_RIGHT:
-		emit_signal("right_click", collection)
+		right_click.emit(collection)
 
 func set_collection(collection_param):
 	lbl_name.text = collection_param["collection"]

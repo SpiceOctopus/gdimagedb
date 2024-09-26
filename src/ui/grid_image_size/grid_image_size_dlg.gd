@@ -9,7 +9,7 @@ func _ready():
 
 func _on_ButtonOK_pressed():
 	Settings.grid_image_size = spinbox.value
-	emit_signal("refresh_grid") # update config file
+	refresh_grid.emit() # update config file
 
 func _on_close_requested():
 	hide()

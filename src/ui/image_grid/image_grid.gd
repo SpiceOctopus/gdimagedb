@@ -124,7 +124,7 @@ func refresh_grid(hard : bool = false):
 			current_images.append(image)
 	
 	window_size_changed() # calculates and sets grid proportions
-	emit_signal("grid_updated")
+	grid_updated.emit()
 
 func get_images_for_current_view():
 	if !((GlobalData.included_tags.size() > 0) || (GlobalData.excluded_tags.size() > 0)):
@@ -165,7 +165,7 @@ func _on_PopupMenu_favorite_changed(id, fav):
 			preview.current_image["fav"] = fav
 
 func _on_PopupMenu_tag_edit(image):
-	emit_signal("tag_edit", image)
+	tag_edit.emit(image)
 
 func _on_PopupMenu_properties(image):
 	media_properties_control.image = image
@@ -212,7 +212,7 @@ func _on_replace_file_window_confirmed():
 		await get_tree().create_timer(0.1).timeout
 	
 	db_images = DB.get_all_images()
-	emit_signal("file_replaced")
+	file_replaced.emit()
 
 func _on_popup_menu_delete(image):
 	delete_file.image = image
