@@ -5,6 +5,9 @@ signal remove(tag)
 signal x(tag)
 
 var selected : bool = false : set=set_selected
+var add_visible : bool = true
+var remove_visible : bool = true
+var x_visible : bool = false
 
 var tag
 
@@ -15,8 +18,11 @@ var tag
 
 func _ready():
 	remove_button.custom_minimum_size.x = remove_button.size.y
+	remove_button.visible = remove_visible
 	add_button.custom_minimum_size.x = add_button.size.y
+	add_button.visible = add_visible
 	x_button.custom_minimum_size.x = x_button.size.y
+	x_button.visible = x_visible
 	custom_minimum_size.y = add_button.size.y
 	tag_label.text = tag["tag"]
 
@@ -49,7 +55,7 @@ func reset():
 	else:
 		tag_label.set("theme_override_colors/font_color", Color.WHITE)
 
-func set_button_visibility(add_visible : bool, remove_visible : bool, x_visible : bool):
-	add_button.visible = add_visible
-	remove_button.visible = remove_visible
-	x_button.visible = x_visible
+func set_button_visibility(add_btn : bool, remove_btn : bool, x_btn : bool):
+	add_button.visible = add_btn
+	remove_button.visible = remove_btn
+	x_button.visible = x_btn

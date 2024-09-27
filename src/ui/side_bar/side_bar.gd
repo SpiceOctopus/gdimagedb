@@ -19,7 +19,8 @@ var assigned_tags
 @onready var all_tags_list = $MarginContainer/VBoxContainer/Panel/ScrollContainer/AllTags
 
 func _ready():
-	rebuild_tag_lists()
+	if mode == MODE.Grid:
+		rebuild_tag_lists()
 	GlobalData.connect("display_mode_changed", _on_display_changed)
 	GlobalData.connect("db_tags_changed", _on_db_tags_changed)
 
@@ -31,31 +32,45 @@ func rebuild_tag_lists():
 	elif mode == MODE.CollectionEditor:
 		assigned_tags = DB.get_tags_for_collection(media_id)
 	
-	# reset and fill all_tags list
 	for item in all_tags_list.get_children():
 		item.queue_free()
+	
+	for item in selected_tags_list.get_children():
+		item.queue_free()
+
+	WorkerThreadPool.add_task(async_build_tag_items_all)
+	WorkerThreadPool.add_task(async_build_tag_items_selected)
+
+func async_build_tag_items_all():
 	for tag in all_tags:
 		var item = tag_item_instance.duplicate()
 		item.tag = tag
 		item.connect("add", _on_tag_item_add)
 		item.connect("remove", _on_tag_item_remove)
-		all_tags_list.add_child(item)
 		if mode == MODE.TagEditor || mode == MODE.CollectionEditor:
-			item.set_button_visibility(true, false, false)
-	
-	# reset and fill selected_tags list
-	for item in selected_tags_list.get_children():
-		item.queue_free()
+			item.add_visible = true
+			item.remove_visible = false
+			item.x_visible = false
+		if mode == MODE.Grid:
+			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			item.visible = !item.tag in assigned_tags
+		all_tags_list.call_deferred("add_child", item)
+
+func async_build_tag_items_selected():
 	for tag in all_tags:
 		var item = tag_item_instance.duplicate()
 		item.tag = tag
 		item.connect("x", _on_tag_item_x)
-		selected_tags_list.add_child(item)
-		item.set_button_visibility(false, false, true)
-	
-	# set correct state
-	update_all_tags_list()
-	update_selected_tags_list()
+		item.add_visible = false
+		item.remove_visible = false
+		item.x_visible = true
+		if mode == MODE.Grid:
+			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			item.visible = item.tag in assigned_tags
+			
+		selected_tags_list.call_deferred("add_child", item)
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed = ""):
