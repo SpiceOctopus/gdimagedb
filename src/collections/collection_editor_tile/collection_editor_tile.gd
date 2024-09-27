@@ -35,10 +35,10 @@ func async_load():
 		display.texture = load("res://gfx/video_placeholder.png")
 
 func _on_btn_move_left_pressed():
-	emit_signal("move_left", image)
+	move_left.emit(image)
 
 func _on_btn_move_right_pressed():
-	emit_signal("move_right", image)
+	move_right.emit(image)
 
 func update_order():
 	var order = DB.get_position_in_collection(image["id"], collection["id"])
@@ -54,4 +54,4 @@ func update_order():
 		button_right.disabled = true
 
 func _on_delete_button_pressed():
-	emit_signal("delete", image)
+	delete.emit(image)

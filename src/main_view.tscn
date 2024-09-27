@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c76rpt4liwntk"]
+[gd_scene load_steps=11 format=3 uid="uid://c76rpt4liwntk"]
 
 [ext_resource type="Script" path="res://main_view.gd" id="1_1xrw4"]
 [ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="2_qxw27"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_072ji"]
 [ext_resource type="PackedScene" uid="uid://86emblidbalh" path="res://ui/image_grid/image_grid.tscn" id="4_ck5lf"]
 [ext_resource type="PackedScene" uid="uid://s3cqe7hw7f1n" path="res://collections/collections_grid/collections_grid.tscn" id="5_mfqte"]
+[ext_resource type="PackedScene" uid="uid://c66ebqguifkyj" path="res://ui/grid_info_panel/grid_info_panel.tscn" id="6_die3w"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pl8um"]
 bg_color = Color(0.223529, 0.239216, 0.25098, 1)
@@ -63,6 +64,10 @@ theme_override_constants/margin_bottom = 1
 [node name="SideBar" parent="VBoxContainer/HBoxContainer/MarginContainer" instance=ExtResource("3_072ji")]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
+
+[node name="GridInfoPanel" parent="VBoxContainer/HBoxContainer/MarginContainer" instance=ExtResource("6_die3w")]
+layout_mode = 2
+size_flags_vertical = 8
 
 [node name="Content" type="Panel" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2

@@ -1,11 +1,17 @@
 extends Control
 
+enum MODE {Grid, TagEditor, CollectionEditor}
+
+@export var mode : MODE = MODE.Grid
+
 var tag_item_instance = load("res://ui/side_bar/tag_item.tscn").instantiate()
 
 var selection_offset : int = 0
 var visible_tags_count : int = 0
 var last_filter : String = ""
 var all_tags
+var media_id
+var assigned_tags
 
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
@@ -20,6 +26,11 @@ func _ready():
 func rebuild_tag_lists():
 	all_tags = DB.get_all_tags()
 	
+	if mode == MODE.TagEditor:
+		assigned_tags = DB.get_tags_for_image(media_id)
+	elif mode == MODE.CollectionEditor:
+		assigned_tags = DB.get_tags_for_collection(media_id)
+	
 	# reset and fill all_tags list
 	for item in all_tags_list.get_children():
 		item.queue_free()
@@ -29,6 +40,8 @@ func rebuild_tag_lists():
 		item.connect("add", _on_tag_item_add)
 		item.connect("remove", _on_tag_item_remove)
 		all_tags_list.add_child(item)
+		if mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			item.set_button_visibility(true, false, false)
 	
 	# reset and fill selected_tags list
 	for item in selected_tags_list.get_children():
@@ -57,7 +70,10 @@ func update_all_tags_list(_from_text_changed = ""):
 	
 	for item in all_tags_list.get_children():
 		item.reset()
-		item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+		if mode == MODE.Grid:
+			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			item.visible = !item.tag in assigned_tags
 		if !item.visible:
 			continue # item is in a selection, no more filters apply
 		
@@ -82,7 +98,10 @@ func update_all_tags_list(_from_text_changed = ""):
 func update_selected_tags_list():
 	for item in selected_tags_list.get_children():
 		item.reset()
-		item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+		if mode == MODE.Grid:
+			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			item.visible = item.tag in assigned_tags
 
 func _on_display_changed():
 	update_all_tags_list()
@@ -105,10 +124,18 @@ func _on_tag_preview_list_gui_input(event):
 		_on_LineEdit_gui_input(event)
 
 func _on_tag_item_add(tag):
-	GlobalData.included_tags.append(tag)
+	if mode == MODE.Grid:
+		GlobalData.included_tags.append(tag)
+	elif mode == MODE.TagEditor:
+		DB.add_tag_to_image(tag["id"], media_id)
+		assigned_tags = DB.get_tags_for_image(media_id)
+	elif mode == MODE.CollectionEditor:
+		DB.add_tag_to_collection(tag["id"], media_id)
+		assigned_tags = DB.get_tags_for_collection(media_id)
 	update_selected_tags_list()
 	update_all_tags_list()
-	GlobalData.notify_tags_changed()
+	if mode == MODE.Grid:
+		GlobalData.notify_tags_changed()
 
 func _on_tag_item_remove(tag):
 	GlobalData.excluded_tags.append(tag)
@@ -117,15 +144,23 @@ func _on_tag_item_remove(tag):
 	GlobalData.notify_tags_changed()
 
 func _on_tag_item_x(tag):
-	for included_tag in GlobalData.included_tags:
-		if included_tag["id"] == tag["id"]:
-			GlobalData.included_tags.erase(included_tag)
-	for excluded_tag in GlobalData.excluded_tags:
-		if excluded_tag["id"] == tag["id"]:
-			GlobalData.excluded_tags.erase(excluded_tag)
+	if mode == MODE.Grid:
+		for included_tag in GlobalData.included_tags:
+			if included_tag["id"] == tag["id"]:
+				GlobalData.included_tags.erase(included_tag)
+		for excluded_tag in GlobalData.excluded_tags:
+			if excluded_tag["id"] == tag["id"]:
+				GlobalData.excluded_tags.erase(excluded_tag)
+	elif mode == MODE.TagEditor:
+		DB.remove_tag_from_image(tag["id"], media_id)
+		assigned_tags = DB.get_tags_for_image(media_id)
+	elif mode == MODE.CollectionEditor:
+		DB.remove_tag_from_collection(tag["id"], media_id)
+		assigned_tags = DB.get_tags_for_collection(media_id)
 	update_selected_tags_list()
 	update_all_tags_list()
-	GlobalData.notify_tags_changed()
+	if mode == MODE.Grid:
+		GlobalData.notify_tags_changed()
 
 func _on_filter_text_submitted(new_text):
 	var remove = new_text.begins_with("-")
@@ -149,3 +184,6 @@ func _on_filter_text_submitted(new_text):
 
 func _on_db_tags_changed():
 	rebuild_tag_lists()
+
+func focus():
+	input_box.grab_focus()

@@ -7,6 +7,7 @@ var tag_editor_scene = load("res://tag_editor/tag_editor.tscn")
 @onready var side_bar = $VBoxContainer/HBoxContainer/MarginContainer/SideBar
 @onready var menu_bar = $VBoxContainer/MenuBar
 @onready var import_log = $ImportLog
+@onready var grid_info_panel = $VBoxContainer/HBoxContainer/MarginContainer/GridInfoPanel
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -74,9 +75,9 @@ func _on_grid_grid_updated():
 		return
 	
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
-		side_bar.get_node("MarginContainer/VBoxContainer/GridInfoPanel").set_grid_items_count(grid.current_images.size())
+		grid_info_panel.set_grid_items_count(grid.current_images.size())
 	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
-		side_bar.get_node("MarginContainer/VBoxContainer/GridInfoPanel").set_grid_items_count(collections_grid.grid_item_count())
+		grid_info_panel.set_grid_items_count(collections_grid.grid_item_count())
 
 func _on_menu_bar_sort_mode_changed(mode):
 	grid.sort_mode = mode
