@@ -48,7 +48,7 @@ func set_show_untagged(untagged : bool):
 		internal_show_untagged_images = untagged
 	elif current_display_mode == DisplayMode.Collections:
 		internal_show_untagged_collections = untagged
-		untagged_changed.emit()
+	untagged_changed.emit()
 
 func get_show_untagged():
 	if current_display_mode == DisplayMode.Images:
