@@ -46,12 +46,7 @@ mode = 1
 [node name="TagButtons" parent="MarginContainer/GridContainer2/VBoxContainer" instance=ExtResource("4_yj4ck")]
 layout_mode = 2
 
-[node name="PreviewAndAssigned" type="VBoxContainer" parent="MarginContainer/GridContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Preview" parent="MarginContainer/GridContainer2/PreviewAndAssigned" instance=ExtResource("3_81t68")]
+[node name="Preview" parent="MarginContainer/GridContainer2" instance=ExtResource("3_81t68")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
