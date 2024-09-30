@@ -43,13 +43,12 @@ func async_load():
 	var dir = DirAccess.open(OS.get_executable_path().get_base_dir())
 	if dir.file_exists(thumb_path):
 		var tmp = ImageUtil.TextureFromFile(thumb_path)
-		call_deferred("set_title_image_internal", tmp)
+		if is_instance_valid(title_image):
+			title_image.call_deferred("set_texture", tmp)
 		CacheManager.call_deferred("add_thumbnail", image["id"], tmp)
 	elif image["path"].get_extension() in Settings.supported_video_files:
-		title_image.texture = load("res://gfx/video_placeholder.png")
+		if is_instance_valid(title_image):
+			title_image.call_deferred("set_texture", load("res://gfx/video_placeholder.png"))
 
 func get_collection():
 	return collection_internal
-
-func set_title_image_internal(img):
-	title_image.texture = img

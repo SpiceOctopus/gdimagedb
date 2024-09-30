@@ -31,10 +31,12 @@ func async_load():
 	var dir = DirAccess.open(OS.get_executable_path().get_base_dir())
 	if dir.file_exists(thumb_path):
 		var tmp = ImageUtil.TextureFromFile(thumb_path)
-		call_deferred("set_image_internal", tmp)
+		if is_instance_valid(self):
+			call_deferred("set_texture", tmp)
 		CacheManager.call_deferred("add_thumbnail", current_image["id"], tmp)
 	elif current_image["path"].get_extension() in Settings.supported_video_files:
-		call_deferred("set_image_internal", load("res://gfx/video_placeholder.png"))
+		if is_instance_valid(self):
+			call_deferred("set_texture", load("res://gfx/video_placeholder.png"))
 
 func _gui_input(ev):
 	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
@@ -53,6 +55,3 @@ func set_selected(is_selected):
 		set_material(load("res://ui/image_grid/outline_material.tres"))
 	else:
 		set_material(null)
-
-func set_image_internal(image):
-	texture = image
