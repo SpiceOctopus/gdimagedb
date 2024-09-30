@@ -1,13 +1,13 @@
 extends Control
 
-var tag_editor_scene = load("res://tag_editor/tag_editor.tscn")
-
 @onready var grid = $VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid
 @onready var collections_grid = $VBoxContainer/HBoxContainer/Content/MarginContainer/CollectionsGrid
 @onready var side_bar = $VBoxContainer/HBoxContainer/MarginContainer/SideBar
 @onready var menu_bar = $VBoxContainer/MenuBar
 @onready var import_log = $ImportLog
 @onready var grid_info_panel = $VBoxContainer/HBoxContainer/MarginContainer/GridInfoPanel
+@onready var tag_editor = $TagEditor
+@onready var collection_editor = $CollectionEditor
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -48,24 +48,14 @@ func _on_files_dropped(files):
 	GlobalData.notify_db_images_changed()
 
 func _on_grid_tag_edit(image):
-	var tag_editor_window = Window.new()
-	tag_editor_window.hide() # super weird bugfix to make popup_centered work
-	add_child(tag_editor_window)
-	tag_editor_window.title = "Tag Editor"
-	var tag_editor_instance = tag_editor_scene.instantiate()
-	tag_editor_window.add_child(tag_editor_instance)
-	
-	# size
-	if tag_editor_instance.custom_minimum_size.x > DisplayServer.window_get_size().x || tag_editor_instance.custom_minimum_size.y > DisplayServer.window_get_size().y:
-		tag_editor_window.min_size = tag_editor_instance.custom_minimum_size
-		tag_editor_window.size = tag_editor_instance.custom_minimum_size
+	if tag_editor.min_size.x > DisplayServer.window_get_size().x || tag_editor.min_size.y > DisplayServer.window_get_size().y:
+		tag_editor.size = tag_editor.min_size
 	else:
-		tag_editor_window.min_size = tag_editor_instance.custom_minimum_size
-		tag_editor_window.size = Vector2( get_window().get_size().x * 0.9, get_window().get_size().y * 0.9 )
+		tag_editor.size = Vector2( get_window().get_size().x * 0.9, get_window().get_size().y * 0.9 )
 	
-	tag_editor_window.connect('close_requested',Callable(tag_editor_window,'queue_free'))
-	tag_editor_window.popup_centered()
-	tag_editor_instance.image = image
+	tag_editor.popup_centered()
+	tag_editor.media = grid.current_images.duplicate()
+	tag_editor.set_current(image["id"])
 
 func _on_menu_bar_refresh_grid():
 	refresh()
@@ -105,3 +95,12 @@ func _on_image_grid_file_replaced():
 	CacheManager.thumb_cache.clear()
 	CacheManager.thumb_mutex.unlock()
 	refresh(true)
+
+func _on_collections_grid_edit_collection(collection):
+	if collection_editor.min_size.x > DisplayServer.window_get_size().x || collection_editor.min_size.y > DisplayServer.window_get_size().y:
+		collection_editor.size = collection_editor.min_size
+	else:
+		collection_editor.size = Vector2( get_window().get_size().x * 0.9, get_window().get_size().y * 0.9 )
+	
+	collection_editor.collection = collection
+	collection_editor.popup_centered()

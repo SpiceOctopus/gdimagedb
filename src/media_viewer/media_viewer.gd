@@ -9,7 +9,7 @@ enum MODE {Picture, Video, gif}
 @export var zoom_factor: float = 0.1
 
 var images 
-var current_image = 0
+var current_image : int = 0
 var current_mode = MODE.Picture
 var video_size
 var video_playing : bool = false
@@ -48,36 +48,9 @@ func _input(event):
 		return
 	
 	if Input.is_action_just_pressed("ui_right"):
-		if preload_next_id > 0:
-			WorkerThreadPool.wait_for_task_completion(preload_next_id)
-			preload_next_id = -1
-		
-		current_image += 1
-		if current_image > images.size() - 1:
-			current_image = 0
-		set_display(images[current_image])
-		
-		var preload_id = current_image + 1
-		if preload_id > images.size() - 1:
-			preload_id = 0
-		if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
-			preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+		set_next_image()
 	elif Input.is_action_just_pressed("ui_left"):
-		if preload_previous_id > 0:
-			WorkerThreadPool.wait_for_task_completion(preload_previous_id)
-			preload_previous_id = -1
-		
-		if current_image == 0:
-			current_image = images.size() - 1
-		else:
-			current_image -= 1
-		set_display(images[current_image])
-		
-		var preload_id = current_image - 1
-		if preload_id < 0:
-			preload_id = images.size() - 1
-		if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
-			preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+		set_previous_image()
 	elif Input.is_action_pressed("ui_cancel"):
 		closing.emit()
 		queue_free()
@@ -135,6 +108,39 @@ func _process(_delta):
 
 func _on_video_timer_tick():
 	video_player_controls.set_time_current($VideoStreamPlayer.stream_position)
+
+func set_next_image():
+	if preload_next_id > 0:
+		WorkerThreadPool.wait_for_task_completion(preload_next_id)
+		preload_next_id = -1
+		
+	current_image += 1
+	if current_image > images.size() - 1:
+		current_image = 0
+	set_display(images[current_image])
+	
+	var preload_id = current_image + 1
+	if preload_id > images.size() - 1:
+		preload_id = 0
+	if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
+		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+
+func set_previous_image():
+	if preload_previous_id > 0:
+		WorkerThreadPool.wait_for_task_completion(preload_previous_id)
+		preload_previous_id = -1
+		
+	if current_image == 0:
+		current_image = images.size() - 1
+	else:
+		current_image -= 1
+	set_display(images[current_image])
+	
+	var preload_id = current_image - 1
+	if preload_id < 0:
+		preload_id = images.size() - 1
+	if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
+		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
 
 func set_video_display_rect():
 	if !current_mode == MODE.Video:
@@ -207,6 +213,7 @@ func set_display(file):
 	set_mode(current_mode)
 	
 	if current_mode == MODE.Picture:
+		$ImageDisplay.hide()
 		loading_label.show()
 		WorkerThreadPool.add_task(Callable(self, "async_load_display").bind(file))
 	elif current_mode == MODE.Video:
@@ -247,6 +254,7 @@ func preload_image(file):
 func set_image_internal(img):
 	loading_label.hide()
 	$ImageDisplay.texture = img
+	$ImageDisplay.show()
 	_on_MediaViewer_resized()
 
 func set_mode(mode):

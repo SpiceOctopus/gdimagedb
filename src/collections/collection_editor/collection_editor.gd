@@ -1,29 +1,29 @@
-extends Control
+extends Window
 
 var collection_editor_tile = load("res://collections/collection_editor_tile/collection_editor_tile.tscn")
 
 var last_window_size : Vector2i
-var collection : get=get_collection, set=set_collection # row from the collections table
-var collection_internal
+var collection : set=set_collection # row from the collections table
 
 @onready var grid = $HBoxContainer/Panel/MarginContainer/ScrollContainer/Grid
 @onready var scroll_container = $HBoxContainer/Panel/MarginContainer/ScrollContainer
 @onready var delete_confirmation = $ConfirmationDialog
 @onready var side_bar = $HBoxContainer/VBoxContainer/SideBar
-@onready var name_edit = $HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/NameEdit
-@onready var apply_name_button = $HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/ApplyButton
-
-func _ready():
-	rebuild_grid()
-	name_edit.text = collection["collection"]
-	side_bar.media_id = collection["id"]
-	side_bar.rebuild_tag_lists()
+@onready var name_edit = $HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit
+@onready var apply_name_button = $HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton
 
 func _process(_delta):
-	var new_size = get_parent().size
+	var new_size = size
 	if new_size != last_window_size:
 		last_window_size = new_size
 		window_size_changed()
+
+func set_collection(collection_in):
+	collection = collection_in
+	name_edit.text = collection["collection"]
+	side_bar.media_id = collection["id"]
+	side_bar._on_display_changed()
+	rebuild_grid()
 
 func window_size_changed():
 	var columns = floor(scroll_container.size.x / Settings.grid_image_size)
@@ -66,12 +66,6 @@ func rebuild_grid():
 func compare_by_position(a, b):
 	return a["position"] < b["position"]
 
-func set_collection(collection_in):
-	collection_internal = collection_in
-
-func get_collection():
-	return collection_internal
-
 func _on_confirmation_dialog_confirmed():
 	DB.remove_image_from_collection(delete_confirmation.image["id"], collection["id"])
 	var images = DB.get_all_images_in_collection(collection["id"])
@@ -89,3 +83,6 @@ func _on_name_edit_text_changed(new_text):
 
 func _on_apply_button_pressed():
 	DB.set_collection_name(collection["id"], name_edit.text)
+
+func _on_close_requested():
+	hide()

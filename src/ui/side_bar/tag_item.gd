@@ -8,6 +8,7 @@ var selected : bool = false : set=set_selected
 var add_visible : bool = true
 var remove_visible : bool = true
 var x_visible : bool = false
+var color_mode : bool = true
 
 var tag
 
@@ -48,9 +49,9 @@ func set_selected(value : bool):
 func reset():
 	visible = true
 	selected = false
-	if tag in GlobalData.excluded_tags:
+	if tag in GlobalData.excluded_tags && color_mode:
 		tag_label.set("theme_override_colors/font_color", Color.ORANGE_RED)
-	elif tag in GlobalData.included_tags:
+	elif tag in GlobalData.included_tags && color_mode:
 		tag_label.set("theme_override_colors/font_color", Color.LIME_GREEN)
 	else:
 		tag_label.set("theme_override_colors/font_color", Color.WHITE)

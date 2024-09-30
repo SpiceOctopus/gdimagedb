@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://pu7tauqonrgp"]
+[gd_scene load_steps=5 format=3 uid="uid://pu7tauqonrgp"]
 
 [ext_resource type="Script" path="res://ui/side_bar/side_bar.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_j7x1g"]
+[ext_resource type="PackedScene" uid="uid://cffjww73hoc0w" path="res://ui/tag_buttons/tag_buttons.tscn" id="3_v0dow"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7pd5m"]
 texture = ExtResource("2_j7x1g")
@@ -89,6 +90,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/v_separation = 1
+
+[node name="TagButtons" parent="MarginContainer/VBoxContainer" instance=ExtResource("3_v0dow")]
+visible = false
+layout_mode = 2
 
 [node name="TagPreviewList" type="ItemList" parent="MarginContainer"]
 visible = false

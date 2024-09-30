@@ -24,26 +24,20 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_s3j38")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
-layout_mode = 2
-
-[node name="AddTagButton" type="Button" parent="MarginContainer/HBoxContainer"]
+[node name="AddTagButton" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Add Tag"
 
-[node name="DeleteTagButton" type="Button" parent="MarginContainer/HBoxContainer"]
+[node name="DeleteTagButton" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Delete Tag"
@@ -54,5 +48,5 @@ visible = false
 [node name="DeleteTagDialog" parent="." instance=ExtResource("4_w0ha1")]
 visible = false
 
-[connection signal="pressed" from="MarginContainer/HBoxContainer/AddTagButton" to="." method="_on_add_tag_button_pressed"]
-[connection signal="pressed" from="MarginContainer/HBoxContainer/DeleteTagButton" to="." method="_on_delete_tag_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/AddTagButton" to="." method="_on_add_tag_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/DeleteTagButton" to="." method="_on_delete_tag_button_pressed"]

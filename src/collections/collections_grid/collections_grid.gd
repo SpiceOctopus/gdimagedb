@@ -1,6 +1,7 @@
 extends Control
 
 signal grid_updated
+signal edit_collection
 
 var new_button_scene = load("res://collections/collections_grid_new_button/new_button.tscn")
 var new_dlg_scene = load("res://collections/new_collection_dialog/new_collection.tscn")
@@ -121,20 +122,7 @@ func new_collection():
 	new_collection_dialog.popup_centered()
 
 func _on_popup_menu_edit():
-	var window = Window.new()
-	window.hide()
-	var editor_instance = collection_editor_scene.instantiate()
-	editor_instance.collection = $PopupMenu.collection
-	window.title = "Collection Editor"
-	get_tree().get_root().add_child(window)
-	window.size = DisplayServer.window_get_size()
-	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
-		window.mode = Window.MODE_MAXIMIZED
-	window.add_child(editor_instance)
-	
-	window.min_size = editor_instance.custom_minimum_size
-	window.popup_centered()
-	window.connect("close_requested", Callable(window, "queue_free"))
+	edit_collection.emit($PopupMenu.collection)
 
 func _on_popup_menu_delete():
 	delete_dialog.collection = popup_menu.collection

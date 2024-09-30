@@ -1,26 +1,18 @@
-[gd_scene load_steps=7 format=3 uid="uid://dse3yrjipspu5"]
+[gd_scene load_steps=6 format=3 uid="uid://dse3yrjipspu5"]
 
 [ext_resource type="Script" path="res://collections/collection_editor/collection_editor.gd" id="1_h34lx"]
 [ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="2_njylg"]
 [ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_4derl"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="3_nwi1d"]
 [ext_resource type="Script" path="res://collections/collection_editor/confirmation_dialog.gd" id="4_mwxed"]
-[ext_resource type="PackedScene" uid="uid://cffjww73hoc0w" path="res://ui/tag_buttons/tag_buttons.tscn" id="4_svgrj"]
 
-[node name="CollectionEditor" type="Control"]
-custom_minimum_size = Vector2(640, 320)
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="CollectionEditor" type="Window"]
+title = "Collection Editor"
+size = Vector2i(800, 500)
+min_size = Vector2i(800, 500)
 script = ExtResource("1_h34lx")
 
 [node name="Background" type="TextureRect" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,7 +21,6 @@ grow_vertical = 2
 texture = ExtResource("2_njylg")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -38,22 +29,41 @@ grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer"]
+[node name="Panel" type="Panel" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_nwi1d")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/Panel/MarginContainer"]
 layout_mode = 2
 
-[node name="NameEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="NameEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Collection Name"
 
-[node name="ApplyButton" type="Button" parent="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="ApplyButton" type="Button" parent="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "Apply"
@@ -62,9 +72,7 @@ text = "Apply"
 layout_mode = 2
 size_flags_vertical = 3
 mode = 2
-
-[node name="TagButtons" parent="HBoxContainer/VBoxContainer" instance=ExtResource("4_svgrj")]
-layout_mode = 2
+show_add_delete_buttons = true
 
 [node name="Panel" type="Panel" parent="HBoxContainer"]
 layout_mode = 2
@@ -105,6 +113,7 @@ size = Vector2i(207, 100)
 dialog_text = "Remove from collection?"
 script = ExtResource("4_mwxed")
 
-[connection signal="text_changed" from="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
-[connection signal="pressed" from="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="text_changed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
 [connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_confirmation_dialog_confirmed"]

@@ -1,30 +1,24 @@
-[gd_scene load_steps=6 format=3 uid="uid://baiebkcdyqp2p"]
+[gd_scene load_steps=5 format=3 uid="uid://baiebkcdyqp2p"]
 
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1"]
 [ext_resource type="Script" path="res://tag_editor/tag_editor.gd" id="2"]
 [ext_resource type="PackedScene" uid="uid://bejhnh5pkveek" path="res://media_viewer/media_viewer.tscn" id="3_81t68"]
 [ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_c1n3h"]
-[ext_resource type="PackedScene" uid="uid://cffjww73hoc0w" path="res://ui/tag_buttons/tag_buttons.tscn" id="4_yj4ck"]
 
-[node name="TagEditor" type="Control"]
-custom_minimum_size = Vector2(1024, 600)
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="TagEditor" type="Window"]
+title = "Tag Editor"
+size = Vector2i(800, 500)
+min_size = Vector2i(800, 500)
 script = ExtResource("2")
 
 [node name="Background" type="TextureRect" parent="."]
-layout_mode = 0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 texture = ExtResource("1")
 expand_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -42,12 +36,12 @@ theme_override_constants/separation = 0
 layout_mode = 2
 size_flags_vertical = 3
 mode = 1
-
-[node name="TagButtons" parent="MarginContainer/GridContainer2/VBoxContainer" instance=ExtResource("4_yj4ck")]
-layout_mode = 2
+show_add_delete_buttons = true
 
 [node name="Preview" parent="MarginContainer/GridContainer2" instance=ExtResource("3_81t68")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 hotkeys_active = false
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]

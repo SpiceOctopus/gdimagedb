@@ -3,6 +3,7 @@ extends Control
 enum MODE {Grid, TagEditor, CollectionEditor}
 
 @export var mode : MODE = MODE.Grid
+@export var show_add_delete_buttons : bool = false
 
 var tag_item_instance = load("res://ui/side_bar/tag_item.tscn").instantiate()
 
@@ -10,27 +11,23 @@ var selection_offset : int = 0
 var visible_tags_count : int = 0
 var last_filter : String = ""
 var all_tags
-var media_id
-var assigned_tags
+var media_id : set=set_media_id
+var assigned_tags : Array = []
 
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
 @onready var tag_preview_list = $MarginContainer/TagPreviewList
 @onready var all_tags_list = $MarginContainer/VBoxContainer/Panel/ScrollContainer/AllTags
+@onready var tag_buttons = $MarginContainer/VBoxContainer/TagButtons
 
 func _ready():
-	if mode == MODE.Grid:
-		rebuild_tag_lists()
+	rebuild_tag_lists()
 	GlobalData.connect("display_mode_changed", _on_display_changed)
 	GlobalData.connect("db_tags_changed", _on_db_tags_changed)
+	tag_buttons.visible = show_add_delete_buttons
 
 func rebuild_tag_lists():
 	all_tags = DB.get_all_tags()
-	
-	if mode == MODE.TagEditor:
-		assigned_tags = DB.get_tags_for_image(media_id)
-	elif mode == MODE.CollectionEditor:
-		assigned_tags = DB.get_tags_for_collection(media_id)
 	
 	for item in all_tags_list.get_children():
 		item.queue_free()
@@ -51,11 +48,14 @@ func async_build_tag_items_all():
 			item.add_visible = true
 			item.remove_visible = false
 			item.x_visible = false
+			item.color_mode = false
 		if mode == MODE.Grid:
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
 			item.visible = !item.tag in assigned_tags
-		all_tags_list.call_deferred("add_child", item)
+		
+		if is_instance_valid(all_tags_list):
+			all_tags_list.call_deferred("add_child", item)
 
 func async_build_tag_items_selected():
 	for tag in all_tags:
@@ -68,9 +68,11 @@ func async_build_tag_items_selected():
 		if mode == MODE.Grid:
 			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			item.color_mode = false
 			item.visible = item.tag in assigned_tags
-			
-		selected_tags_list.call_deferred("add_child", item)
+		
+		if is_instance_valid(selected_tags_list):
+			selected_tags_list.call_deferred("add_child", item)
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed = ""):
@@ -202,3 +204,10 @@ func _on_db_tags_changed():
 
 func focus():
 	input_box.grab_focus()
+
+func set_media_id(id):
+	media_id = id
+	if mode == MODE.Grid || mode == MODE.TagEditor:
+		assigned_tags = DB.get_tags_for_image(id)
+	else:
+		assigned_tags = DB.get_tags_for_collection(id)
