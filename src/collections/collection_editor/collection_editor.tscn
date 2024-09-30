@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dse3yrjipspu5"]
+[gd_scene load_steps=7 format=3 uid="uid://dse3yrjipspu5"]
 
 [ext_resource type="Script" path="res://collections/collection_editor/collection_editor.gd" id="1_h34lx"]
 [ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="2_njylg"]
-[ext_resource type="PackedScene" uid="uid://dtvf0wi0e2xn8" path="res://collections/collection_editor_sidebar/sidebar.tscn" id="2_vpjgr"]
+[ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_4derl"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="3_nwi1d"]
 [ext_resource type="Script" path="res://collections/collection_editor/confirmation_dialog.gd" id="4_mwxed"]
+[ext_resource type="PackedScene" uid="uid://cffjww73hoc0w" path="res://ui/tag_buttons/tag_buttons.tscn" id="4_svgrj"]
 
 [node name="CollectionEditor" type="Control"]
 custom_minimum_size = Vector2(640, 320)
@@ -35,8 +36,34 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SideBar" parent="HBoxContainer" instance=ExtResource("2_vpjgr")]
-custom_minimum_size = Vector2(240, 0)
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="NameEdit" type="LineEdit" parent="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Collection Name"
+
+[node name="ApplyButton" type="Button" parent="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Apply"
+
+[node name="SideBar" parent="HBoxContainer/VBoxContainer" instance=ExtResource("3_4derl")]
+layout_mode = 2
+size_flags_vertical = 3
+mode = 2
+
+[node name="TagButtons" parent="HBoxContainer/VBoxContainer" instance=ExtResource("4_svgrj")]
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="HBoxContainer"]
@@ -78,4 +105,6 @@ size = Vector2i(207, 100)
 dialog_text = "Remove from collection?"
 script = ExtResource("4_mwxed")
 
+[connection signal="text_changed" from="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
 [connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_confirmation_dialog_confirmed"]

@@ -9,11 +9,15 @@ var collection_internal
 @onready var grid = $HBoxContainer/Panel/MarginContainer/ScrollContainer/Grid
 @onready var scroll_container = $HBoxContainer/Panel/MarginContainer/ScrollContainer
 @onready var delete_confirmation = $ConfirmationDialog
-@onready var side_bar = $HBoxContainer/SideBar
+@onready var side_bar = $HBoxContainer/VBoxContainer/SideBar
+@onready var name_edit = $HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/NameEdit
+@onready var apply_name_button = $HBoxContainer/VBoxContainer/MarginContainer/HBoxContainer/ApplyButton
 
 func _ready():
 	rebuild_grid()
-	side_bar.collection = collection
+	name_edit.text = collection["collection"]
+	side_bar.media_id = collection["id"]
+	side_bar.rebuild_tag_lists()
 
 func _process(_delta):
 	var new_size = get_parent().size
@@ -79,3 +83,9 @@ func _on_confirmation_dialog_confirmed():
 		counter += 1
 	
 	rebuild_grid()
+
+func _on_name_edit_text_changed(new_text):
+	apply_name_button.disabled = new_text.is_empty()
+
+func _on_apply_button_pressed():
+	DB.set_collection_name(collection["id"], name_edit.text)
