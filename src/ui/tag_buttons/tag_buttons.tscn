@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3 uid="uid://cffjww73hoc0w"]
+
+[ext_resource type="Script" path="res://ui/tag_buttons/tag_buttons.gd" id="1_6bsbb"]
+[ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1_s3j38"]
+[ext_resource type="PackedScene" uid="uid://datbrq8xuommo" path="res://ui/add_tag_dlg/add_tag_dialog.tscn" id="3_m2le3"]
+[ext_resource type="PackedScene" uid="uid://duqp5jb7muyp2" path="res://ui/delete_tag_dlg/delete_tag_dialog.tscn" id="4_w0ha1"]
+
+[node name="TagButtons" type="Control"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6bsbb")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_s3j38")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="AddTagButton" type="Button" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Add Tag"
+
+[node name="DeleteTagButton" type="Button" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Delete Tag"
+
+[node name="AddTagDialog" parent="." instance=ExtResource("3_m2le3")]
+visible = false
+
+[node name="DeleteTagDialog" parent="." instance=ExtResource("4_w0ha1")]
+visible = false
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/AddTagButton" to="." method="_on_add_tag_button_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/DeleteTagButton" to="." method="_on_delete_tag_button_pressed"]

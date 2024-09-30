@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="3_nkicc"]
 
 [node name="DeleteTagDialog" type="Window"]
+title = "Delete Tag"
 position = Vector2i(0, 36)
 size = Vector2i(800, 500)
 script = ExtResource("1")
@@ -23,6 +24,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/margin_left = 4
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
@@ -128,7 +131,7 @@ texture = ExtResource("3_nkicc")
 stretch_mode = 5
 
 [node name="DeleteButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(150, 0)
+custom_minimum_size = Vector2(150, 25)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Delete Tag"
