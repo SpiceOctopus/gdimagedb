@@ -6,9 +6,6 @@ var current_media : int = 0
 @onready var preview = $MarginContainer/GridContainer2/Preview
 @onready var sidebar = $MarginContainer/GridContainer2/VBoxContainer/SideBar
 
-func _ready():
-	sidebar.focus()
-
 func set_current(id):
 	preview.images = media
 	
@@ -31,6 +28,7 @@ func _input(event):
 		preview.set_next_image()
 		sidebar.media_id = media[current_media]["id"]
 		sidebar._on_display_changed() # updates both tag lists
+		sidebar.focus()
 	elif Input.is_action_just_pressed("ui_left"):
 		if current_media == 0:
 			current_media = media.size() - 1
@@ -39,6 +37,10 @@ func _input(event):
 		preview.set_previous_image()
 		sidebar.media_id = media[current_media]["id"]
 		sidebar._on_display_changed() # updates both tag lists
+		sidebar.focus()
 
 func _on_close_requested():
 	hide()
+
+func _on_about_to_popup() -> void:
+	sidebar.focus()
