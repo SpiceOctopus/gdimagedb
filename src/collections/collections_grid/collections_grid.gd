@@ -12,7 +12,7 @@ var collection_editor_scene = load("res://collections/collection_editor/collecti
 var show_only_favorites : bool = GlobalData.show_favorites
 var show_only_untagged : bool = GlobalData.show_untagged
 
-@onready var grid_container = $ScrollContainer/GridContainer
+@onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var last_window_size = Vector2i(0,0)
 @onready var delete_dialog = $DeleteCollection
 @onready var popup_menu = $PopupMenu
@@ -68,14 +68,14 @@ func reset_grid():
 		instance.connect("double_click", tile_double_click)
 		instance.connect("right_click", tile_right_click)
 		instance.add_to_group("collections_grid_tiles")
-		$ScrollContainer/GridContainer.add_child(instance)
+		grid_container.add_child(instance)
 		instance.collection = collection
 	
 	var new_button_instance = new_button_scene.instantiate()
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 	new_button_instance.connect("new_collection", new_collection)
 	new_button_instance.add_to_group("collections_grid_tiles")
-	$ScrollContainer/GridContainer.add_child(new_button_instance)
+	grid_container.add_child(new_button_instance)
 	
 	grid_updated.emit()
 
@@ -112,7 +112,7 @@ func tile_right_click(collection):
 	$PopupMenu.popup()
 
 func window_size_changed():
-	var columns = floor($ScrollContainer.size.x / Settings.grid_image_size)
+	var columns = floor($MarginContainer.size.x / Settings.grid_image_size)
 	if  columns < 1:
 		grid_container.columns = 1
 	else:
