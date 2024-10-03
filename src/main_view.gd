@@ -1,11 +1,11 @@
 extends Control
 
-@onready var grid = $VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid
-@onready var collections_grid = $VBoxContainer/HBoxContainer/Content/MarginContainer/CollectionsGrid
-@onready var side_bar = $VBoxContainer/HBoxContainer/MarginContainer/SideBar
+@onready var grid = $VBoxContainer/HBoxContainer/Content/ImageGrid
+@onready var collections_grid = $VBoxContainer/HBoxContainer/Content/CollectionsGrid
+@onready var side_bar = $VBoxContainer/HBoxContainer/VBoxContainer/SideBar
 @onready var menu_bar = $VBoxContainer/MenuBar
 @onready var import_log = $ImportLog
-@onready var grid_info_panel = $VBoxContainer/HBoxContainer/MarginContainer/GridInfoPanel
+@onready var grid_info_panel = $VBoxContainer/HBoxContainer/VBoxContainer/GridInfoPanel
 @onready var tag_editor = $TagEditor
 @onready var collection_editor = $CollectionEditor
 

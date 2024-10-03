@@ -136,3 +136,9 @@ func _on_new_collection_create_new():
 
 func _on_delete_collection_deleted():
 	reset_grid()
+
+func _on_visibility_changed() -> void:
+	if grid_container == null:
+		return
+	for child in grid_container.get_children():
+		child.visible = visible

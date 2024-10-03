@@ -77,6 +77,7 @@ offset_bottom = 100.0
 grow_horizontal = 1
 grow_vertical = 1
 
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="delete" from="PopupMenu" to="." method="_on_popup_menu_delete"]
 [connection signal="edit" from="PopupMenu" to="." method="_on_popup_menu_edit"]
 [connection signal="id_pressed" from="PopupMenu" to="PopupMenu" method="_on_id_pressed"]

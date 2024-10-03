@@ -46,36 +46,38 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 4
 
 [node name="MenuBar" parent="VBoxContainer" instance=ExtResource("2_v12bk")]
-custom_minimum_size = Vector2(0, 40)
+clip_contents = true
+custom_minimum_size = Vector2(0, 35)
 layout_mode = 2
+size_flags_vertical = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 4
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 1
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_bottom = 1
+theme_override_constants/separation = 0
 
-[node name="SideBar" parent="VBoxContainer/HBoxContainer/MarginContainer" instance=ExtResource("3_072ji")]
+[node name="SideBar" parent="VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_072ji")]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="GridInfoPanel" parent="VBoxContainer/HBoxContainer/MarginContainer" instance=ExtResource("6_die3w")]
+[node name="GridInfoPanel" parent="VBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("6_die3w")]
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_vertical = 4
 
 [node name="Content" type="Panel" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/Content"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -87,12 +89,13 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 1
 theme_override_constants/margin_bottom = 1
 
-[node name="ImageGrid" parent="VBoxContainer/HBoxContainer/Content/MarginContainer" instance=ExtResource("4_ck5lf")]
-layout_mode = 2
+[node name="ImageGrid" parent="VBoxContainer/HBoxContainer/Content" instance=ExtResource("4_ck5lf")]
+layout_mode = 1
 
-[node name="CollectionsGrid" parent="VBoxContainer/HBoxContainer/Content/MarginContainer" instance=ExtResource("5_mfqte")]
+[node name="CollectionsGrid" parent="VBoxContainer/HBoxContainer/Content" instance=ExtResource("5_mfqte")]
 visible = false
 layout_mode = 2
+anchors_preset = 0
 
 [node name="TagEditor" parent="." instance=ExtResource("9_7sv3t")]
 visible = false
@@ -103,8 +106,8 @@ visible = false
 [connection signal="refresh_grid" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_refresh_grid"]
 [connection signal="sort_mode_changed" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_sort_mode_changed"]
 [connection signal="switch_grids" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_switch_grids"]
-[connection signal="file_replaced" from="VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid" to="." method="_on_image_grid_file_replaced"]
-[connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid" to="." method="_on_grid_grid_updated"]
-[connection signal="tag_edit" from="VBoxContainer/HBoxContainer/Content/MarginContainer/ImageGrid" to="." method="_on_grid_tag_edit"]
-[connection signal="edit_collection" from="VBoxContainer/HBoxContainer/Content/MarginContainer/CollectionsGrid" to="." method="_on_collections_grid_edit_collection"]
-[connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/MarginContainer/CollectionsGrid" to="." method="_on_grid_grid_updated"]
+[connection signal="file_replaced" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="_on_image_grid_file_replaced"]
+[connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="_on_grid_grid_updated"]
+[connection signal="tag_edit" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="_on_grid_tag_edit"]
+[connection signal="edit_collection" from="VBoxContainer/HBoxContainer/Content/CollectionsGrid" to="." method="_on_collections_grid_edit_collection"]
+[connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/CollectionsGrid" to="." method="_on_grid_grid_updated"]

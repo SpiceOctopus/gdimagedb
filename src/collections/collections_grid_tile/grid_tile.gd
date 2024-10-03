@@ -17,7 +17,7 @@ func _ready():
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
 
 func _input(event):
-	if get_parent().get_parent().get_parent().visible == false:
+	if !visible:
 		return
 	elif ! (event is InputEventMouseButton) || !get_global_rect().has_point(event.global_position):
 		return

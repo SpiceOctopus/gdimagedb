@@ -8,11 +8,12 @@
 [ext_resource type="PackedScene" uid="uid://d0fnkvx35hyhg" path="res://ui/help/help.tscn" id="6_gfo7c"]
 
 [node name="MenuBar" type="Control"]
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -548.0
+offset_bottom = -608.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -20,9 +21,12 @@ script = ExtResource("3")
 
 [node name="Background" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(1024, 40)
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 texture = ExtResource("2_o5tsc")
 expand_mode = 1
@@ -36,9 +40,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -74,16 +76,18 @@ popup/item_1/text = "By Position"
 popup/item_1/id = 1
 
 [node name="FavoritesCheckBox" type="CheckButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_vertical = 4
 text = "Favorites"
 
 [node name="UntaggedCheckBox" type="CheckButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 4
 text = "Untagged"
 
 [node name="RefreshButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 4
 text = "Refresh"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer2"]
@@ -93,10 +97,12 @@ alignment = 2
 
 [node name="HelpButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer2"]
 layout_mode = 2
+size_flags_vertical = 4
 text = "Help"
 
 [node name="SwitchGridsButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer2"]
 layout_mode = 2
+size_flags_vertical = 4
 text = "Switch to Collections"
 
 [node name="AddTagDialog" parent="." instance=ExtResource("3_ler4g")]
