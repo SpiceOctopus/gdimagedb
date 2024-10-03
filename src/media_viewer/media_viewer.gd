@@ -352,3 +352,6 @@ func _on_media_viewer_top_menu_stretch_mode_changed():
 
 func _on_video_player_controls_time_selected(time):
 	$VideoStreamPlayer.stream_position = time
+
+func stop_video():
+	$VideoStreamPlayer.stop()

@@ -40,6 +40,7 @@ func _input(event):
 		sidebar.focus()
 
 func _on_close_requested():
+	preview.stop_video()
 	hide()
 
 func _on_about_to_popup() -> void:

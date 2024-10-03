@@ -1,7 +1,7 @@
 extends Node
 
 var hide_images_collections : bool : set=set_hide_images_collections, get=get_hide_images_collections
-var grid_image_size : int : set=set_grid_image_size, get=get_grid_image_size
+var grid_image_size : int : set=set_grid_image_size, get=get_grid_image_size 
 
 # Supported file types
 # .gif gets special treatment by the media viewer and thumbnail creator.

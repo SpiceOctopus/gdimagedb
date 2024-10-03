@@ -13,6 +13,7 @@ var last_filter : String = ""
 var all_tags
 var media_id : set=set_media_id
 var assigned_tags : Array = []
+var all_tag_counts
 
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
@@ -28,7 +29,13 @@ func _ready():
 
 func rebuild_tag_lists():
 	all_tags = DB.get_all_tags()
-	
+	all_tag_counts = DB.get_all_tag_counts()
+	for tag in all_tags:
+		if all_tag_counts.has(tag["id"]):
+			tag["count"] = all_tag_counts[tag["id"]]
+		else:
+			tag["count"] = 0
+	all_tags.sort_custom(sort_by_count)
 	for item in all_tags_list.get_children():
 		item.queue_free()
 	
@@ -41,7 +48,7 @@ func rebuild_tag_lists():
 func async_build_tag_items_all():
 	for tag in all_tags:
 		var item = tag_item_instance.duplicate()
-		item.tag = tag
+		item.tag = DB.get_tag_by_name(tag["tag"])
 		item.connect("add", _on_tag_item_add)
 		item.connect("remove", _on_tag_item_remove)
 		if mode == MODE.TagEditor || mode == MODE.CollectionEditor:
@@ -60,7 +67,7 @@ func async_build_tag_items_all():
 func async_build_tag_items_selected():
 	for tag in all_tags:
 		var item = tag_item_instance.duplicate()
-		item.tag = tag
+		item.tag = DB.get_tag_by_name(tag["tag"])
 		item.connect("x", _on_tag_item_x)
 		item.add_visible = false
 		item.remove_visible = false
@@ -211,3 +218,8 @@ func set_media_id(id):
 		assigned_tags = DB.get_tags_for_image(id)
 	else:
 		assigned_tags = DB.get_tags_for_collection(id)
+
+func sort_by_count(a, b):
+	if a["count"] > b["count"]:
+		return true
+	return false
