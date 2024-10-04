@@ -68,6 +68,7 @@ func reset_grid():
 		instance.connect("double_click", tile_double_click)
 		instance.connect("right_click", tile_right_click)
 		instance.add_to_group("collections_grid_tiles")
+		instance.visible = false
 		grid_container.add_child(instance)
 		instance.collection = collection
 	
