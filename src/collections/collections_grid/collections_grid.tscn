@@ -38,7 +38,6 @@ theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
-clip_contents = false
 layout_mode = 2
 horizontal_scroll_mode = 3
 
