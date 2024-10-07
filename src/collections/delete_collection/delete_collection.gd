@@ -1,7 +1,5 @@
 extends Window
 
-signal deleted
-
 var collection : set=set_collection
 
 @onready var message = $MarginContainer/VBoxContainer/Label
@@ -15,7 +13,7 @@ func _on_cancel_button_pressed():
 
 func _on_ok_button_pressed():
 	DB.delete_collection(collection["id"])
-	deleted.emit()
+	GlobalData.notify_collection_deleted(collection["id"])
 	hide()
 
 func _on_close_requested():

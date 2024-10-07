@@ -5,6 +5,7 @@
 
 [node name="DeleteCollection" type="Window"]
 title = "Delete Collection"
+position = Vector2i(0, 36)
 size = Vector2i(500, 100)
 script = ExtResource("1_kyplx")
 
