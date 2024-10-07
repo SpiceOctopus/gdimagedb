@@ -3,11 +3,9 @@ extends Control
 signal grid_updated
 signal edit_collection
 
-var new_button_scene = load("res://collections/collections_grid_new_button/new_button.tscn")
-var new_dlg_scene = load("res://collections/new_collection_dialog/new_collection.tscn")
-var grid_tile_scene = load("res://collections/collections_grid_tile/grid_tile.tscn")
-var viewer_scene = load("res://media_viewer/media_viewer.tscn")
-var collection_editor_scene = load("res://collections/collection_editor/collection_editor.tscn")
+var new_button_instance = load("res://collections/collections_grid_new_button/new_button.tscn").instantiate()
+var grid_tile_instance = load("res://collections/collections_grid_tile/grid_tile.tscn").instantiate()
+var viewer_instance = load("res://media_viewer/media_viewer.tscn").instantiate()
 
 var db_collections = [] # to be filled with all collections available in the database
 var tiles = {} # cached tiles for the grid
@@ -16,9 +14,6 @@ var tiles = {} # cached tiles for the grid
 @onready var last_window_size = Vector2i(0,0)
 @onready var delete_dialog = $DeleteCollection
 @onready var popup_menu = $PopupMenu
-@onready var grid_tile_instance = grid_tile_scene.instantiate()
-@onready var new_button_instance = new_button_scene.instantiate()
-@onready var viewer_instance = viewer_scene.instantiate()
 
 func _ready():
 	refresh_grid()
