@@ -12,7 +12,6 @@ var db_images = []
 var current_images = []
 var previews = {}
 
-var viewer_scene = load("res://media_viewer/media_viewer.tscn")
 var sort_mode : SortMode = SortMode.none : set=set_sort_mode
 
 var previews_mutex = Mutex.new()
@@ -136,11 +135,11 @@ func compare_by_position(a, b):
 	return a["position"] < b["position"]
 
 func _on_input_grid_image(senderImage):
-	var viewer_instance = viewer_scene.instantiate().duplicate()
-	viewer_instance.images = current_images.duplicate()
+	var instance = load("res://media_viewer/media_viewer.tscn").instantiate()
+	instance.images = current_images.duplicate()
 	for image in current_images:
 		if image["id"] == senderImage["id"]:
-			viewer_instance.current_image = current_images.find(image)
+			instance.current_image = current_images.find(image)
 	
 	var window = Window.new()
 	window.hide()
@@ -148,8 +147,9 @@ func _on_input_grid_image(senderImage):
 	window.size = DisplayServer.window_get_size()
 	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
 		window.mode = Window.MODE_MAXIMIZED
-	viewer_instance.connect("closing", Callable(window, "queue_free"))
-	window.add_child(viewer_instance)
+	instance.connect("closing", Callable(window, "queue_free"))
+	instance.visible = true
+	window.add_child(instance)
 	window.title = "Media Viewer"
 	window.popup_centered()
 	window.connect("close_requested", Callable(window, "queue_free"))

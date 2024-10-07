@@ -45,6 +45,7 @@ func create_database():
 	query("CREATE TABLE tags_collections ( tag_id INTEGER, collection_id INTEGER, PRIMARY KEY (tag_id, collection_id), FOREIGN KEY (tag_id) REFERENCES tags (id), FOREIGN KEY (collection_id) REFERENCES collections (id));")
 
 func update_database():
+	db_access_mutex.lock()
 	# add metadata table. Some old dev dbs don't have it. Good test right now (05.06.23)
 	query("SELECT name FROM sqlite_master WHERE type='table' AND name='metadata';")
 	if query_result.size() == 0:
@@ -72,6 +73,7 @@ func update_database():
 			query("UPDATE metadata SET version='3'")
 		query("SELECT version FROM metadata")
 		version = query_result[0]["version"]
+	db_access_mutex.unlock()
 
 func db_path_to_full_path(path):
 	return path.insert(0, OS.get_executable_path().get_base_dir() + "/content/")

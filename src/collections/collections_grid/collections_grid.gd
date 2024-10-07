@@ -4,8 +4,6 @@ signal grid_updated
 signal edit_collection
 
 var new_button_instance = load("res://collections/collections_grid_new_button/new_button.tscn").instantiate()
-var grid_tile_instance = load("res://collections/collections_grid_tile/grid_tile.tscn").instantiate()
-var viewer_instance = load("res://media_viewer/media_viewer.tscn").instantiate()
 
 var db_collections = [] # to be filled with all collections available in the database
 var tiles = {} # cached tiles for the grid
@@ -30,6 +28,8 @@ func _process(_delta):
 		window_size_changed()
 
 func refresh_grid():
+	var grid_tile_instance = load("res://collections/collections_grid_tile/grid_tile.tscn").instantiate()
+	
 	if grid_container.get_children().has(new_button_instance):
 		grid_container.remove_child(new_button_instance) # remove here, add back to the end
 	
@@ -68,11 +68,15 @@ func refresh_grid():
 			pass
 		else:
 			tile.visible = true
+		
+		if GlobalData.current_display_mode != GlobalData.DisplayMode.Collections: # overrides all other possibilites
+			tile.visible = false
 	
+	grid_tile_instance.queue_free()
 	grid_updated.emit()
 
 func tile_double_click(collection):
-	var instance = viewer_instance.duplicate()
+	var instance = load("res://media_viewer/media_viewer.tscn").instantiate()
 	var images = DB.get_all_images_in_collection(collection["id"])
 	images.sort_custom(compare_by_position)
 	instance.images = images
@@ -90,6 +94,7 @@ func tile_double_click(collection):
 	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
 		window.mode = Window.MODE_MAXIMIZED
 	window.add_child(instance)
+	instance.visible = true
 	window.title = collection["collection"]
 	window.popup_centered()
 	window.connect("close_requested", Callable(window, "queue_free"))

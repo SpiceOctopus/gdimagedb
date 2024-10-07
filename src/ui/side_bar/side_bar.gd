@@ -5,8 +5,6 @@ enum MODE {Grid, TagEditor, CollectionEditor}
 @export var mode : MODE = MODE.Grid
 @export var show_add_delete_buttons : bool = false
 
-var tag_item_instance = load("res://ui/side_bar/tag_item.tscn").instantiate()
-
 var selection_offset : int = 0
 var visible_tags_count : int = 0
 var last_filter : String = ""
@@ -14,6 +12,7 @@ var all_tags
 var media_id : set=set_media_id
 var assigned_tags : Array = []
 var all_tag_counts
+var exiting : bool = false # fix for crash on premature closing
 
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
@@ -31,10 +30,8 @@ func rebuild_tag_lists():
 	all_tags = DB.get_all_tags()
 	all_tag_counts = DB.get_all_tag_counts()
 	for tag in all_tags:
-		if all_tag_counts.has(tag["id"]):
-			tag["count"] = all_tag_counts[tag["id"]]
-		else:
-			tag["count"] = 0
+		if !all_tag_counts.has(tag["id"]):
+			all_tag_counts[tag["id"]] = 0
 	all_tags.sort_custom(sort_by_count)
 	for item in all_tags_list.get_children():
 		item.queue_free()
@@ -46,33 +43,41 @@ func rebuild_tag_lists():
 	WorkerThreadPool.add_task(async_build_tag_items_selected)
 
 func async_build_tag_items_all():
+	var tag_item_plus_instance = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
+	var tag_item_plus_minus_instance = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
 	for tag in all_tags:
-		var item = tag_item_instance.duplicate()
-		item.tag = DB.get_tag_by_name(tag["tag"])
-		item.connect("add", _on_tag_item_add)
-		item.connect("remove", _on_tag_item_remove)
-		if mode == MODE.TagEditor || mode == MODE.CollectionEditor:
-			item.add_visible = true
-			item.remove_visible = false
-			item.x_visible = false
-			item.color_mode = false
-		if mode == MODE.Grid:
-			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
-		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
-			item.visible = !item.tag in assigned_tags
+		if exiting: # crash fix
+			return
 		
-		if is_instance_valid(all_tags_list):
-			all_tags_list.call_deferred("add_child", item)
+		if mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+			var item = tag_item_plus_instance.duplicate()
+			item.tag = tag
+			item.connect("add", _on_tag_item_add)
+			item.visible = !item.tag in assigned_tags
+			if is_instance_valid(all_tags_list):
+				all_tags_list.call_deferred("add_child", item)
+		elif mode == MODE.Grid:
+			var item = tag_item_plus_minus_instance.duplicate()
+			item.tag = tag
+			item.connect("add", _on_tag_item_add)
+			item.connect("remove", _on_tag_item_remove)
+			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
+			if is_instance_valid(all_tags_list):
+				all_tags_list.call_deferred("add_child", item)
+		
+	tag_item_plus_instance.queue_free()
+	tag_item_plus_minus_instance.queue_free()
 
 func async_build_tag_items_selected():
+	var tag_item_instance = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
 	for tag in all_tags:
+		if exiting: # crash fix
+			return
 		var item = tag_item_instance.duplicate()
 		item.tag = DB.get_tag_by_name(tag["tag"])
 		item.connect("x", _on_tag_item_x)
-		item.add_visible = false
-		item.remove_visible = false
-		item.x_visible = true
 		if mode == MODE.Grid:
+			item.color_mode = true
 			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
 			item.color_mode = false
@@ -80,6 +85,7 @@ func async_build_tag_items_selected():
 		
 		if is_instance_valid(selected_tags_list):
 			selected_tags_list.call_deferred("add_child", item)
+	tag_item_instance.queue_free()
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed = ""):
@@ -220,6 +226,10 @@ func set_media_id(id):
 		assigned_tags = DB.get_tags_for_collection(id)
 
 func sort_by_count(a, b):
-	if a["count"] > b["count"]:
+	if all_tag_counts[a["id"]] > all_tag_counts[b["id"]]:
 		return true
 	return false
+
+# catch premature window closing and stop initializing ui to prevent crash
+func _on_tree_exiting():
+	exiting = true

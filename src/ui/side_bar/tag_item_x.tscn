@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://lmo7vniqvkxi"]
+
+[ext_resource type="Theme" uid="uid://cjoymj7qrcnmm" path="res://ui/side_bar/tag_item.tres" id="1_pf6bh"]
+[ext_resource type="Script" path="res://ui/side_bar/tag_item_x.gd" id="1_x8dp6"]
+
+[node name="TagItemX" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_x8dp6")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Tag" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme = ExtResource("1_pf6bh")
+text = "tag name here"
+vertical_alignment = 1
+clip_text = true
+
+[node name="X" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "X"
+
+[connection signal="pressed" from="HBoxContainer/X" to="." method="_on_x_pressed"]

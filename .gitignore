@@ -13,3 +13,6 @@ data_*/
 build/
 *.kra~
 *.blend1
+
+# vs code
+src/.vscode/
