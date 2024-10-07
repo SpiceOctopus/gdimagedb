@@ -9,21 +9,24 @@ var grid_tile_scene = load("res://collections/collections_grid_tile/grid_tile.ts
 var viewer_scene = load("res://media_viewer/media_viewer.tscn")
 var collection_editor_scene = load("res://collections/collection_editor/collection_editor.tscn")
 
-var show_only_favorites : bool = GlobalData.show_favorites
-var show_only_untagged : bool = GlobalData.show_untagged
+var db_collections = [] # to be filled with all collections available in the database
+var tiles = {} # cached tiles for the grid
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var last_window_size = Vector2i(0,0)
 @onready var delete_dialog = $DeleteCollection
 @onready var popup_menu = $PopupMenu
-@onready var new_collection_dialog = $NewCollectionDialog
 @onready var grid_tile_instance = grid_tile_scene.instantiate()
+@onready var new_button_instance = new_button_scene.instantiate()
+@onready var viewer_instance = viewer_scene.instantiate()
 
 func _ready():
-	reset_grid()
-	GlobalData.connect("favorites_changed", show_favorites)
-	GlobalData.connect("untagged_changed", show_untagged)
-	GlobalData.connect("tags_changed", _on_tags_changed)
+	refresh_grid()
+	GlobalData.connect("favorites_changed", refresh_grid)
+	GlobalData.connect("untagged_changed", refresh_grid)
+	GlobalData.connect("tags_changed", refresh_grid)
+	GlobalData.connect("db_collections_changed", refresh_grid)
+	GlobalData.connect("collection_deleted", _on_collection_deleted)
 
 func _process(_delta):
 	var new_size = DisplayServer.window_get_size()
@@ -31,66 +34,59 @@ func _process(_delta):
 		last_window_size = new_size
 		window_size_changed()
 
-func _on_tags_changed():
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
-		reset_grid()
-
-func show_untagged():
-	if show_only_untagged != GlobalData.show_untagged:
-		show_only_untagged = GlobalData.show_untagged
-		reset_grid()
-
-func show_favorites():
-	if show_only_favorites != GlobalData.show_favorites: # avoid doing lots of unnecessary stuff
-		show_only_favorites = GlobalData.show_favorites
-		reset_grid()
-
-func reset_grid():
-	for tile in get_tree().get_nodes_in_group("collections_grid_tiles"):
-		tile.remove_from_group("collections_grid_tiles")
-		grid_container.remove_child(tile)
-		tile.queue_free()
+func refresh_grid():
+	if grid_container.get_children().has(new_button_instance):
+		grid_container.remove_child(new_button_instance) # remove here, add back to the end
 	
-	var all_collections
-	if GlobalData.included_tags.size() > 0 || GlobalData.excluded_tags.size() > 0:
-		all_collections = DB.get_collections_for_tags(GlobalData.included_tags, GlobalData.excluded_tags)
-	else:
-		all_collections = DB.get_all_collections()
+	for tile in tiles.values():
+		tile.visible = false
 	
-	for collection in all_collections:
-		if show_only_favorites && collection["fav"] == 0:
-			continue
-		if GlobalData.show_untagged && DB.get_tags_for_collection(collection["id"]).size() > 0:
-			continue
-		
-		var instance = grid_tile_instance.duplicate()
-		instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-		instance.connect("double_click", tile_double_click)
-		instance.connect("right_click", tile_right_click)
-		instance.add_to_group("collections_grid_tiles")
-		instance.visible = false
-		grid_container.add_child(instance)
-		instance.collection = collection
+	db_collections = DB.get_all_collections()
 	
-	var new_button_instance = new_button_scene.instantiate()
+	for collection in db_collections:
+		if !tiles.has(collection["id"]):
+			var instance = grid_tile_instance.duplicate()
+			instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
+			instance.connect("double_click", tile_double_click)
+			instance.connect("right_click", tile_right_click)
+			instance.visible = false
+			grid_container.add_child(instance)
+			instance.collection = collection
+			tiles[collection["id"]] = instance
+	
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-	new_button_instance.connect("new_collection", new_collection)
-	new_button_instance.add_to_group("collections_grid_tiles")
 	grid_container.add_child(new_button_instance)
+	
+	var collections_without_tags = DB.get_ids_collections_without_tags()
+	var current_tiles = {}
+	
+	if !((GlobalData.included_tags.size() > 0) || (GlobalData.excluded_tags.size() > 0)):
+		current_tiles = tiles
+	else:
+		for collection in DB.get_collections_for_tags(GlobalData.included_tags, GlobalData.excluded_tags):
+			current_tiles[collection["id"]] = tiles[collection["id"]]
+	
+	for tile in current_tiles.values():
+		if GlobalData.show_favorites && !tile.collection["fav"]:
+			pass
+		elif GlobalData.show_untagged && !(tile.collection["id"] in collections_without_tags):
+			pass
+		else:
+			tile.visible = true
 	
 	grid_updated.emit()
 
 func tile_double_click(collection):
-	var viewer_instance = viewer_scene.instantiate()
+	var instance = viewer_instance.duplicate()
 	var images = DB.get_all_images_in_collection(collection["id"])
 	images.sort_custom(compare_by_position)
-	viewer_instance.images = images
+	instance.images = images
 	
 	# add code to resume collection from last seen image
 	
 	#for image in images:
 	#	if image["id"] == senderImage["id"]:
-	#		viewer_instance.current_image = images.find(image)
+	#		instance.current_image = images.find(image)
 	
 	var window = Window.new()
 	window.hide()
@@ -98,8 +94,7 @@ func tile_double_click(collection):
 	window.size = DisplayServer.window_get_size()
 	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
 		window.mode = Window.MODE_MAXIMIZED
-	viewer_instance.connect("closing", Callable(window, "queue_free"))
-	window.add_child(viewer_instance)
+	window.add_child(instance)
 	window.title = collection["collection"]
 	window.popup_centered()
 	window.connect("close_requested", Callable(window, "queue_free"))
@@ -119,9 +114,6 @@ func window_size_changed():
 	else:
 		grid_container.columns = columns
 
-func new_collection():
-	new_collection_dialog.popup_centered()
-
 func _on_popup_menu_edit():
 	edit_collection.emit($PopupMenu.collection)
 
@@ -132,14 +124,13 @@ func _on_popup_menu_delete():
 func grid_item_count():
 	return grid_container.get_child_count() - 1
 
-func _on_new_collection_create_new():
-	reset_grid()
-
-func _on_delete_collection_deleted():
-	reset_grid()
-
 func _on_visibility_changed() -> void:
 	if grid_container == null:
 		return
 	for child in grid_container.get_children():
 		child.visible = visible
+
+func _on_collection_deleted(id):
+	tiles[id].queue_free()
+	tiles.erase(id)
+	refresh_grid()

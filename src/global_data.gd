@@ -6,7 +6,9 @@ signal untagged_changed
 signal tags_changed
 signal db_images_changed
 signal db_tags_changed
+signal db_collections_changed
 signal media_deleted
+signal collection_deleted
 signal help
 signal last_used_collection_changed
 
@@ -102,3 +104,9 @@ func notify_db_tags_changed():
 
 func notify_media_deleted(id):
 	media_deleted.emit(id)
+
+func notify_db_collections_changed():
+	db_collections_changed.emit()
+
+func notify_collection_deleted(id):
+	collection_deleted.emit(id)

@@ -290,6 +290,15 @@ func get_ids_images_without_tags():
 	db_access_mutex.unlock()
 	return retval
 
+func get_ids_collections_without_tags() -> Array:
+	db_access_mutex.lock()
+	query("SELECT id FROM collections t1 LEFT JOIN tags_collections t2 ON t2.collection_id = t1.id WHERE t2.collection_id IS NULL")
+	var retval = []
+	for entry in query_result:
+		retval.append(entry["id"])
+	db_access_mutex.unlock()
+	return retval
+
 func count_images_in_db():
 	db_access_mutex.lock()
 	query("SELECT COUNT(id) FROM images")

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://odtwa3ah5qra"]
+[gd_scene load_steps=3 format=3 uid="uid://odtwa3ah5qra"]
 
 [ext_resource type="Script" path="res://collections/collections_grid_new_button/new_button.gd" id="1_wljcj"]
+[ext_resource type="PackedScene" uid="uid://c2cc6h6qxov7y" path="res://collections/new_collection_dialog/new_collection.tscn" id="2_sckb3"]
 
 [node name="NewButton" type="Control"]
 layout_mode = 3
@@ -21,5 +22,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "New Collection"
+
+[node name="NewCollection" parent="." instance=ExtResource("2_sckb3")]
+visible = false
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

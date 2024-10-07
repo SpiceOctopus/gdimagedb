@@ -76,7 +76,7 @@ func refresh(hard : bool = false):
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
 		grid.refresh_grid(hard)
 	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
-		collections_grid.reset_grid()
+		collections_grid.refresh_grid()
 
 func _on_menu_bar_switch_grids():
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images: # switch to collections
