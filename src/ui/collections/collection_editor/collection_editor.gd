@@ -1,6 +1,6 @@
 extends Window
 
-var collection_editor_tile = load("res://collections/collection_editor_tile/collection_editor_tile.tscn")
+var collection_editor_tile = load("res://ui/collections/collection_editor_tile/collection_editor_tile.tscn")
 
 var last_window_size : Vector2i
 var collection : set=set_collection # row from the collections table

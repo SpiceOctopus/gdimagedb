@@ -101,9 +101,10 @@ size_flags_vertical = 4
 text = "Help"
 
 [node name="SwitchGridsButton" type="Button" parent="MarginContainer/HBoxContainer2/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 4
-text = "Switch to Collections"
+text = "Collections"
 
 [node name="AddTagDialog" parent="." instance=ExtResource("3_ler4g")]
 visible = false

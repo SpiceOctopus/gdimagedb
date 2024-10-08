@@ -38,16 +38,10 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
-layout_mode = 2
-
-[node name="FilterLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
-layout_mode = 2
-text = "Filter:"
-
-[node name="FilterEdit" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+[node name="FilterEdit" type="LineEdit" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
+placeholder_text = "Filter Tags"
 
 [node name="TagList" type="ItemList" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
@@ -138,6 +132,6 @@ text = "Delete Tag"
 
 [connection signal="about_to_popup" from="." to="." method="_on_about_to_popup"]
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
-[connection signal="text_changed" from="MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer/FilterEdit" to="." method="_on_filter_edit_text_changed"]
+[connection signal="text_changed" from="MarginContainer/HBoxContainer/VBoxContainer2/FilterEdit" to="." method="_on_filter_edit_text_changed"]
 [connection signal="item_selected" from="MarginContainer/HBoxContainer/VBoxContainer2/TagList" to="." method="_on_tag_list_item_selected"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer/VBoxContainer/DeleteButton" to="." method="_on_DeleteButton_pressed"]

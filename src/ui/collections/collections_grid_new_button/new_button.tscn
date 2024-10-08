@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://odtwa3ah5qra"]
 
-[ext_resource type="Script" path="res://collections/collections_grid_new_button/new_button.gd" id="1_wljcj"]
-[ext_resource type="PackedScene" uid="uid://c2cc6h6qxov7y" path="res://collections/new_collection_dialog/new_collection.tscn" id="2_sckb3"]
+[ext_resource type="Script" path="res://ui/collections/collections_grid_new_button/new_button.gd" id="1_wljcj"]
+[ext_resource type="PackedScene" uid="uid://c2cc6h6qxov7y" path="res://ui/collections/new_collection_dialog/new_collection.tscn" id="2_sckb3"]
 
 [node name="NewButton" type="Control"]
 layout_mode = 3

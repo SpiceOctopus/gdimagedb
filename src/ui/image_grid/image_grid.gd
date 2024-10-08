@@ -135,7 +135,7 @@ func compare_by_position(a, b):
 	return a["position"] < b["position"]
 
 func _on_input_grid_image(senderImage):
-	var instance = load("res://media_viewer/media_viewer.tscn").instantiate()
+	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
 	instance.images = current_images.duplicate()
 	for image in current_images:
 		if image["id"] == senderImage["id"]:

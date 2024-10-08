@@ -12,7 +12,7 @@ var image:
 		return image_internal
 
 @onready var collections_list = $MarginContainer/VBoxContainer/CollectionsList
-@onready var edit_filter = $MarginContainer/VBoxContainer/FilterContainer/FilterEdit
+@onready var edit_filter = $MarginContainer/VBoxContainer/FilterEdit
 @onready var btn_add = $MarginContainer/VBoxContainer/AddButton
 
 func _on_btn_add_pressed():

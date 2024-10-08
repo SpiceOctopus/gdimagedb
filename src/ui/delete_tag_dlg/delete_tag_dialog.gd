@@ -3,7 +3,7 @@ extends Window
 var images_for_tag
 var previews
 
-@onready var filter_edit = $MarginContainer/HBoxContainer/VBoxContainer2/HBoxContainer/FilterEdit
+@onready var filter_edit = $MarginContainer/HBoxContainer/VBoxContainer2/FilterEdit
 @onready var tag_list = $MarginContainer/HBoxContainer/VBoxContainer2/TagList
 @onready var tags = DB.get_all_tags()
 @onready var preview1 = $MarginContainer/HBoxContainer/VBoxContainer/TopContainer/Preview1

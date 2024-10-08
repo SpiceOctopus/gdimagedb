@@ -3,7 +3,7 @@ extends Control
 signal grid_updated
 signal edit_collection
 
-var new_button_instance = load("res://collections/collections_grid_new_button/new_button.tscn").instantiate()
+var new_button_instance = load("res://ui/collections/collections_grid_new_button/new_button.tscn").instantiate()
 
 var db_collections = [] # to be filled with all collections available in the database
 var tiles = {} # cached tiles for the grid
@@ -28,7 +28,7 @@ func _process(_delta):
 		window_size_changed()
 
 func refresh_grid():
-	var grid_tile_instance = load("res://collections/collections_grid_tile/grid_tile.tscn").instantiate()
+	var grid_tile_instance = load("res://ui/collections/collections_grid_tile/grid_tile.tscn").instantiate()
 	
 	if grid_container.get_children().has(new_button_instance):
 		grid_container.remove_child(new_button_instance) # remove here, add back to the end
@@ -44,6 +44,7 @@ func refresh_grid():
 			instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 			instance.connect("double_click", tile_double_click)
 			instance.connect("right_click", tile_right_click)
+			instance.connect("click", on_grid_tile_click)
 			instance.visible = false
 			grid_container.add_child(instance)
 			instance.collection = collection
@@ -76,7 +77,7 @@ func refresh_grid():
 	grid_updated.emit()
 
 func tile_double_click(collection):
-	var instance = load("res://media_viewer/media_viewer.tscn").instantiate()
+	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
 	var images = DB.get_all_images_in_collection(collection["id"])
 	images.sort_custom(compare_by_position)
 	instance.images = images
@@ -134,3 +135,8 @@ func _on_collection_deleted(id):
 	tiles[id].queue_free()
 	tiles.erase(id)
 	refresh_grid()
+
+func on_grid_tile_click(grid_tile):
+	for tile in tiles.values():
+		tile.set_selected(false)
+	grid_tile.set_selected(true)

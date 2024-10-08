@@ -100,8 +100,6 @@ While using the filter textbox, hit enter to add the currently selected tag to t
 
 The tag list is automatically sorted by most used to least used tags for the current filter.
 
-If only a mouse or touch input are available the arrow buttons at the bottom left can be used to tag / untag the image as well.
-
 "
 metadata/_tab_index = 2
 

@@ -6,10 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://b5u3ncjp2ptt7" path="res://ui/import_log/import_log.tscn" id="3_2vkq6"]
 [ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_072ji"]
 [ext_resource type="PackedScene" uid="uid://86emblidbalh" path="res://ui/image_grid/image_grid.tscn" id="4_ck5lf"]
-[ext_resource type="PackedScene" uid="uid://s3cqe7hw7f1n" path="res://collections/collections_grid/collections_grid.tscn" id="5_mfqte"]
+[ext_resource type="PackedScene" uid="uid://s3cqe7hw7f1n" path="res://ui/collections/collections_grid/collections_grid.tscn" id="5_mfqte"]
 [ext_resource type="PackedScene" uid="uid://c66ebqguifkyj" path="res://ui/grid_info_panel/grid_info_panel.tscn" id="6_die3w"]
-[ext_resource type="PackedScene" uid="uid://baiebkcdyqp2p" path="res://tag_editor/tag_editor.tscn" id="9_7sv3t"]
-[ext_resource type="PackedScene" uid="uid://dse3yrjipspu5" path="res://collections/collection_editor/collection_editor.tscn" id="10_gala1"]
+[ext_resource type="PackedScene" uid="uid://baiebkcdyqp2p" path="res://ui/tag_editor/tag_editor.tscn" id="9_7sv3t"]
+[ext_resource type="PackedScene" uid="uid://dse3yrjipspu5" path="res://ui/collections/collection_editor/collection_editor.tscn" id="10_gala1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pl8um"]
 bg_color = Color(0.223529, 0.239216, 0.25098, 1)

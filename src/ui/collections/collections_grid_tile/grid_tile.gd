@@ -2,6 +2,7 @@ extends Control
 
 signal double_click
 signal right_click
+signal click
 
 var collection : set=set_collection, get=get_collection
 var collection_internal
@@ -28,6 +29,12 @@ func _input(event):
 	elif event.is_pressed() and event.button_index == MOUSE_BUTTON_RIGHT:
 		right_click.emit(collection)
 
+func _gui_input(ev):
+	if !visible:
+		return
+	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
+		click.emit(self)
+
 func set_collection(collection_param):
 	lbl_name.text = collection_param["collection"]
 	collection_internal = collection_param
@@ -52,3 +59,9 @@ func async_load():
 
 func get_collection():
 	return collection_internal
+
+func set_selected(is_selected):
+	if(is_selected):
+		title_image.set_material(load("res://ui/image_grid/outline_material.tres"))
+	else:
+		title_image.set_material(null)

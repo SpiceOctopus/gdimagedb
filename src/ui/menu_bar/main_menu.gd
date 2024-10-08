@@ -34,11 +34,11 @@ func _on_display_mode_changed():
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
 		favorites_checkbox.button_pressed = GlobalData.show_favorites
 		untagged_checkbox.button_pressed = GlobalData.show_untagged
-		btn_switch_grids.text = "Switch to Collections"
+		btn_switch_grids.text = "Collections"
 	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
 		favorites_checkbox.button_pressed = GlobalData.show_favorites
 		untagged_checkbox.button_pressed = GlobalData.show_untagged
-		btn_switch_grids.text = "Switch to Images"
+		btn_switch_grids.text = "Images"
 	untagged_checkbox.disabled = (GlobalData.included_tags.size() > 0 || GlobalData.excluded_tags.size() > 0)
 
 func _on_settings_menu_selection(id):

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://da2ycb4o4vxr3"]
 
-[ext_resource type="Script" path="res://media_viewer/video_player_controls/time_display.gd" id="1_i7mrp"]
+[ext_resource type="Script" path="res://ui/media_viewer/video_player_controls/time_display.gd" id="1_i7mrp"]
 
 [node name="TimeDisplay" type="HBoxContainer"]
 anchors_preset = 15

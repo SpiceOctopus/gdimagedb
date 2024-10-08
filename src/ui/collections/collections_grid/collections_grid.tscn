@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://s3cqe7hw7f1n"]
 
-[ext_resource type="Script" path="res://collections/collections_grid/collections_grid.gd" id="1_xvdnw"]
+[ext_resource type="Script" path="res://ui/collections/collections_grid/collections_grid.gd" id="1_xvdnw"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_62jvj"]
-[ext_resource type="Script" path="res://collections/collections_grid/popup_menu.gd" id="2_d2s68"]
-[ext_resource type="PackedScene" uid="uid://caw3e0r70wu5s" path="res://collections/delete_collection/delete_collection.tscn" id="4_csmqc"]
+[ext_resource type="Script" path="res://ui/collections/collections_grid/popup_menu.gd" id="2_d2s68"]
+[ext_resource type="PackedScene" uid="uid://caw3e0r70wu5s" path="res://ui/collections/delete_collection/delete_collection.tscn" id="4_csmqc"]
 
 [node name="CollectionsGrid" type="Control"]
 layout_mode = 3

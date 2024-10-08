@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c6wroaqhgwlbv"]
 
-[ext_resource type="Script" path="res://collections/add_to_collection_dialog/add_to_collection.gd" id="1_wkjjs"]
+[ext_resource type="Script" path="res://ui/collections/add_to_collection_dialog/add_to_collection.gd" id="1_wkjjs"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_dagm2"]
 
 [node name="AddToCollection" type="Control"]
@@ -37,16 +37,10 @@ theme_override_constants/margin_bottom = 4
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="FilterContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="FilterLabel" type="Label" parent="MarginContainer/VBoxContainer/FilterContainer"]
-layout_mode = 2
-text = "Filter:"
-
-[node name="FilterEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/FilterContainer"]
+[node name="FilterEdit" type="LineEdit" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+placeholder_text = "Filter Collections"
 
 [node name="CollectionsList" type="ItemList" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -60,5 +54,5 @@ text = "Add"
 size = Vector2i(313, 100)
 dialog_text = "The image is already in that collection."
 
-[connection signal="text_changed" from="MarginContainer/VBoxContainer/FilterContainer/FilterEdit" to="." method="_on_edit_filter_text_changed"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/FilterEdit" to="." method="_on_edit_filter_text_changed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/AddButton" to="." method="_on_btn_add_pressed"]

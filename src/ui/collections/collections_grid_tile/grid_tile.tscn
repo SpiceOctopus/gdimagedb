@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c3ayyd0rgjplk"]
 
-[ext_resource type="Script" path="res://collections/collections_grid_tile/grid_tile.gd" id="1_163ec"]
+[ext_resource type="Script" path="res://ui/collections/collections_grid_tile/grid_tile.gd" id="1_163ec"]
 [ext_resource type="Texture2D" uid="uid://dfm4mrg7upxca" path="res://gfx/collection_placeholder_icon.png" id="1_ak872"]
 
 [node name="GridTile" type="Control"]

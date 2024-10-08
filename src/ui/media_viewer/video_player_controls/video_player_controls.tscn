@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://b4p0ep42wesi1"]
 
-[ext_resource type="Script" path="res://media_viewer/video_player_controls/video_player_controls.gd" id="1_pun6c"]
+[ext_resource type="Script" path="res://ui/media_viewer/video_player_controls/video_player_controls.gd" id="1_pun6c"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_7gwqt"]
-[ext_resource type="PackedScene" uid="uid://da2ycb4o4vxr3" path="res://media_viewer/video_player_controls/time_display.tscn" id="2_fdtwv"]
+[ext_resource type="PackedScene" uid="uid://da2ycb4o4vxr3" path="res://ui/media_viewer/video_player_controls/time_display.tscn" id="2_fdtwv"]
 
 [node name="VideoPlayerControls" type="Control"]
 custom_minimum_size = Vector2(0, 40)
