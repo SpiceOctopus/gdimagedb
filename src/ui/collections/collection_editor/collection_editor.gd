@@ -36,11 +36,16 @@ func tile_move_left(image):
 	var image_pos = DB.get_position_in_collection(image["id"], collection["id"])
 	DB.swap_positions_in_collection(image, DB.get_collection_image_by_position(collection["id"], (image_pos - 1)), collection)
 	rebuild_grid()
+	if DB.get_position_in_collection(image["id"], collection["id"]) == 0:
+		GlobalData.notify_db_collections_changed()
 
 func tile_move_right(image):
 	var image_pos = DB.get_position_in_collection(image["id"], collection["id"])
 	DB.swap_positions_in_collection(image, DB.get_collection_image_by_position(collection["id"], (image_pos + 1)), collection)
 	rebuild_grid()
+	GlobalData.notify_db_collections_changed()
+	if DB.get_position_in_collection(image["id"], collection["id"]) == 0:
+		GlobalData.notify_db_collections_changed()
 
 func tile_delete(image):
 	delete_confirmation.image = image
