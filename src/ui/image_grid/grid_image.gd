@@ -24,6 +24,7 @@ func set_image(image):
 	if CacheManager.thumb_cache.has(current_image["id"]):
 		texture = CacheManager.thumb_cache[current_image["id"]]
 	else:
+		texture = load("res://gfx/loading.png")
 		WorkerThreadPool.add_task(async_load)
 
 func async_load():

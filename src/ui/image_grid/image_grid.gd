@@ -39,7 +39,8 @@ func _ready():
 	GlobalData.connect("db_images_changed", _on_db_images_changed)
 	GlobalData.connect("media_deleted", _on_media_deleted)
 	db_images = DB.get_all_images()
-	refresh_grid()
+	WorkerThreadPool.add_task(refresh_grid)
+	#refresh_grid()
 	add_to_collection_window.connect('close_requested', Callable(add_to_collection_window,'hide'))
 	add_to_collection_window.min_size = add_to_collection_control.custom_minimum_size
 	media_properties_window.connect('close_requested', Callable(media_properties_window,'hide'))
@@ -84,7 +85,7 @@ func refresh_grid(hard : bool = false):
 		for grid_image in grid_container.get_children():
 			grid_image.free()
 	
-	drop_files_label.visible = (db_images.size() <= 0)
+	drop_files_label.call_deferred("set_visible", (db_images.size() <= 0))
 	
 	for preview in previews.values():
 		preview.visible = false
@@ -93,7 +94,7 @@ func refresh_grid(hard : bool = false):
 		if !previews.has(image["id"]):
 			var gridImageInstance = GridImage.new()
 			gridImageInstance.set_image(image)
-			grid_container.add_child(gridImageInstance)
+			grid_container.call_deferred("add_child", gridImageInstance)
 			gridImageInstance.add_to_group("previews")
 			gridImageInstance.connect("double_click",Callable(self,"_on_input_grid_image"))
 			gridImageInstance.connect("right_click",Callable(self,"grid_image_right_click"))
@@ -119,10 +120,13 @@ func refresh_grid(hard : bool = false):
 		elif Settings.hide_images_collections && (image["id"] in images_in_collections):
 			pass
 		else:
-			previews[image["id"]].visible = true
+			previews[image["id"]].call_deferred("set_visible", true)
 			current_images.append(image)
 	
-	window_size_changed() # calculates and sets grid proportions
+	call_deferred("window_size_changed") # calculates and sets grid proportions
+	call_deferred("notify_grid_updated")
+
+func notify_grid_updated():
 	grid_updated.emit()
 
 func get_images_for_current_view():
