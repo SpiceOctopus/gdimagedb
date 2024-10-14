@@ -20,6 +20,7 @@ func _on_btn_add_pressed():
 	if !DB.is_image_in_collection(image["id"], collection["id"]):
 		DB.add_image_to_collection(collection["id"], image["id"])
 		GlobalData.last_used_collection = collection
+		GlobalData.notify_db_collections_changed()
 		get_parent().hide()
 	else:
 		$AlreadyInCollectionError.popup_centered()

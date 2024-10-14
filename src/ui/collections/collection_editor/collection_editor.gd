@@ -66,6 +66,7 @@ func rebuild_grid():
 func compare_by_position(a, b):
 	return a["position"] < b["position"]
 
+# confirmed = remove image from collection
 func _on_confirmation_dialog_confirmed():
 	DB.remove_image_from_collection(delete_confirmation.image["id"], collection["id"])
 	var images = DB.get_all_images_in_collection(collection["id"])
@@ -77,6 +78,7 @@ func _on_confirmation_dialog_confirmed():
 		counter += 1
 	
 	rebuild_grid()
+	GlobalData.notify_db_collections_changed()
 
 func _on_name_edit_text_changed(new_text):
 	apply_name_button.disabled = new_text.is_empty()

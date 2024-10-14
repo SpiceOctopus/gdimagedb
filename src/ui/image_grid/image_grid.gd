@@ -38,9 +38,9 @@ func _ready():
 	GlobalData.connect("db_tags_changed", tags_changed)
 	GlobalData.connect("db_images_changed", _on_db_images_changed)
 	GlobalData.connect("media_deleted", _on_media_deleted)
+	GlobalData.connect("db_collections_changed", refresh_grid)
 	db_images = DB.get_all_images()
 	WorkerThreadPool.add_task(refresh_grid)
-	#refresh_grid()
 	add_to_collection_window.connect('close_requested', Callable(add_to_collection_window,'hide'))
 	add_to_collection_window.min_size = add_to_collection_control.custom_minimum_size
 	media_properties_window.connect('close_requested', Callable(media_properties_window,'hide'))

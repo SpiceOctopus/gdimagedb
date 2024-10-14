@@ -38,6 +38,7 @@ func _on_PopupMenu_id_pressed(id):
 		if !DB.is_image_in_collection(image["id"], collection["id"]):
 			DB.add_image_to_collection(collection["id"], image["id"])
 			GlobalData.notify_tags_changed() # not technically correct but will cause the grid to refresh
+			GlobalData.notify_db_collections_changed()
 	elif id == 8: # replace file
 		replace_file.emit(image)
 

@@ -26,3 +26,4 @@ func _on_about_to_popup():
 	collections = DB.get_all_collection_names()
 	txt_name.text = ""
 	btn_accept.disabled = true
+	txt_name.grab_focus()
