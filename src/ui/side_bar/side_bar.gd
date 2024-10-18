@@ -218,6 +218,10 @@ func _on_db_tags_changed():
 func focus():
 	input_box.grab_focus()
 
+func clear_filter_text():
+	input_box.text = ""
+	_on_display_changed()
+
 func set_media_id(id):
 	media_id = id
 	if mode == MODE.Grid || mode == MODE.TagEditor:

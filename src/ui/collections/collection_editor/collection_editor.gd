@@ -93,3 +93,7 @@ func _on_apply_button_pressed():
 
 func _on_close_requested():
 	hide()
+
+func _on_about_to_popup():
+	side_bar.focus()
+	side_bar.clear_filter_text()

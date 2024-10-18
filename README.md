@@ -13,7 +13,7 @@ The project (mostly) follows the official godot guidelines.
 [GDScript style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html)
 
 ## How to build
-Download [Godot engine](https://godotengine.org/) version 4.2.2.  
+Download [Godot engine](https://godotengine.org/) version 4.3.  
 Import the src/project.godot file via the godot project manager.  
 After opening the project, you can now press 'F5' to build and start debugging.
 

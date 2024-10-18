@@ -113,6 +113,7 @@ size = Vector2i(207, 100)
 dialog_text = "Remove from collection?"
 script = ExtResource("4_mwxed")
 
+[connection signal="about_to_popup" from="." to="." method="_on_about_to_popup"]
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="text_changed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="pressed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]

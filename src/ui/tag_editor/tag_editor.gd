@@ -45,3 +45,4 @@ func _on_close_requested():
 
 func _on_about_to_popup() -> void:
 	sidebar.focus()
+	sidebar.clear_filter_text()
