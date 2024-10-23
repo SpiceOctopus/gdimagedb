@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cs0k3k1ng3gon"]
+
+[ext_resource type="Material" uid="uid://6vdxary7rqsu" path="res://ui/side_bar/shader_button_plus/shader_button_plus.tres" id="1_ugn0k"]
+[ext_resource type="Script" path="res://ui/side_bar/shader_button_plus/shader_button_plus.gd" id="2_u7sra"]
+
+[node name="ShaderButtonPlus" type="Panel"]
+material = ExtResource("1_ugn0k")
+custom_minimum_size = Vector2(31, 31)
+script = ExtResource("2_u7sra")
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

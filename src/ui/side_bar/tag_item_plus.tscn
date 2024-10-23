@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://cjcx2ixlcoqo"]
+[gd_scene load_steps=4 format=3 uid="uid://cjcx2ixlcoqo"]
 
 [ext_resource type="Script" path="res://ui/side_bar/tag_item_plus.gd" id="1_56s1j"]
 [ext_resource type="Theme" uid="uid://cjoymj7qrcnmm" path="res://ui/side_bar/tag_item.tres" id="2_bku34"]
+[ext_resource type="PackedScene" uid="uid://cs0k3k1ng3gon" path="res://ui/side_bar/shader_button_plus/shader_button_plus.tscn" id="3_pyfxc"]
 
 [node name="TagItemPlus" type="Control"]
 layout_mode = 3
@@ -31,8 +32,7 @@ text = "tag name here"
 vertical_alignment = 1
 clip_text = true
 
-[node name="Add" type="Button" parent="HBoxContainer"]
+[node name="ShaderButtonPlus" parent="HBoxContainer" instance=ExtResource("3_pyfxc")]
 layout_mode = 2
-text = "+"
 
-[connection signal="pressed" from="HBoxContainer/Add" to="." method="_on_add_pressed"]
+[connection signal="pressed" from="HBoxContainer/ShaderButtonPlus" to="." method="_on_add_pressed"]

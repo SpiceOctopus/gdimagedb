@@ -7,10 +7,9 @@ var selected : bool = false : set=set_selected
 var tag
 
 @onready var tag_label = $HBoxContainer/Tag
-@onready var add_button = $HBoxContainer/Add
+@onready var add_button = $HBoxContainer/ShaderButtonPlus
 
 func _ready():
-	add_button.custom_minimum_size.x = add_button.size.y
 	custom_minimum_size.y = add_button.size.y
 	if tag != null:
 		tag_label.text = tag["tag"]

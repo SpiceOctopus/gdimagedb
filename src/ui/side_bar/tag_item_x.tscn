@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://lmo7vniqvkxi"]
+[gd_scene load_steps=4 format=3 uid="uid://lmo7vniqvkxi"]
 
 [ext_resource type="Theme" uid="uid://cjoymj7qrcnmm" path="res://ui/side_bar/tag_item.tres" id="1_pf6bh"]
 [ext_resource type="Script" path="res://ui/side_bar/tag_item_x.gd" id="1_x8dp6"]
+[ext_resource type="PackedScene" uid="uid://dhdjej2c4lbtq" path="res://ui/side_bar/shader_button_minus/shader_button_minus.tscn" id="3_l35m0"]
 
 [node name="TagItemX" type="Control"]
 layout_mode = 3
@@ -31,8 +32,7 @@ text = "tag name here"
 vertical_alignment = 1
 clip_text = true
 
-[node name="X" type="Button" parent="HBoxContainer"]
+[node name="X" parent="HBoxContainer" instance=ExtResource("3_l35m0")]
 layout_mode = 2
-text = "X"
 
 [connection signal="pressed" from="HBoxContainer/X" to="." method="_on_x_pressed"]
