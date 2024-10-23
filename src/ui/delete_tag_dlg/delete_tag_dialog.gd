@@ -40,6 +40,7 @@ func _on_DeleteButton_pressed():
 	
 	GlobalData.notify_db_tags_changed()
 	GlobalData.notify_tags_changed()
+	tags = DB.get_all_tags()
 	update_tag_list()
 
 func _on_filter_edit_text_changed(_new_text : String):
@@ -80,6 +81,7 @@ func set_thumb(image, preview : TextureRect):
 
 func reset_window():
 	filter_edit.text = ""
+	tags = DB.get_all_tags()
 	filter_edit.grab_focus()
 	update_tag_list()
 

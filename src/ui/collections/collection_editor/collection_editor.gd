@@ -7,7 +7,7 @@ var collection : set=set_collection # row from the collections table
 
 @onready var grid = $HBoxContainer/Panel/MarginContainer/ScrollContainer/Grid
 @onready var scroll_container = $HBoxContainer/Panel/MarginContainer/ScrollContainer
-@onready var delete_confirmation = $ConfirmationDialog
+@onready var delete_confirmation = $RemoveFromCollection
 @onready var side_bar = $HBoxContainer/VBoxContainer/SideBar
 @onready var name_edit = $HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit
 @onready var apply_name_button = $HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton

@@ -11,6 +11,7 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	get_parent().min_size = custom_minimum_size
 	get_tree().root.connect("files_dropped",Callable(self,"_on_files_dropped"))
 	_on_grid_grid_updated()
 

@@ -7,6 +7,7 @@
 title = "Delete file?"
 position = Vector2i(0, 36)
 size = Vector2i(400, 100)
+min_size = Vector2i(300, 80)
 script = ExtResource("1_uvj65")
 
 [node name="TextureRect" type="TextureRect" parent="."]

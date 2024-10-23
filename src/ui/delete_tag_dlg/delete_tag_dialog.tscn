@@ -8,6 +8,8 @@
 title = "Delete Tag"
 position = Vector2i(0, 36)
 size = Vector2i(800, 500)
+wrap_controls = true
+min_size = Vector2i(800, 500)
 script = ExtResource("1")
 
 [node name="TextureRect" type="TextureRect" parent="."]

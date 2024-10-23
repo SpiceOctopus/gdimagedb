@@ -6,6 +6,7 @@
 [node name="GridImageSizeCtrl" type="Window"]
 title = "Grid Image Size"
 size = Vector2i(400, 80)
+min_size = Vector2i(400, 60)
 script = ExtResource("1")
 
 [node name="TextureRect" type="TextureRect" parent="."]

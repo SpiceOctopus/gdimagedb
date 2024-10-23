@@ -5,7 +5,9 @@
 [ext_resource type="Script" path="res://ui/help/godot_engine_license.gd" id="2_e662u"]
 
 [node name="Help" type="Window"]
+title = "Help"
 size = Vector2i(950, 600)
+min_size = Vector2i(300, 200)
 script = ExtResource("1_5our0")
 
 [node name="Background" type="TextureRect" parent="."]

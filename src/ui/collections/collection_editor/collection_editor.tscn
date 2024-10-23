@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="2_njylg"]
 [ext_resource type="PackedScene" uid="uid://pu7tauqonrgp" path="res://ui/side_bar/side_bar.tscn" id="3_4derl"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="3_nwi1d"]
-[ext_resource type="Script" path="res://ui/collections/collection_editor/confirmation_dialog.gd" id="4_mwxed"]
+[ext_resource type="PackedScene" uid="uid://bvv4kkn1rflpw" path="res://ui/collections/remove_from_collection_dialog/remove_from_collection.tscn" id="5_if0nt"]
 
 [node name="CollectionEditor" type="Window"]
 title = "Collection Editor"
@@ -107,14 +107,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
-title = "Remove?"
-size = Vector2i(207, 100)
-dialog_text = "Remove from collection?"
-script = ExtResource("4_mwxed")
+[node name="RemoveFromCollection" parent="." instance=ExtResource("5_if0nt")]
+visible = false
 
 [connection signal="about_to_popup" from="." to="." method="_on_about_to_popup"]
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="text_changed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="pressed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
-[connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_confirmation_dialog_confirmed"]
+[connection signal="confirmed" from="RemoveFromCollection" to="." method="_on_confirmation_dialog_confirmed"]
