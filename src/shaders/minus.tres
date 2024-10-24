@@ -1,16 +1,16 @@
 [gd_resource type="VisualShader" load_steps=8 format=3 uid="uid://bdvpthgbybfsc"]
 
 [sub_resource type="VisualShaderNodeIf" id="VisualShaderNodeIf_hmgpx"]
-default_input_values = [0, 0.0, 1, 0.25, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
+default_input_values = [0, 0.0, 1, 0.35, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
 
 [sub_resource type="VisualShaderNodeIf" id="VisualShaderNodeIf_2eahc"]
-default_input_values = [0, 0.0, 1, 0.75, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
+default_input_values = [0, 0.0, 1, 0.65, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
 
 [sub_resource type="VisualShaderNodeIf" id="VisualShaderNodeIf_apgxy"]
-default_input_values = [0, 0.0, 1, 0.45, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
+default_input_values = [0, 0.0, 1, 0.47, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
 
 [sub_resource type="VisualShaderNodeIf" id="VisualShaderNodeIf_of3ag"]
-default_input_values = [0, 0.0, 1, 0.55, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
+default_input_values = [0, 0.0, 1, 0.53, 2, 1e-05, 3, Vector3(0, 0, 0), 4, Vector3(0, 0, 0), 5, Vector3(0, 0, 0)]
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_e8gkv"]
 input_name = "color"
@@ -45,7 +45,7 @@ void fragment() {
 
 	vec3 n_out12p0;
 // If:12
-	float n_in12p1 = 0.25000;
+	float n_in12p1 = 0.35000;
 	float n_in12p2 = 0.00001;
 	vec3 n_in12p3 = vec3(0.00000, 0.00000, 0.00000);
 	if(abs(n_out2p1 - n_in12p1) < n_in12p2)
@@ -64,7 +64,7 @@ void fragment() {
 
 	vec3 n_out13p0;
 // If:13
-	float n_in13p1 = 0.75000;
+	float n_in13p1 = 0.65000;
 	float n_in13p2 = 0.00001;
 	vec3 n_in13p3 = vec3(0.00000, 0.00000, 0.00000);
 	if(abs(n_out2p1 - n_in13p1) < n_in13p2)
@@ -83,7 +83,7 @@ void fragment() {
 
 	vec3 n_out14p0;
 // If:14
-	float n_in14p1 = 0.45000;
+	float n_in14p1 = 0.47000;
 	float n_in14p2 = 0.00001;
 	vec3 n_in14p3 = vec3(0.00000, 0.00000, 0.00000);
 	if(abs(n_out2p2 - n_in14p1) < n_in14p2)
@@ -102,7 +102,7 @@ void fragment() {
 
 	vec3 n_out15p0;
 // If:15
-	float n_in15p1 = 0.55000;
+	float n_in15p1 = 0.53000;
 	float n_in15p2 = 0.00001;
 	vec3 n_in15p3 = vec3(0.00000, 0.00000, 0.00000);
 	if(abs(n_out2p2 - n_in15p1) < n_in15p2)
@@ -125,7 +125,7 @@ void fragment() {
 
 }
 "
-graph_offset = Vector2(-375.756, -222.585)
+graph_offset = Vector2(-66.6546, 0)
 mode = 1
 flags/light_only = false
 nodes/fragment/0/position = Vector2(1280, 340)
