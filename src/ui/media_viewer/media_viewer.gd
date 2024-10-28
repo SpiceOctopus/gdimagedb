@@ -215,7 +215,7 @@ func set_display(file):
 	if current_mode == MODE.Picture:
 		$ImageDisplay.hide()
 		loading_label.show()
-		WorkerThreadPool.add_task(Callable(self, "async_load_display").bind(file))
+		WorkerThreadPool.add_task(Callable(self, "async_load_display").bind(file), true)
 	elif current_mode == MODE.Video:
 		loading_label.show()
 		$VideoStreamPlayer.stream = null # Solves a hard crash.
