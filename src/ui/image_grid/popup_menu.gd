@@ -4,6 +4,7 @@ signal favorite_changed
 signal tag_edit
 signal properties
 signal add_to_collection
+signal export(image)
 signal replace_file
 signal delete(image)
 
@@ -41,6 +42,8 @@ func _on_PopupMenu_id_pressed(id):
 			GlobalData.notify_db_collections_changed()
 	elif id == 8: # replace file
 		replace_file.emit(image)
+	elif id == 9: # export
+		export.emit(image)
 
 func _set_image(img):
 	image = img

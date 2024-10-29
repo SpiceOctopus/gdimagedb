@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://86emblidbalh"]
+[gd_scene load_steps=12 format=3 uid="uid://86emblidbalh"]
 
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1"]
 [ext_resource type="Script" path="res://ui/image_grid/image_grid.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://ui/image_grid/replace_file_window.gd" id="7_0wxrp"]
 [ext_resource type="PackedScene" uid="uid://b5u3ncjp2ptt7" path="res://ui/import_log/import_log.tscn" id="8_bn58o"]
 [ext_resource type="PackedScene" uid="uid://v8t6vwawua50" path="res://ui/delete_file/delete_file.tscn" id="8_l7y63"]
+[ext_resource type="Script" path="res://ui/image_grid/export_file_dialog.gd" id="9_1r7am"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ygfgn"]
 bg_color = Color(0.156863, 0.180392, 0.2, 1)
@@ -39,7 +40,7 @@ expand_mode = 1
 [node name="PopupMenu" type="PopupMenu" parent="."]
 size = Vector2i(253, 178)
 hide_on_checkable_item_selection = false
-item_count = 9
+item_count = 10
 item_0/text = "Favorite"
 item_0/checkable = 1
 item_1/text = "Add to Collection"
@@ -55,10 +56,12 @@ item_5/text = "Properties"
 item_5/id = 3
 item_6/id = 4
 item_6/separator = true
-item_7/text = "Replace File"
-item_7/id = 8
-item_8/text = "Delete"
-item_8/id = 5
+item_7/text = "Export"
+item_7/id = 9
+item_8/text = "Replace File"
+item_8/id = 8
+item_9/text = "Delete"
+item_9/id = 5
 script = ExtResource("3")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -125,11 +128,20 @@ visible = false
 size = Vector2i(500, 100)
 visible = false
 
+[node name="ExportFileDialog" type="FileDialog" parent="."]
+size = Vector2i(700, 400)
+min_size = Vector2i(300, 200)
+access = 2
+script = ExtResource("9_1r7am")
+
 [connection signal="add_to_collection" from="PopupMenu" to="." method="_on_popup_menu_add_to_collection"]
 [connection signal="delete" from="PopupMenu" to="." method="_on_popup_menu_delete"]
+[connection signal="export" from="PopupMenu" to="." method="_on_popup_menu_export"]
 [connection signal="favorite_changed" from="PopupMenu" to="." method="_on_PopupMenu_favorite_changed"]
 [connection signal="id_pressed" from="PopupMenu" to="PopupMenu" method="_on_PopupMenu_id_pressed"]
 [connection signal="properties" from="PopupMenu" to="." method="_on_PopupMenu_properties"]
 [connection signal="replace_file" from="PopupMenu" to="." method="_on_popup_menu_replace_file"]
 [connection signal="tag_edit" from="PopupMenu" to="." method="_on_PopupMenu_tag_edit"]
 [connection signal="confirmed" from="ReplaceFileWindow" to="." method="_on_replace_file_window_confirmed"]
+[connection signal="about_to_popup" from="ExportFileDialog" to="ExportFileDialog" method="_on_about_to_popup"]
+[connection signal="confirmed" from="ExportFileDialog" to="ExportFileDialog" method="_on_confirmed"]

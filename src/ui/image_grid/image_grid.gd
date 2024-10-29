@@ -26,6 +26,7 @@ var previews_mutex = Mutex.new()
 @onready var drop_files_label = $DropFilesLabel
 @onready var import_log = $ImportLog
 @onready var delete_file = $DeleteFile
+@onready var export_file = $ExportFileDialog
 
 @onready var last_window_size = Vector2i(0,0)
 
@@ -227,3 +228,7 @@ func _on_media_deleted(id):
 	previews_mutex.lock()
 	previews.erase(id)
 	previews_mutex.unlock()
+
+func _on_popup_menu_export(image):
+	export_file.media = image
+	export_file.popup_centered()

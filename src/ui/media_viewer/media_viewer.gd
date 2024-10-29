@@ -35,13 +35,13 @@ func _ready():
 			if preload_id > images.size() - 1:
 				preload_id = 0
 			if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
-				preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+				preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]), true)
 		if images.size() > 2:
 			var preload_id = current_image - 1
 			if preload_id < 0:
 				preload_id = images.size() - 1
 			if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
-				preload_previous_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+				preload_previous_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]), true)
 
 func _input(event):
 	if !hotkeys_active:
@@ -123,7 +123,7 @@ func set_next_image():
 	if preload_id > images.size() - 1:
 		preload_id = 0
 	if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
-		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]), true)
 
 func set_previous_image():
 	if preload_previous_id > 0:
@@ -140,7 +140,7 @@ func set_previous_image():
 	if preload_id < 0:
 		preload_id = images.size() - 1
 	if !CacheManager.image_cache.has(images[preload_id]["id"]) && (get_mode_for_file(images[preload_id]["path"]) == MODE.Picture):
-		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]))
+		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(images[preload_id]), true)
 
 func set_video_display_rect():
 	if !current_mode == MODE.Video:
