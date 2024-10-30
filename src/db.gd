@@ -434,24 +434,27 @@ func set_collection_name(id : int, collection_name : String) -> void:
 	db_access_mutex.unlock()
 
 # for fetching the title image
-func get_first_image_in_collection(collection_id):
+func get_first_image_in_collection(collection_id : int) -> DBMedia:
 	db_access_mutex.lock()
 	query_with_bindings("SELECT * FROM collections_images WHERE collection_id=? AND position='0'", [collection_id])
 	if query_result.size() > 1 || query_result.size() <= 0:
 		db_access_mutex.unlock()
-		return {}
+		return null
 	else:
 		query_with_bindings("SELECT * FROM images WHERE id=?", [query_result[0]["image_id"]])
-		var retval = query_result.duplicate()[0]
+		var retval = DBMedia.new()
+		retval.id = query_result[0]["id"]
+		retval.path = query_result[0]["path"]
+		retval.favorite = query_result[0]["fav"]
 		db_access_mutex.unlock()
 		return retval
 
-func set_collection_favorite(collection_id, fav):
+func set_collection_favorite(collection_id : int, fav : bool) -> void:
 	db_access_mutex.lock()
-	query_with_bindings("UPDATE collections SET fav=? WHERE id=?", [fav, collection_id])
+	query_with_bindings("UPDATE collections SET fav=? WHERE id=?", [int(fav), collection_id])
 	db_access_mutex.unlock()
 
-func delete_collection(collection_id):
+func delete_collection(collection_id : int) -> void:
 	db_access_mutex.lock()
 	query_with_bindings("DELETE FROM collections WHERE id=?", [collection_id])
 	query_with_bindings("DELETE FROM collections_images WHERE collection_id=?", [collection_id])
