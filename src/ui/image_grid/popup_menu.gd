@@ -8,7 +8,7 @@ signal export(image)
 signal replace_file
 signal delete(image)
 
-var image = null : set = _set_image
+var media : DBMedia = null : set = _set_media
 var last_used_collection
 
 func _ready():
@@ -23,28 +23,28 @@ func update_last_used_collection(collection):
 # It's translation save and get_text() is confusing since it uses order instead of ID.
 func _on_PopupMenu_id_pressed(id):
 	if id == 5: # delete
-		delete.emit(image)
+		delete.emit(media)
 	elif id == 2: # edit tags
-		tag_edit.emit(image["id"])
+		tag_edit.emit(media.id)
 	elif id == 0: # favorite
 		self.set_item_checked(0, !self.is_item_checked(0))
-		DB.set_fav(image["id"], int(self.is_item_checked(0)))
-		favorite_changed.emit(image["id"], int(self.is_item_checked(0)))
+		DB.set_fav(media.id, int(self.is_item_checked(0)))
+		favorite_changed.emit(media.id, int(self.is_item_checked(0)))
 	elif id == 3: # properties
-		properties.emit(image)
+		properties.emit(media)
 	elif id == 6: # add to collection
-		add_to_collection.emit(image["id"])
+		add_to_collection.emit(media.id)
 	elif id == 7: # add to last used collection
 		var collection = DB.get_collection_by_name(last_used_collection["collection"])[0]
-		if !DB.is_image_in_collection(image["id"], collection["id"]):
-			DB.add_image_to_collection(collection["id"], image["id"])
+		if !DB.is_image_in_collection(media.id, collection["id"]):
+			DB.add_image_to_collection(collection["id"], media.id)
 			GlobalData.notify_tags_changed() # not technically correct but will cause the grid to refresh
 			GlobalData.notify_db_collections_changed()
 	elif id == 8: # replace file
-		replace_file.emit(image)
+		replace_file.emit(media)
 	elif id == 9: # export
-		export.emit(image)
+		export.emit(media)
 
-func _set_image(img):
-	image = img
-	self.set_item_checked(0, bool(image["fav"]))
+func _set_media(media_in : DBMedia) -> void:
+	media = media_in
+	self.set_item_checked(0, bool(media.favorite))

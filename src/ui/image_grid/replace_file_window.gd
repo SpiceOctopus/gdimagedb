@@ -1,3 +1,3 @@
 extends FileDialog
 
-var file
+var media : DBMedia

@@ -80,7 +80,7 @@ func tile_double_click(collection):
 	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
 	var images = DB.get_all_images_in_collection(collection["id"])
 	images.sort_custom(compare_by_position)
-	instance.images = images
+	instance.media_set = images
 	
 	# add code to resume collection from last seen image
 	
@@ -101,7 +101,7 @@ func tile_double_click(collection):
 	window.connect("close_requested", Callable(window, "queue_free"))
 
 func compare_by_position(a, b):
-	return a["position"] < b["position"]
+	return a.position < b.position
 
 func tile_right_click(collection):
 	$PopupMenu.position = DisplayServer.mouse_get_position()

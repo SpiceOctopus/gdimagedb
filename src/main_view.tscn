@@ -105,7 +105,6 @@ visible = false
 visible = false
 
 [connection signal="refresh_grid" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_refresh_grid"]
-[connection signal="sort_mode_changed" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_sort_mode_changed"]
 [connection signal="switch_grids" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_switch_grids"]
 [connection signal="file_replaced" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="_on_image_grid_file_replaced"]
 [connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="_on_grid_grid_updated"]

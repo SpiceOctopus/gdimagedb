@@ -19,7 +19,6 @@ var previews
 
 func _ready():
 	previews = [preview1, preview2, preview3, preview4, preview5, preview6, preview7, preview8, preview9]
-	reset_window()
 
 func _on_DeleteButton_pressed():
 	var id
@@ -73,13 +72,13 @@ func _on_tag_list_item_selected(index):
 		for i in (9 - counter):
 			previews[counter + i].texture = empty_preview
 
-func set_thumb(image, preview : TextureRect):
-	if CacheManager.thumb_cache.has(image["id"]):
-		preview.texture = CacheManager.thumb_cache[image["id"]]
+func set_thumb(media : DBMedia, preview : TextureRect) -> void:
+	if CacheManager.thumb_cache.has(media.id):
+		preview.texture = CacheManager.thumb_cache[media.id]
 	else:
-		preview.texture = ImageUtil.TextureFromFile(DB.db_path_to_full_thumb_path(image["path"]))
+		preview.texture = ImageUtil.TextureFromFile(media.thumb_path)
 
-func reset_window():
+func reset_window() -> void:
 	filter_edit.text = ""
 	tags = DB.get_all_tags()
 	filter_edit.grab_focus()

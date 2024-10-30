@@ -86,17 +86,16 @@ func db_path_to_full_thumb_path(path):
 		thumb_path = thumb_path.replace("\\", "/")
 	return thumb_path
 
-func get_all_images():
+func get_all_media() -> Array[DBMedia]:
 	db_access_mutex.lock()
 	query("SELECT * FROM images")
-	var retval = query_result.duplicate()
-	db_access_mutex.unlock()
-	return retval
-
-func get_all_images_relative_paths():
-	db_access_mutex.lock()
-	query("SELECT * FROM images")
-	var retval = query_result.duplicate()
+	var retval : Array[DBMedia] = []
+	for entry in query_result:
+		var media = DBMedia.new()
+		media.id = entry["id"]
+		media.path = entry["path"]
+		media.favorite = entry["fav"]
+		retval.append(media)
 	db_access_mutex.unlock()
 	return retval
 
@@ -107,7 +106,7 @@ func get_all_tags():
 	db_access_mutex.unlock()
 	return retval
 
-func get_all_tag_counts():
+func get_all_tag_counts() -> Dictionary:
 	db_access_mutex.lock()
 	query("SELECT tag_id, count(tag_id) FROM tags_images GROUP BY tag_id")
 	var counts : Dictionary = {}
@@ -154,7 +153,7 @@ func remove_tag_from_image(tag_id, image_id):
 	query_with_bindings("DELETE FROM tags_images WHERE tag_id=? AND image_id=?", [tag_id, image_id])
 	db_access_mutex.unlock()
 
-func delete_image(image_id):
+func delete_image(image_id : int) -> void:
 	db_access_mutex.lock()
 	query_with_bindings("SELECT collection_id FROM collections_images WHERE image_id=?", [image_id])
 	if query_result.size() > 0:
@@ -208,33 +207,41 @@ func is_hash_in_db(file_hash : String) -> bool:
 	return false
 
 # Both tag parameters represent a full tag row as retrieved from the db (array of dicts).
-func get_images_for_tags(includedTags = [], excludedTags = []):
+func get_images_for_tags(includedTags = [], excludedTags = []) -> Array[DBMedia]:
 	db_access_mutex.lock()
-	var result
+	var result : Array[DBMedia] = []
+	var ids_to_exclude : Array[int] = []
 	
-	if includedTags.size() > 0:
-		var tagString = ""
-		var tagCount = 0
-		for tag in includedTags:
-			tagString += " %s," % tag["id"]
-			tagCount += 1
-		tagString = tagString.trim_suffix(",") # remove the last colon
-		query("SELECT * FROM images AS img JOIN tags_images AS tgimg ON tgimg.image_id = img.id AND tgimg.tag_id IN( %s ) " % tagString + "GROUP BY img.id HAVING COUNT(img.id) = %s" % tagCount)
-		result = query_result.duplicate()
-	else:
-		result = get_all_images_relative_paths()
-		
 	if excludedTags.size() > 0:
 		var cmd = "SELECT DISTINCT images.id FROM images JOIN tags_images ON tags_images.image_id = images.id JOIN tags ON tags_images.tag_id = tags.id WHERE"
 		for tag in excludedTags:
 			cmd += " tags.id = '%s' OR" % tag["id"]
 		cmd = cmd.trim_suffix("OR")
 		query(cmd)
-		var tmp = query_result.duplicate()
-		for image in result.duplicate():
-			for tmpimage in tmp:
-				if image["id"] == tmpimage["id"]:
-					result.erase(image)
+		for entry : Dictionary in query_result:
+			ids_to_exclude.append(entry["id"])
+	
+	if includedTags.size() > 0:
+		var tagString : String = ""
+		var tagCount : int = 0
+		for tag in includedTags:
+			tagString += " %s," % tag["id"]
+			tagCount += 1
+		tagString = tagString.trim_suffix(",") # remove the last colon
+		query("SELECT * FROM images AS img JOIN tags_images AS tgimg ON tgimg.image_id = img.id AND tgimg.tag_id IN( %s ) " % tagString + "GROUP BY img.id HAVING COUNT(img.id) = %s" % tagCount)
+		for media in query_result:
+			if media["id"] in ids_to_exclude:
+				continue
+			var temp = DBMedia.new()
+			temp.id = media["id"]
+			temp.path = media["path"]
+			temp.favorite = media["fav"]
+			result.append(temp)
+	else:
+		for media : DBMedia in get_all_media():
+			if media.id not in ids_to_exclude:
+				result.append(media)
+		
 	db_access_mutex.unlock()
 	return result
 
@@ -278,17 +285,19 @@ func update_position(id, position):
 	query_with_bindings("UPDATE images set position=? WHERE id=?", [position, id])
 	db_access_mutex.unlock()
 
-func get_ids_images_without_tags():
+func get_ids_images_without_tags() -> Array[int]:
 	db_access_mutex.lock()
 	query("SELECT id FROM images t1 LEFT JOIN tags_images t2 ON t2.image_id = t1.id WHERE t2.image_id IS NULL")
-	var retval = query_result.duplicate()
+	var retval : Array[int] = []
+	for result in query_result:
+		retval.append(result["id"])
 	db_access_mutex.unlock()
 	return retval
 
-func get_ids_collections_without_tags() -> Array:
+func get_ids_collections_without_tags() -> Array[int]:
 	db_access_mutex.lock()
 	query("SELECT id FROM collections t1 LEFT JOIN tags_collections t2 ON t2.collection_id = t1.id WHERE t2.collection_id IS NULL")
-	var retval = []
+	var retval : Array[int] = []
 	for entry in query_result:
 		retval.append(entry["id"])
 	db_access_mutex.unlock()
@@ -301,7 +310,7 @@ func count_images_in_db():
 	db_access_mutex.unlock()
 	return retval
 
-func get_setting_grid_image_size():
+func get_setting_grid_image_size() -> int:
 	db_access_mutex.lock()
 	var retval = db.select_rows("settings", "", ["grid_image_size"])[0]["grid_image_size"]
 	db_access_mutex.unlock()
@@ -327,15 +336,15 @@ func set_setting_media_viewer_stretch_mode(value : int):
 	query_with_bindings("UPDATE settings SET stretch_mode=?", [value])
 	db_access_mutex.unlock()
 
-func get_setting_hide_collection_images():
+func get_setting_hide_collection_images() -> bool:
 	db_access_mutex.lock()
-	var retval = db.select_rows("settings", "", ["hide_images_collections"])[0]["hide_images_collections"]
+	var retval : bool = bool(db.select_rows("settings", "", ["hide_images_collections"])[0]["hide_images_collections"])
 	db_access_mutex.unlock()
 	return retval
 
-func set_setting_hide_collection_images(value : int):
+func set_setting_hide_collection_images(value : bool):
 	db_access_mutex.lock()
-	query_with_bindings("UPDATE settings SET hide_images_collections=?", [value])
+	query_with_bindings("UPDATE settings SET hide_images_collections=?", [int(value)])
 	db_access_mutex.unlock()
 
 func create_new_collection(collection_name : String):
@@ -372,10 +381,17 @@ func add_image_to_collection(collection_id, image_id):
 	query_with_bindings("INSERT INTO collections_images (collection_id, image_id, position) VALUES (?, ?, ?)", [collection_id, image_id, query_result.size()])
 	db_access_mutex.unlock()
 
-func get_all_images_in_collection(collection_id):
+func get_all_images_in_collection(collection_id : int) -> Array[DBMedia]:
 	db_access_mutex.lock()
 	query_with_bindings("SELECT * FROM collections_images JOIN images ON images.id=collections_images.image_id WHERE collection_id=?", [collection_id])
-	var retval = query_result.duplicate()
+	var retval : Array[DBMedia] = []
+	for media in query_result:
+		var temp = DBMedia.new()
+		temp.id = media["id"]
+		temp.path = media["path"]
+		temp.favorite = media["fav"]
+		temp.position = media["position"]
+		retval.append(temp)
 	db_access_mutex.unlock()
 	return retval
 
@@ -386,7 +402,7 @@ func get_position_in_collection(image_id, collection_id):
 	db_access_mutex.unlock()
 	return retval
 
-func set_position_in_collection(image_id, collection_id, position):
+func set_position_in_collection(image_id : int, collection_id : int, position : int) -> void:
 	db_access_mutex.lock()
 	query("UPDATE collections_images SET position='%s' WHERE image_id='%s' AND collection_id='%s'" % [position, image_id, collection_id])
 	db_access_mutex.unlock()
@@ -406,13 +422,13 @@ func get_collection_image_by_position(collection_id, position):
 	db_access_mutex.unlock()
 	return retval
 
-func swap_positions_in_collection(image1, image2, collection):
-	var image_1_pos = get_position_in_collection(image1["id"], collection["id"])
+func swap_positions_in_collection(image1 : DBMedia, image2, collection):
+	var image_1_pos = get_position_in_collection(image1.id, collection["id"])
 	var image_2_pos = get_position_in_collection(image2["id"], collection["id"])
-	set_position_in_collection(image1["id"], collection["id"], image_2_pos)
+	set_position_in_collection(image1.id, collection["id"], image_2_pos)
 	set_position_in_collection(image2["id"], collection["id"], image_1_pos)
 
-func set_collection_name(id, collection_name):
+func set_collection_name(id : int, collection_name : String) -> void:
 	db_access_mutex.lock()
 	query_with_bindings("UPDATE collections SET collection=? WHERE id=?", [collection_name, id])
 	db_access_mutex.unlock()
@@ -459,15 +475,15 @@ func remove_tag_from_collection(tag_id, collection_id):
 	query_with_bindings("DELETE FROM tags_collections WHERE tag_id=? AND collection_id=?", [tag_id, collection_id])
 	db_access_mutex.unlock()
 
-func remove_image_from_collection(image_id, collection_id):
+func remove_image_from_collection(image_id : int, collection_id : int) -> void:
 	db_access_mutex.lock()
 	query_with_bindings("DELETE FROM collections_images WHERE image_id=? and collection_id=?", [image_id, collection_id])
 	db_access_mutex.unlock()
 
-func get_all_image_ids_in_collections():
+func get_all_image_ids_in_collections() -> Array[int]:
 	db_access_mutex.lock()
 	query("SELECT DISTINCT image_id FROM collections_images")
-	var retval = []
+	var retval : Array[int] = []
 	for id in query_result:
 		retval.append(id["image_id"])
 	db_access_mutex.unlock()

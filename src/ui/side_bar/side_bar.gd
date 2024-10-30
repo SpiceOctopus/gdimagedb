@@ -11,7 +11,7 @@ var last_filter : String = ""
 var all_tags
 var media_id : set=set_media_id
 var assigned_tags : Array = []
-var all_tag_counts
+var all_tag_counts : Dictionary
 var exiting : bool = false # fix for crash on premature closing
 
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
@@ -20,13 +20,13 @@ var exiting : bool = false # fix for crash on premature closing
 @onready var all_tags_list = $MarginContainer/VBoxContainer/Panel/ScrollContainer/AllTags
 @onready var tag_buttons = $MarginContainer/VBoxContainer/TagButtons
 
-func _ready():
+func _ready() -> void:
 	rebuild_tag_lists()
 	GlobalData.connect("display_mode_changed", _on_display_changed)
 	GlobalData.connect("db_tags_changed", _on_db_tags_changed)
 	tag_buttons.visible = show_add_delete_buttons
 
-func rebuild_tag_lists():
+func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
 	all_tag_counts = DB.get_all_tag_counts()
 	for tag in all_tags:
@@ -42,7 +42,7 @@ func rebuild_tag_lists():
 	WorkerThreadPool.add_task(async_build_tag_items_all)
 	WorkerThreadPool.add_task(async_build_tag_items_selected)
 
-func async_build_tag_items_all():
+func async_build_tag_items_all() -> void:
 	var tag_item_plus_instance = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
 	var tag_item_plus_minus_instance = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
 	for tag in all_tags:

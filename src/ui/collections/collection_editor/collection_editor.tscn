@@ -114,4 +114,4 @@ visible = false
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="text_changed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="pressed" from="HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton" to="." method="_on_apply_button_pressed"]
-[connection signal="confirmed" from="RemoveFromCollection" to="." method="_on_confirmation_dialog_confirmed"]
+[connection signal="confirmed" from="RemoveFromCollection" to="." method="_on_remove_from_collection_confirmed"]

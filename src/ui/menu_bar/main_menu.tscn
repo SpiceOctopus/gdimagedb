@@ -65,16 +65,6 @@ popup/item_0/text = "Add Tag"
 popup/item_1/text = "Delete Tag"
 popup/item_1/id = 1
 
-[node name="SortMenu" type="MenuButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
-visible = false
-layout_mode = 2
-disabled = true
-text = "Sort"
-item_count = 2
-popup/item_0/text = "Unsorted"
-popup/item_1/text = "By Position"
-popup/item_1/id = 1
-
 [node name="FavoritesCheckBox" type="CheckButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4

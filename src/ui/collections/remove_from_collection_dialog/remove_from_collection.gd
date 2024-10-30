@@ -2,7 +2,7 @@ extends Window
 
 signal confirmed
 
-var image
+var media : DBMedia
 
 func _on_cancel_pressed():
 	hide()

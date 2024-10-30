@@ -1,13 +1,11 @@
 extends Control
 
 signal refresh_grid
-signal sort_mode_changed
 signal switch_grids
 
 @onready var settings_menu = $MarginContainer/HBoxContainer2/HBoxContainer/SettingsMenu
 @onready var btn_switch_grids = $MarginContainer/HBoxContainer2/HBoxContainer2/SwitchGridsButton
 @onready var tags_menu = $MarginContainer/HBoxContainer2/HBoxContainer/TagsMenu
-@onready var sort_menu = $MarginContainer/HBoxContainer2/HBoxContainer/SortMenu
 @onready var favorites_checkbox = $MarginContainer/HBoxContainer2/HBoxContainer/FavoritesCheckBox
 @onready var untagged_checkbox = $MarginContainer/HBoxContainer2/HBoxContainer/UntaggedCheckBox
 @onready var add_tag_window = $AddTagDialog
@@ -19,7 +17,6 @@ func _ready():
 	settings_menu.get_popup().connect("id_pressed",Callable(self,"_on_settings_menu_selection"))
 	settings_menu.get_popup().set_item_checked(1, Settings.hide_images_collections)
 	tags_menu.get_popup().connect("id_pressed",Callable(self,"_on_tags_menu_selection"))
-	sort_menu.get_popup().connect("id_pressed", _on_sort_menu_selection)
 	GlobalData.connect("display_mode_changed", _on_display_mode_changed)
 	GlobalData.connect("tags_changed", _on_tags_changed)
 	GlobalData.connect("help", _on_help_button_pressed)
@@ -54,12 +51,6 @@ func _on_tags_menu_selection(id):
 		add_tag_window.popup_centered()
 	elif id == 1: # delete tag
 		delete_tag_window.popup_centered()
-
-func _on_sort_menu_selection(id):
-	if id == 0:
-		sort_mode_changed.emit(ImageGrid.SortMode.none)
-	elif id == 1:
-		sort_mode_changed.emit(ImageGrid.SortMode.pos)
 
 func _on_untagged_check_box_toggled(button_pressed):
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
