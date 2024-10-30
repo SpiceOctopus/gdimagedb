@@ -2,7 +2,7 @@ extends Control
 
 class_name ImageGrid
 
-signal tag_edit
+signal tag_edit(id)
 signal grid_updated
 signal file_replaced
 
@@ -169,8 +169,8 @@ func _on_PopupMenu_favorite_changed(id, fav):
 		if preview.current_image["id"] == id:
 			preview.current_image["fav"] = fav
 
-func _on_PopupMenu_tag_edit(image):
-	tag_edit.emit(image)
+func _on_PopupMenu_tag_edit(id):
+	tag_edit.emit(id)
 
 func _on_PopupMenu_properties(image):
 	media_properties_control.image = image
@@ -182,8 +182,8 @@ func on_grid_image_click(grid_image):
 		if preview != grid_image:
 			preview.set_selected(false)
 
-func _on_popup_menu_add_to_collection(image):
-	add_to_collection_control.image = image
+func _on_popup_menu_add_to_collection(image_id):
+	add_to_collection_control.image_id = image_id
 	add_to_collection_window.popup_centered()
 
 func _on_db_images_changed():

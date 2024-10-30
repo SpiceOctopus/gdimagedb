@@ -48,7 +48,7 @@ func _on_files_dropped(files):
 
 	GlobalData.notify_db_images_changed()
 
-func _on_grid_tag_edit(image):
+func _on_grid_tag_edit(id):
 	if tag_editor.min_size.x > DisplayServer.window_get_size().x || tag_editor.min_size.y > DisplayServer.window_get_size().y:
 		tag_editor.size = tag_editor.min_size
 	else:
@@ -56,7 +56,7 @@ func _on_grid_tag_edit(image):
 	
 	tag_editor.popup_centered()
 	tag_editor.media = grid.current_images.duplicate()
-	tag_editor.set_current(image["id"])
+	tag_editor.set_current(id)
 
 func _on_menu_bar_refresh_grid():
 	refresh()

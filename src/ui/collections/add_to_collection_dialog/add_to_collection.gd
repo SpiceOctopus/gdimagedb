@@ -1,15 +1,12 @@
 extends Control
 
 var all_collections
-var image_internal
-var image:
+var image_id:
 	set(val):
-		image_internal = val
+		image_id = val
 		all_collections = DB.get_all_collections()
 		rebuild_list()
 		edit_filter.grab_focus()
-	get:
-		return image_internal
 
 @onready var collections_list = $MarginContainer/VBoxContainer/CollectionsList
 @onready var edit_filter = $MarginContainer/VBoxContainer/FilterEdit
@@ -17,8 +14,8 @@ var image:
 
 func _on_btn_add_pressed():
 	var collection = DB.get_collection_by_name(collections_list.get_item_text(collections_list.get_selected_items()[0]))[0]
-	if !DB.is_image_in_collection(image["id"], collection["id"]):
-		DB.add_image_to_collection(collection["id"], image["id"])
+	if !DB.is_image_in_collection(image_id, collection["id"]):
+		DB.add_image_to_collection(collection["id"], image_id)
 		GlobalData.last_used_collection = collection
 		GlobalData.notify_db_collections_changed()
 		get_parent().hide()

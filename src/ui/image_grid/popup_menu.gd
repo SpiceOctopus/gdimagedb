@@ -1,7 +1,7 @@
 extends PopupMenu
 
 signal favorite_changed
-signal tag_edit
+signal tag_edit(id)
 signal properties
 signal add_to_collection
 signal export(image)
@@ -25,7 +25,7 @@ func _on_PopupMenu_id_pressed(id):
 	if id == 5: # delete
 		delete.emit(image)
 	elif id == 2: # edit tags
-		tag_edit.emit(DB.get_image(image["id"]))
+		tag_edit.emit(image["id"])
 	elif id == 0: # favorite
 		self.set_item_checked(0, !self.is_item_checked(0))
 		DB.set_fav(image["id"], int(self.is_item_checked(0)))
@@ -33,7 +33,7 @@ func _on_PopupMenu_id_pressed(id):
 	elif id == 3: # properties
 		properties.emit(image)
 	elif id == 6: # add to collection
-		add_to_collection.emit(DB.get_image(image["id"]))
+		add_to_collection.emit(image["id"])
 	elif id == 7: # add to last used collection
 		var collection = DB.get_collection_by_name(last_used_collection["collection"])[0]
 		if !DB.is_image_in_collection(image["id"], collection["id"]):

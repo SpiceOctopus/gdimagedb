@@ -116,13 +116,6 @@ func get_all_tag_counts():
 	db_access_mutex.unlock()
 	return counts
 
-func get_image(id):
-	db_access_mutex.lock()
-	query_with_bindings("SELECT * FROM images WHERE id=?", [id])
-	var retval = query_result.duplicate()[0]
-	db_access_mutex.unlock()
-	return retval
-
 func get_tags_for_image(id):
 	db_access_mutex.lock()
 	query_with_bindings("SELECT tags.id, tags.tag FROM tags_images JOIN tags ON tags_images.tag_id = tags.id WHERE image_id = ?", [id])
