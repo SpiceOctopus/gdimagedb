@@ -5,12 +5,16 @@ class_name ImageGrid
 signal tag_edit(id : int)
 signal grid_updated
 signal file_replaced
+signal thumbnail_load_complete
 
 var db_media : Array[DBMedia] = []
 var current_media : Array[DBMedia] = []
 var previews : Dictionary = {}
 
 var previews_mutex : Mutex = Mutex.new()
+
+var grid_refresh_thread_id : int = -1
+var thumbnail_load_thread_id : int = -1
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
@@ -28,6 +32,7 @@ var previews_mutex : Mutex = Mutex.new()
 
 func _ready() -> void:
 	drop_files_label.visible = (DB.count_images_in_db() == 0)
+	CacheManager.connect("thumb_cache_loading_complete", trigger_load_thumbnails)
 	GlobalData.connect("favorites_changed", show_favorites)
 	GlobalData.connect("untagged_changed", show_untagged)
 	GlobalData.connect("tags_changed", tags_changed)
@@ -35,8 +40,9 @@ func _ready() -> void:
 	GlobalData.connect("db_images_changed", _on_db_images_changed)
 	GlobalData.connect("media_deleted", _on_media_deleted)
 	GlobalData.connect("db_collections_changed", refresh_grid)
+	connect("thumbnail_load_complete", merge_thumbnail_load_thread)
 	db_media = DB.get_all_media()
-	WorkerThreadPool.add_task(refresh_grid)
+	grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
 	add_to_collection_window.connect('close_requested', Callable(add_to_collection_window,'hide'))
 	add_to_collection_window.min_size = add_to_collection_control.custom_minimum_size
 	media_properties_window.connect('close_requested', Callable(media_properties_window,'hide'))
@@ -50,15 +56,15 @@ func _process(_delta) -> void:
 
 func tags_changed() -> void:
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
-		refresh_grid()
+		grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
 
 func show_favorites() -> void:
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
-		refresh_grid()
+		grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
 
 func show_untagged() -> void:
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
-		refresh_grid()
+		grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
 
 func window_size_changed() -> void:
 	var columns : int = floor(scroll_container.size.x / Settings.grid_image_size)
@@ -70,18 +76,11 @@ func window_size_changed() -> void:
 # hard = thumbnail cache has been cleared, reload all previews
 func refresh_grid(hard : bool = false) -> void:
 	current_media.clear()
-	
-	if hard:
-		previews_mutex.lock()
-		previews.clear()
-		previews_mutex.unlock()
-		for grid_image in grid_container.get_children():
-			grid_image.free()
-	
 	drop_files_label.call_deferred("set_visible", (db_media.size() <= 0))
 	
+	previews_mutex.lock()
 	for preview in previews.values():
-		preview.visible = false
+		preview.call_deferred("set_visible", false)
 	
 	for media : DBMedia in db_media:
 		if !previews.has(media.id):
@@ -90,14 +89,12 @@ func refresh_grid(hard : bool = false) -> void:
 			grid_container.call_deferred("add_child", gridImageInstance)
 			gridImageInstance.add_to_group("previews")
 			gridImageInstance.connect("double_click", _on_grid_image_double_click)
-			gridImageInstance.connect("right_click",Callable(self,"grid_image_right_click"))
-			gridImageInstance.connect("click",Callable(self,"on_grid_image_click"))
-			gridImageInstance.connect("multi_select", _on_grid_image_multi_select)
-			gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-			gridImageInstance.visible = false
-			previews_mutex.lock()
+			gridImageInstance.call_deferred("connect", "right_click", grid_image_right_click)
+			gridImageInstance.call_deferred("connect", "click", on_grid_image_click)
+			gridImageInstance.call_deferred("connect", "multi_select", _on_grid_image_multi_select)
+			gridImageInstance.call_deferred("set_custom_minimum_size", Vector2(Settings.grid_image_size, Settings.grid_image_size))
+			gridImageInstance.call_deferred("set_visible", false)
 			previews[media.id] = gridImageInstance
-			previews_mutex.unlock()
 	
 	var images_without_tags : Array[int] = []
 	if GlobalData.show_untagged: # no need to run this if it's not in use
@@ -114,12 +111,27 @@ func refresh_grid(hard : bool = false) -> void:
 		else:
 			previews[image.id].call_deferred("set_visible", true)
 			current_media.append(image)
+	previews_mutex.unlock()
 	
 	call_deferred("window_size_changed") # calculates and sets grid proportions
 	call_deferred("notify_grid_updated")
+	if hard:
+		call_deferred("trigger_load_thumbnails")
+
+func trigger_load_thumbnails() -> void:
+	thumbnail_load_thread_id = WorkerThreadPool.add_task(async_load_thumbnails)
+
+func async_load_thumbnails() -> void:
+	for preview : GridImage in previews.values():
+		preview.load_thumbnail()
+	thumbnail_load_complete.emit.call_deferred()
+
+func merge_thumbnail_load_thread() -> void:
+	WorkerThreadPool.wait_for_task_completion(thumbnail_load_thread_id)
 
 func notify_grid_updated() -> void:
 	grid_updated.emit()
+	WorkerThreadPool.wait_for_task_completion(grid_refresh_thread_id)
 
 func get_images_for_current_view() -> Array[DBMedia]:
 	if !((GlobalData.included_tags.size() > 0) || (GlobalData.excluded_tags.size() > 0)):
@@ -176,7 +188,7 @@ func _on_popup_menu_add_to_collection(image_id : int) -> void:
 
 func _on_db_images_changed() -> void:
 	db_media = DB.get_all_media()
-	refresh_grid()
+	grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
 
 func _on_grid_image_multi_select(_image):
 	return # inactive for now
@@ -220,3 +232,15 @@ func _on_media_deleted(id : int) -> void:
 func _on_popup_menu_export(image : DBMedia) -> void:
 	export_file.media = image
 	export_file.popup_centered()
+
+func queue_refresh_grid(hard : bool = false) -> void:
+	if hard:
+		previews_mutex.lock()
+		previews.clear()
+		previews_mutex.unlock()
+		for grid_image in grid_container.get_children():
+			grid_image.free()
+		grid_refresh_thread_id = WorkerThreadPool.add_task(Callable(refresh_grid).bind(hard))
+	else:
+		grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
+		

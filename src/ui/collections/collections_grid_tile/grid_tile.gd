@@ -7,19 +7,19 @@ signal click
 var collection : set=set_collection, get=get_collection
 var collection_internal
 var image : DBMedia
-var last_refresh_thread_id = -1
 
 @onready var lbl_name = $CollectionNameLabel
 @onready var title_image = $TitleImage
 
-func _ready():
+func _ready() -> void:
 	# name label background
 	var stylebox = StyleBoxFlat.new()
 	stylebox.bg_color = Color("DARK_SLATE_GRAY", 0.9)
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
 	GlobalData.connect("db_collections_changed", queue_thumbnail_refresh)
+	title_image.texture = load("res://gfx/loading.png")
 
-func _input(event):
+func _input(event) -> void:
 	if !visible:
 		return
 	elif ! (event is InputEventMouseButton) || !get_global_rect().has_point(event.global_position):
@@ -31,32 +31,22 @@ func _input(event):
 	elif event.is_pressed() and event.button_index == MOUSE_BUTTON_RIGHT:
 		right_click.emit(collection)
 
-func _gui_input(ev):
+func _gui_input(ev) -> void:
 	if !visible:
 		return
 	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
 		click.emit(self)
 
-func set_collection(collection_param):
+func set_collection(collection_param) -> void:
 	lbl_name.text = collection_param["collection"]
 	collection_internal = collection_param
 	image = DB.get_first_image_in_collection(collection["id"])
-	if not image == null:
-		if CacheManager.thumb_cache.has(image.id):
-			title_image.texture = CacheManager.thumb_cache[image.id]
-		else:
-			last_refresh_thread_id = WorkerThreadPool.add_task(async_load)
 
-func async_load() -> void:
-	var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
-	if dir.file_exists(image.thumb_path):
-		var tmp = ImageUtil.TextureFromFile(image.thumb_path)
-		if is_instance_valid(title_image):
-			title_image.call_deferred("set_texture", tmp)
-		CacheManager.call_deferred("add_thumbnail", image.id, tmp)
+func load_thumbnail() -> void:
+	if CacheManager.thumb_cache.has(image.id):
+		title_image.call_deferred("set_texture", CacheManager.thumb_cache[image.id])
 	elif image.path.get_extension() in Settings.supported_video_files:
-		if is_instance_valid(title_image):
-			title_image.call_deferred("set_texture", load("res://gfx/video_placeholder.png"))
+		title_image.call_deferred("set_texture", load("res://gfx/video_placeholder.png"))
 
 func get_collection():
 	return collection_internal
@@ -72,8 +62,5 @@ func queue_thumbnail_refresh() -> void:
 	if not image == null:
 		if CacheManager.thumb_cache.has(image.id):
 			title_image.texture = CacheManager.thumb_cache[image.id]
-		else:
-			WorkerThreadPool.wait_for_task_completion(last_refresh_thread_id)
-			last_refresh_thread_id = WorkerThreadPool.add_task(async_load)
 	else:
 		title_image.texture = load("res://gfx/collection_placeholder_icon.png")

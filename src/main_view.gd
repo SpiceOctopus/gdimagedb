@@ -15,10 +15,11 @@ func _ready() -> void:
 	_on_grid_grid_updated()
 
 func _input(_event) -> void:
-	if Input.is_action_just_pressed("ui_filedialog_refresh"):
+	if Input.is_action_just_pressed("ui_filedialog_refresh") && not Input.is_key_pressed(KEY_SHIFT):
 		refresh()
 	if Input.is_action_just_pressed("clear_thumb_cache_refresh"):
 		CacheManager.clear_thumb_cache()
+		CacheManager.reload_thumbcache()
 		refresh(true)
 	if Input.is_action_just_pressed("help"):
 		GlobalData.notify_help_called()
@@ -70,7 +71,7 @@ func _on_grid_grid_updated() -> void:
 # hard refresh = clear cache
 func refresh(hard : bool = false) -> void:
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
-		image_grid.refresh_grid(hard)
+		image_grid.queue_refresh_grid(hard)
 	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
 		collections_grid.refresh_grid()
 

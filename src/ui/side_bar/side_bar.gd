@@ -1,5 +1,9 @@
 extends Control
 
+signal load_all_done
+signal load_selected_done
+
+
 enum MODE {Grid, TagEditor, CollectionEditor}
 
 @export var mode : MODE = MODE.Grid
@@ -14,6 +18,9 @@ var assigned_tags : Array = []
 var all_tag_counts : Dictionary
 var exiting : bool = false # fix for crash on premature closing
 
+var load_all_thread_id : int = -1
+var load_selected_thread_id : int = -1
+
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
 @onready var tag_preview_list = $MarginContainer/TagPreviewList
@@ -24,7 +31,12 @@ func _ready() -> void:
 	rebuild_tag_lists()
 	GlobalData.connect("display_mode_changed", _on_display_changed)
 	GlobalData.connect("db_tags_changed", _on_db_tags_changed)
+	connect("load_all_done", merge_loader_threads)
+	connect("load_selected_done", merge_loader_threads)
 	tag_buttons.visible = show_add_delete_buttons
+
+func merge_loader_threads(id : int) -> void:
+		WorkerThreadPool.wait_for_task_completion(id)
 
 func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
@@ -39,8 +51,8 @@ func rebuild_tag_lists() -> void:
 	for item in selected_tags_list.get_children():
 		item.queue_free()
 
-	WorkerThreadPool.add_task(async_build_tag_items_all)
-	WorkerThreadPool.add_task(async_build_tag_items_selected)
+	load_all_thread_id = WorkerThreadPool.add_task(async_build_tag_items_all)
+	load_selected_thread_id = WorkerThreadPool.add_task(async_build_tag_items_selected)
 
 func async_build_tag_items_all() -> void:
 	var tag_item_plus_instance = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
@@ -67,6 +79,7 @@ func async_build_tag_items_all() -> void:
 		
 	tag_item_plus_instance.queue_free()
 	tag_item_plus_minus_instance.queue_free()
+	load_all_done.emit.call_deferred(load_all_thread_id)
 
 func async_build_tag_items_selected():
 	var tag_item_instance = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
@@ -86,6 +99,7 @@ func async_build_tag_items_selected():
 		if is_instance_valid(selected_tags_list):
 			selected_tags_list.call_deferred("add_child", item)
 	tag_item_instance.queue_free()
+	load_selected_done.emit.call_deferred(load_selected_thread_id)
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed = ""):

@@ -22,6 +22,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_ak872")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="CollectionNameLabel" type="Label" parent="."]
