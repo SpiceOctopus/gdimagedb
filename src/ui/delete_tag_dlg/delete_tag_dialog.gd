@@ -5,7 +5,7 @@ var previews
 
 @onready var filter_edit = $MarginContainer/HBoxContainer/VBoxContainer2/FilterEdit
 @onready var tag_list = $MarginContainer/HBoxContainer/VBoxContainer2/TagList
-@onready var tags = DB.get_all_tags()
+@onready var tags : Array[DBTag] = DB.get_all_tags()
 @onready var preview1 = $MarginContainer/HBoxContainer/VBoxContainer/TopContainer/Preview1
 @onready var preview2 = $MarginContainer/HBoxContainer/VBoxContainer/TopContainer/Preview2
 @onready var preview3 = $MarginContainer/HBoxContainer/VBoxContainer/TopContainer/Preview3
@@ -23,17 +23,17 @@ func _ready():
 func _on_DeleteButton_pressed():
 	var id
 	for tag in tags:
-		if tag["tag"] == tag_list.get_item_text((tag_list.get_selected_items()[0])):
-			id = tag["id"]
+		if tag.tag == tag_list.get_item_text((tag_list.get_selected_items()[0])):
+			id = tag.id
 			break
 	
 	DB.delete_tag(id)
 	
 	for included_tag in GlobalData.included_tags:
-		if included_tag["id"] == id:
+		if included_tag.id == id:
 			GlobalData.included_tags.erase(included_tag)
 	for excluded_tag in GlobalData.excluded_tags:
-		if excluded_tag["id"] == id:
+		if excluded_tag.id == id:
 			GlobalData.excluded_tags.erase(excluded_tag)
 	filter_edit.text = ""
 	
@@ -49,11 +49,11 @@ func update_tag_list():
 	tag_list.clear()
 	if filter_edit.text == "":
 		for tag in tags:
-			tag_list.add_item(tag["tag"])
+			tag_list.add_item(tag.tag)
 	else:
 		for tag in tags:
-			if filter_edit.text.to_lower() in tag["tag"].to_lower():
-				tag_list.add_item(tag["tag"])
+			if filter_edit.text.to_lower() in tag.tag.to_lower():
+				tag_list.add_item(tag.tag)
 	if tag_list.item_count > 0:
 		tag_list.select(0)
 		_on_tag_list_item_selected(0)

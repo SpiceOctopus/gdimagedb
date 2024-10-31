@@ -4,17 +4,17 @@ signal load_all_done
 signal load_selected_done
 
 
-enum MODE {Grid, TagEditor, CollectionEditor}
+enum MODE {GRID, TAG_EDITOR, COLLECTION_EDITOR}
 
-@export var mode : MODE = MODE.Grid
+@export var mode : MODE = MODE.GRID
 @export var show_add_delete_buttons : bool = false
 
 var selection_offset : int = 0
 var visible_tags_count : int = 0
 var last_filter : String = ""
-var all_tags
-var media_id : set=set_media_id
-var assigned_tags : Array = []
+var all_tags : Array[DBTag] = []
+var media_id : int : set=set_media_id
+var assigned_tags_ids : Array[int] = []
 var all_tag_counts : Dictionary
 var exiting : bool = false # fix for crash on premature closing
 
@@ -42,8 +42,8 @@ func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
 	all_tag_counts = DB.get_all_tag_counts()
 	for tag in all_tags:
-		if !all_tag_counts.has(tag["id"]):
-			all_tag_counts[tag["id"]] = 0
+		if !all_tag_counts.has(tag.id):
+			all_tag_counts[tag.id] = 0
 	all_tags.sort_custom(sort_by_count)
 	for item in all_tags_list.get_children():
 		item.queue_free()
@@ -61,14 +61,14 @@ func async_build_tag_items_all() -> void:
 		if exiting: # crash fix
 			return
 		
-		if mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+		if mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
 			var item = tag_item_plus_instance.duplicate()
 			item.tag = tag
 			item.connect("add", _on_tag_item_add)
-			item.visible = !item.tag in assigned_tags
+			item.visible = !item.tag.id in assigned_tags_ids
 			if is_instance_valid(all_tags_list):
 				all_tags_list.call_deferred("add_child", item)
-		elif mode == MODE.Grid:
+		elif mode == MODE.GRID:
 			var item = tag_item_plus_minus_instance.duplicate()
 			item.tag = tag
 			item.connect("add", _on_tag_item_add)
@@ -87,14 +87,14 @@ func async_build_tag_items_selected():
 		if exiting: # crash fix
 			return
 		var item = tag_item_instance.duplicate()
-		item.tag = DB.get_tag_by_name(tag["tag"])
+		item.tag = tag
 		item.connect("x", _on_tag_item_x)
-		if mode == MODE.Grid:
+		if mode == MODE.GRID:
 			item.color_mode = true
 			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
-		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
+		elif mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
 			item.color_mode = false
-			item.visible = item.tag in assigned_tags
+			item.visible = item.tag.id in assigned_tags_ids
 		
 		if is_instance_valid(selected_tags_list):
 			selected_tags_list.call_deferred("add_child", item)
@@ -114,10 +114,10 @@ func update_all_tags_list(_from_text_changed = ""):
 	
 	for item in all_tags_list.get_children():
 		item.reset()
-		if mode == MODE.Grid:
+		if mode == MODE.GRID:
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
-		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
-			item.visible = !item.tag in assigned_tags
+		elif mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
+			item.visible = !item.tag.id in assigned_tags_ids
 		if !item.visible:
 			continue # item is in a selection, no more filters apply
 		
@@ -142,10 +142,10 @@ func update_all_tags_list(_from_text_changed = ""):
 func update_selected_tags_list():
 	for item in selected_tags_list.get_children():
 		item.reset()
-		if mode == MODE.Grid:
+		if mode == MODE.GRID:
 			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
-		elif mode == MODE.TagEditor || mode == MODE.CollectionEditor:
-			item.visible = item.tag in assigned_tags
+		elif mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
+			item.visible = item.tag.id in assigned_tags_ids
 
 func _on_display_changed():
 	update_all_tags_list()
@@ -168,17 +168,23 @@ func _on_tag_preview_list_gui_input(event):
 		_on_LineEdit_gui_input(event)
 
 func _on_tag_item_add(tag):
-	if mode == MODE.Grid:
+	if mode == MODE.GRID:
 		GlobalData.included_tags.append(tag)
-	elif mode == MODE.TagEditor:
-		DB.add_tag_to_image(tag["id"], media_id)
-		assigned_tags = DB.get_tags_for_image(media_id)
-	elif mode == MODE.CollectionEditor:
-		DB.add_tag_to_collection(tag["id"], media_id)
-		assigned_tags = DB.get_tags_for_collection(media_id)
+	elif mode == MODE.TAG_EDITOR:
+		DB.add_tag_to_image(tag.id, media_id)
+		var assigned : Array[int] = []
+		for entry in DB.get_tags_for_image(media_id):
+			assigned.append(entry.id)
+		assigned_tags_ids = assigned
+	elif mode == MODE.COLLECTION_EDITOR:
+		DB.add_tag_to_collection(tag.id, media_id)
+		var assigned : Array[int] = []
+		for entry in DB.get_tags_for_collection(media_id):
+			assigned.append(entry.id)
+		assigned_tags_ids = assigned
 	update_selected_tags_list()
 	update_all_tags_list()
-	if mode == MODE.Grid:
+	if mode == MODE.GRID:
 		GlobalData.notify_tags_changed()
 
 func _on_tag_item_remove(tag):
@@ -188,22 +194,28 @@ func _on_tag_item_remove(tag):
 	GlobalData.notify_tags_changed()
 
 func _on_tag_item_x(tag):
-	if mode == MODE.Grid:
+	if mode == MODE.GRID:
 		for included_tag in GlobalData.included_tags:
 			if included_tag["id"] == tag["id"]:
 				GlobalData.included_tags.erase(included_tag)
 		for excluded_tag in GlobalData.excluded_tags:
 			if excluded_tag["id"] == tag["id"]:
 				GlobalData.excluded_tags.erase(excluded_tag)
-	elif mode == MODE.TagEditor:
-		DB.remove_tag_from_image(tag["id"], media_id)
-		assigned_tags = DB.get_tags_for_image(media_id)
-	elif mode == MODE.CollectionEditor:
+	elif mode == MODE.TAG_EDITOR:
+		DB.remove_tag_from_image(tag.id, media_id)
+		var assigned : Array[int] = []
+		for entry in DB.get_tags_for_image(media_id):
+			assigned.append(entry.id)
+		assigned_tags_ids = assigned
+	elif mode == MODE.COLLECTION_EDITOR:
 		DB.remove_tag_from_collection(tag["id"], media_id)
-		assigned_tags = DB.get_tags_for_collection(media_id)
+		var assigned : Array[int] = []
+		for entry in DB.get_tags_for_collection(media_id):
+			assigned.append(entry.id)
+		assigned_tags_ids = assigned
 	update_selected_tags_list()
 	update_all_tags_list()
-	if mode == MODE.Grid:
+	if mode == MODE.GRID:
 		GlobalData.notify_tags_changed()
 
 func _on_filter_text_submitted(new_text):
@@ -236,15 +248,21 @@ func clear_filter_text():
 	input_box.text = ""
 	_on_display_changed()
 
-func set_media_id(id):
+func set_media_id(id : int):
 	media_id = id
-	if mode == MODE.Grid || mode == MODE.TagEditor:
-		assigned_tags = DB.get_tags_for_image(id)
+	if mode == MODE.GRID || mode == MODE.TAG_EDITOR:
+		var assigned : Array[int] = []
+		for entry in DB.get_tags_for_image(media_id):
+			assigned.append(entry.id)
+		assigned_tags_ids = assigned
 	else:
-		assigned_tags = DB.get_tags_for_collection(id)
+		var assigned : Array[int] = []
+		for entry in DB.get_tags_for_collection(media_id):
+			assigned.append(entry.id)
+		assigned_tags_ids = assigned
 
 func sort_by_count(a, b):
-	if all_tag_counts[a["id"]] > all_tag_counts[b["id"]]:
+	if all_tag_counts[a.id] > all_tag_counts[b.id]:
 		return true
 	return false
 

@@ -5,7 +5,7 @@ signal remove(tag)
 
 var selected : bool = false : set=set_selected
 
-var tag
+var tag : DBTag
 
 @onready var tag_label = $HBoxContainer/Tag
 @onready var remove_button = $HBoxContainer/Remove
@@ -16,7 +16,7 @@ func _ready():
 	add_button.custom_minimum_size.x = add_button.size.y
 	custom_minimum_size.y = add_button.size.y
 	if tag != null:
-		tag_label.text = tag["tag"]
+		tag_label.text = tag.tag
 
 func _on_add_pressed():
 	add.emit(tag)
@@ -29,9 +29,9 @@ func _on_remove_pressed():
 func set_selected(value : bool):
 	selected = value
 	if value:
-		tag_label.text = "> " + tag["tag"]
+		tag_label.text = "> " + tag.tag
 	else:
-		tag_label.text = tag["tag"]
+		tag_label.text = tag.tag
 
 func reset():
 	visible = true

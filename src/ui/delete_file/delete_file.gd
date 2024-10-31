@@ -23,7 +23,6 @@ func _on_ok_button_pressed():
 	CacheManager.thumb_cache.erase(media.id)
 	CacheManager.thumb_mutex.unlock()
 	GlobalData.notify_media_deleted(media.id)
-	GlobalData.notify_db_images_changed()
 	hide()
 
 func _on_close_requested():

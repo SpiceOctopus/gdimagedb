@@ -15,6 +15,7 @@ var previews_mutex : Mutex = Mutex.new()
 
 var grid_refresh_thread_id : int = -1
 var thumbnail_load_thread_id : int = -1
+var grid_refresh_finished : bool = true
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
@@ -37,7 +38,6 @@ func _ready() -> void:
 	GlobalData.connect("untagged_changed", show_untagged)
 	GlobalData.connect("tags_changed", tags_changed)
 	GlobalData.connect("db_tags_changed", tags_changed)
-	GlobalData.connect("db_images_changed", _on_db_images_changed)
 	GlobalData.connect("media_deleted", _on_media_deleted)
 	GlobalData.connect("db_collections_changed", refresh_grid)
 	connect("thumbnail_load_complete", merge_thumbnail_load_thread)
@@ -75,15 +75,15 @@ func window_size_changed() -> void:
 
 # hard = thumbnail cache has been cleared, reload all previews
 func refresh_grid(hard : bool = false) -> void:
+	db_media = DB.get_all_media()
 	current_media.clear()
 	drop_files_label.call_deferred("set_visible", (db_media.size() <= 0))
 	
 	previews_mutex.lock()
 	for preview in previews.values():
 		preview.call_deferred("set_visible", false)
-	
 	for media : DBMedia in db_media:
-		if !previews.has(media.id):
+		if !previews.keys().has(media.id):
 			var gridImageInstance = GridImage.new()
 			gridImageInstance.set_media(media)
 			grid_container.call_deferred("add_child", gridImageInstance)
@@ -118,12 +118,17 @@ func refresh_grid(hard : bool = false) -> void:
 	if hard:
 		call_deferred("trigger_load_thumbnails")
 
-func trigger_load_thumbnails() -> void:
-	thumbnail_load_thread_id = WorkerThreadPool.add_task(async_load_thumbnails)
+func trigger_load_thumbnails(to_load : Array = []) -> void:
+	thumbnail_load_thread_id = WorkerThreadPool.add_task(Callable(async_load_thumbnails).bind(to_load))
 
-func async_load_thumbnails() -> void:
-	for preview : GridImage in previews.values():
-		preview.load_thumbnail()
+func async_load_thumbnails(to_load : Array = []) -> void:
+	if to_load.size() > 0:
+		for media in to_load:
+			if previews.has(media.id):
+				previews[media.id].load_thumbnail()
+	else:
+		for preview : GridImage in previews.values():
+			preview.load_thumbnail()
 	thumbnail_load_complete.emit.call_deferred()
 
 func merge_thumbnail_load_thread() -> void:
@@ -132,6 +137,7 @@ func merge_thumbnail_load_thread() -> void:
 func notify_grid_updated() -> void:
 	grid_updated.emit()
 	WorkerThreadPool.wait_for_task_completion(grid_refresh_thread_id)
+	grid_refresh_finished = true
 
 func get_images_for_current_view() -> Array[DBMedia]:
 	if !((GlobalData.included_tags.size() > 0) || (GlobalData.excluded_tags.size() > 0)):
@@ -186,10 +192,6 @@ func _on_popup_menu_add_to_collection(image_id : int) -> void:
 	add_to_collection_control.image_id = image_id
 	add_to_collection_window.popup_centered()
 
-func _on_db_images_changed() -> void:
-	db_media = DB.get_all_media()
-	grid_refresh_thread_id = WorkerThreadPool.add_task(refresh_grid)
-
 func _on_grid_image_multi_select(_image):
 	return # inactive for now
 	#image.set_selected(true)
@@ -234,6 +236,11 @@ func _on_popup_menu_export(image : DBMedia) -> void:
 	export_file.popup_centered()
 
 func queue_refresh_grid(hard : bool = false) -> void:
+	if not grid_refresh_finished:
+		return
+	
+	grid_refresh_finished = false
+	
 	if hard:
 		previews_mutex.lock()
 		previews.clear()

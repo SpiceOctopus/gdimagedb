@@ -32,9 +32,11 @@ func _on_files_dropped(files : PackedStringArray) -> void:
 	
 	await get_tree().create_timer(0.1).timeout
 	
+	var import_counter : int = 0
 	for file in files:
 		var error = ImportUtil.import_image(file)
 		if error == OK:
+			import_counter += 1
 			import_log.add_message("File %s successfully imported." % file)
 			await get_tree().create_timer(0.1).timeout
 		elif error == ERR_ALREADY_EXISTS:
@@ -43,8 +45,10 @@ func _on_files_dropped(files : PackedStringArray) -> void:
 		elif error == ERR_FILE_UNRECOGNIZED:
 			import_log.add_message("File type %s not supported." % file.get_extension())
 			await get_tree().create_timer(0.1).timeout
-
-	GlobalData.notify_db_images_changed()
+	
+	if import_counter > 0:
+		image_grid.refresh_grid()
+		image_grid.trigger_load_thumbnails(CacheManager.load_missing_thumbnails())
 
 func _on_grid_tag_edit(id : int) -> void:
 	if tag_editor.min_size.x > DisplayServer.window_get_size().x || tag_editor.min_size.y > DisplayServer.window_get_size().y:

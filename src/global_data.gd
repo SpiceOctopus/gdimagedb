@@ -4,7 +4,6 @@ signal display_mode_changed
 signal favorites_changed
 signal untagged_changed
 signal tags_changed
-signal db_images_changed
 signal db_tags_changed
 signal db_collections_changed
 signal media_deleted
@@ -18,8 +17,8 @@ var current_display_mode : DisplayMode : set=set_current_display_mode
 
 var show_favorites : bool : set=set_show_favorites, get=get_show_favorites
 var show_untagged : bool : set=set_show_untagged, get=get_show_untagged
-var included_tags : set=set_included_tags, get=get_included_tags
-var excluded_tags : set=set_excluded_tags, get=get_excluded_tags
+var included_tags : Array[DBTag] : set=set_included_tags, get=get_included_tags
+var excluded_tags : Array[DBTag] : set=set_excluded_tags, get=get_excluded_tags
 var last_used_collection : set=set_last_used_collection
 
 var internal_current_display_mode : DisplayMode = DisplayMode.Images
@@ -92,9 +91,6 @@ func set_last_used_collection(collection):
 
 func notify_tags_changed():
 	tags_changed.emit()
-
-func notify_db_images_changed():
-	db_images_changed.emit()
 
 func notify_help_called():
 	help.emit()

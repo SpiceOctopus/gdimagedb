@@ -5,7 +5,7 @@ signal x(tag)
 var selected : bool = false : set=set_selected
 var color_mode : bool = true
 
-var tag
+var tag : DBTag
 
 @onready var tag_label = $HBoxContainer/Tag
 @onready var x_button = $HBoxContainer/X
@@ -14,7 +14,7 @@ func _ready():
 	x_button.custom_minimum_size.x = x_button.size.y
 	custom_minimum_size.y = x_button.size.y
 	if tag != null:
-		tag_label.text = tag["tag"]
+		tag_label.text = tag.tag
 
 func _on_x_pressed():
 	x.emit(tag)
@@ -23,9 +23,9 @@ func _on_x_pressed():
 func set_selected(value : bool):
 	selected = value
 	if value:
-		tag_label.text = "> " + tag["tag"]
+		tag_label.text = "> " + tag.tag
 	else:
-		tag_label.text = tag["tag"]
+		tag_label.text = tag.tag
 
 func reset():
 	visible = true

@@ -43,6 +43,9 @@ func set_collection(collection_param) -> void:
 	image = DB.get_first_image_in_collection(collection["id"])
 
 func load_thumbnail() -> void:
+	if image == null: 
+		title_image.call_deferred("set_texture", load("res://gfx/collection_placeholder_icon.png"))
+		return
 	if CacheManager.thumb_cache.has(image.id):
 		title_image.call_deferred("set_texture", CacheManager.thumb_cache[image.id])
 	elif image.path.get_extension() in Settings.supported_video_files:

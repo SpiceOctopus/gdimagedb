@@ -50,5 +50,20 @@ func merge_wait_thread() -> void:
 	WorkerThreadPool.wait_for_task_completion(thumb_cache_wait_id)
 
 func reload_thumbcache() -> void:
+	all_media = DB.get_all_media()
 	thumb_cache_loader_id = WorkerThreadPool.add_group_task(async_preload, all_media.size())
 	WorkerThreadPool.wait_for_group_task_completion(thumb_cache_loader_id)
+
+# returns array of media that had its thumbnails loaded
+func load_missing_thumbnails() -> Array[DBMedia]:
+	var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
+	var retval : Array[DBMedia] = []
+	for media in DB.get_all_media():
+		if media.id not in thumb_cache.keys():
+			if dir.file_exists(media.thumb_path):
+				var tmp = ImageUtil.TextureFromFile(media.thumb_path)
+				thumb_mutex.lock()
+				thumb_cache[media.id] = tmp
+				thumb_mutex.unlock()
+				retval.append(media)
+	return retval
