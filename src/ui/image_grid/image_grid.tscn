@@ -100,11 +100,8 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Drop files here to start importing."
 
-[node name="AddToCollectionWindow" type="Window" parent="."]
-title = "Add to Collection"
+[node name="AddToCollection" parent="." instance=ExtResource("5_inbqb")]
 visible = false
-
-[node name="AddToCollection" parent="AddToCollectionWindow" instance=ExtResource("5_inbqb")]
 
 [node name="MediaPropertiesWindow" type="Window" parent="."]
 title = "Properties"

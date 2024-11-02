@@ -16,8 +16,7 @@ var initialize_grid_thread_id : int = -1
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
-@onready var add_to_collection_window = $AddToCollectionWindow
-@onready var add_to_collection_control = $AddToCollectionWindow/AddToCollection
+@onready var add_to_collection_window = $AddToCollection
 @onready var media_properties_window = $MediaPropertiesWindow
 @onready var media_properties_control = $MediaPropertiesWindow/MediaProperties
 @onready var replace_file_window = $ReplaceFileWindow
@@ -40,8 +39,6 @@ func _ready() -> void:
 	GlobalData.connect("db_collections_changed", trigger_visibility_update)
 	db_media = DB.get_all_media()
 	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
-	add_to_collection_window.connect('close_requested', Callable(add_to_collection_window,'hide'))
-	add_to_collection_window.min_size = add_to_collection_control.custom_minimum_size
 	media_properties_window.connect('close_requested', Callable(media_properties_window,'hide'))
 	media_properties_window.min_size = media_properties_control.custom_minimum_size
 
@@ -168,7 +165,7 @@ func on_grid_image_click(grid_image : GridImage) -> void:
 			preview.set_selected(false)
 
 func _on_popup_menu_add_to_collection(image_id : int) -> void:
-	add_to_collection_control.image_id = image_id
+	add_to_collection_window.image_id = image_id
 	add_to_collection_window.popup_centered()
 
 func _on_grid_image_multi_select(_image):
