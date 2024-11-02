@@ -31,12 +31,12 @@ func _ready() -> void:
 	drop_files_label.visible = (DB.count_images_in_db() == 0)
 	await get_tree().create_timer(0.01).timeout # give the ui a moment to display
 	initialize_grid_finished.connect(on_initialize_grid_finished)
-	GlobalData.connect("favorites_changed", trigger_visibility_update)
-	GlobalData.connect("untagged_changed", trigger_visibility_update)
-	GlobalData.connect("tags_changed", trigger_visibility_update)
-	GlobalData.connect("db_tags_changed", trigger_visibility_update)
-	GlobalData.connect("media_deleted", _on_media_deleted)
-	GlobalData.connect("db_collections_changed", trigger_visibility_update)
+	GlobalData.favorites_changed.connect(trigger_visibility_update)
+	GlobalData.untagged_changed.connect(trigger_visibility_update)
+	GlobalData.tags_changed.connect(trigger_visibility_update)
+	GlobalData.db_tags_changed.connect(trigger_visibility_update)
+	GlobalData.media_deleted.connect(_on_media_deleted)
+	GlobalData.db_collections_changed.connect(trigger_visibility_update)
 	db_media = DB.get_all_media()
 	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
 	media_properties_window.connect('close_requested', Callable(media_properties_window,'hide'))
@@ -52,17 +52,16 @@ func initialize_grid_async(i : int):
 	if !previews.has(db_media[i].id):
 		var gridImageInstance = GridImage.new()
 		gridImageInstance.set_media(db_media[i])
-		gridImageInstance.connect("double_click", _on_grid_image_double_click)
-		gridImageInstance.connect("right_click", grid_image_right_click)
-		gridImageInstance.connect("click", on_grid_image_click)
-		gridImageInstance.connect("multi_select", _on_grid_image_multi_select)
+		gridImageInstance.double_click.connect(_on_grid_image_double_click)
+		gridImageInstance.right_click.connect(grid_image_right_click)
+		gridImageInstance.click.connect(on_grid_image_click)
+		#gridImageInstance.multi_select.connect(_on_grid_image_multi_select) # feature not implemented yet
 		gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 		gridImageInstance.visible = true
 		gridImageInstance.load_thumbnail()
 		gridImageInstance.add_to_group("previews")
-
+		grid_container.add_child.call_deferred(gridImageInstance)
 		previews_mutex.lock()
-		grid_container.call_deferred("add_child", gridImageInstance)
 		previews[db_media[i].id] = gridImageInstance
 		previews_mutex.unlock()
 	if i >= (db_media.size() - 1):
@@ -134,12 +133,12 @@ func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 	window.size = DisplayServer.window_get_size()
 	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
 		window.mode = Window.MODE_MAXIMIZED
-	instance.connect("closing", Callable(window, "queue_free"))
+	instance.closing.connect(window.queue_free) # required to allow closing with esc key
 	instance.visible = true
 	window.add_child(instance)
 	window.title = "Media Viewer"
+	window.close_requested.connect(window.queue_free)
 	window.popup_centered()
-	window.connect("close_requested", Callable(window, "queue_free"))
 
 func grid_image_right_click(media : DBMedia) -> void:
 	$PopupMenu.position = DisplayServer.mouse_get_position()

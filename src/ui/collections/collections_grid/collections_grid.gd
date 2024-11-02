@@ -5,29 +5,29 @@ signal edit_collection
 
 var new_button_instance = load("res://ui/collections/collections_grid_new_button/new_button.tscn").instantiate()
 
-var db_collections = [] # to be filled with all collections available in the database
-var tiles = {} # cached tiles for the grid
+var db_collections : Array = [] # to be filled with all collections available in the database
+var tiles : Dictionary = {} # cached tiles for the grid
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var last_window_size = Vector2i(0,0)
 @onready var delete_dialog = $DeleteCollection
 @onready var popup_menu = $PopupMenu
 
-func _ready():
+func _ready() -> void:
 	refresh_grid()
-	GlobalData.connect("favorites_changed", refresh_grid)
-	GlobalData.connect("untagged_changed", refresh_grid)
-	GlobalData.connect("tags_changed", refresh_grid)
-	GlobalData.connect("db_collections_changed", refresh_grid)
-	GlobalData.connect("collection_deleted", _on_collection_deleted)
+	GlobalData.favorites_changed.connect(refresh_grid)
+	GlobalData.untagged_changed.connect(refresh_grid)
+	GlobalData.tags_changed.connect(refresh_grid)
+	GlobalData.db_collections_changed.connect(refresh_grid)
+	GlobalData.collection_deleted.connect(_on_collection_deleted)
 
-func _process(_delta):
+func _process(_delta : float) -> void:
 	var new_size = DisplayServer.window_get_size()
 	if new_size != last_window_size:
 		last_window_size = new_size
 		window_size_changed()
 
-func refresh_grid():
+func refresh_grid() -> void:
 	var grid_tile_instance = load("res://ui/collections/collections_grid_tile/grid_tile.tscn").instantiate()
 	
 	if grid_container.get_children().has(new_button_instance):
@@ -53,8 +53,8 @@ func refresh_grid():
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 	grid_container.add_child(new_button_instance)
 	
-	var collections_without_tags = DB.get_ids_collections_without_tags()
-	var current_tiles = {}
+	var collections_without_tags : Array[int] = DB.get_ids_collections_without_tags()
+	var current_tiles : Dictionary = {}
 	
 	if !((GlobalData.included_tags.size() > 0) || (GlobalData.excluded_tags.size() > 0)):
 		current_tiles = tiles
@@ -76,7 +76,7 @@ func refresh_grid():
 	grid_tile_instance.queue_free()
 	grid_updated.emit()
 
-func tile_double_click(collection):
+func tile_double_click(collection) -> void:
 	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
 	var images = DB.get_all_images_in_collection(collection["id"])
 	images.sort_custom(compare_by_position)
@@ -95,34 +95,35 @@ func tile_double_click(collection):
 	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
 		window.mode = Window.MODE_MAXIMIZED
 	window.add_child(instance)
+	instance.closing.connect(window.queue_free) # required to allow closing with esc key
 	instance.visible = true
 	window.title = collection["collection"]
+	window.close_requested.connect(window.queue_free)
 	window.popup_centered()
-	window.connect("close_requested", Callable(window, "queue_free"))
 
-func compare_by_position(a, b):
+func compare_by_position(a, b) -> bool:
 	return a.position < b.position
 
-func tile_right_click(collection):
+func tile_right_click(collection) -> void:
 	$PopupMenu.position = DisplayServer.mouse_get_position()
 	$PopupMenu.collection = collection
 	$PopupMenu.popup()
 
-func window_size_changed():
+func window_size_changed() -> void:
 	var columns = floor($MarginContainer.size.x / Settings.grid_image_size)
 	if  columns < 1:
 		grid_container.columns = 1
 	else:
 		grid_container.columns = columns
 
-func _on_popup_menu_edit():
+func _on_popup_menu_edit() -> void:
 	edit_collection.emit($PopupMenu.collection)
 
-func _on_popup_menu_delete():
+func _on_popup_menu_delete() -> void:
 	delete_dialog.collection = popup_menu.collection
 	delete_dialog.popup_centered()
 
-func grid_item_count():
+func grid_item_count() -> int:
 	return grid_container.get_child_count() - 1
 
 func _on_visibility_changed() -> void:
@@ -131,12 +132,12 @@ func _on_visibility_changed() -> void:
 	for child in grid_container.get_children():
 		child.visible = visible
 
-func _on_collection_deleted(id):
+func _on_collection_deleted(id) -> void:
 	tiles[id].queue_free()
 	tiles.erase(id)
 	refresh_grid()
 
-func on_grid_tile_click(grid_tile):
+func on_grid_tile_click(grid_tile) -> void:
 	for tile in tiles.values():
 		tile.set_selected(false)
 	grid_tile.set_selected(true)

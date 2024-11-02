@@ -4,7 +4,7 @@ var collection : set=set_collection
 
 @onready var message = $MarginContainer/VBoxContainer/Label
 
-func set_collection(collection_in):
+func set_collection(collection_in) -> void:
 	collection = collection_in
 	message.text = "Delete collection \"%s\"?" % collection["collection"]
 

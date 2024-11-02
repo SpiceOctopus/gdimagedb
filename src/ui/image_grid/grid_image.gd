@@ -8,7 +8,7 @@ signal click
 signal multi_select
 
 var current_media : DBMedia
-var selected = false
+var selected : bool = false
 
 func _ready() -> void:
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE

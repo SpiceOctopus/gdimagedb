@@ -104,6 +104,7 @@ visible = false
 [node name="CollectionEditor" parent="." instance=ExtResource("10_gala1")]
 visible = false
 
+[connection signal="close_requested" from="ImportLog" to="ImportLog" method="_on_close_requested"]
 [connection signal="refresh_grid" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_refresh_grid"]
 [connection signal="switch_grids" from="VBoxContainer/MenuBar" to="." method="_on_menu_bar_switch_grids"]
 [connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="update_grid_info_panel"]

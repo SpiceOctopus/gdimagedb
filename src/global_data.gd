@@ -46,7 +46,7 @@ func get_show_favorites() -> bool:
 	else:
 		return false
 
-func set_show_untagged(untagged : bool):
+func set_show_untagged(untagged : bool) -> void:
 	if current_display_mode == DisplayMode.IMAGES:
 		internal_show_untagged_images = untagged
 	elif current_display_mode == DisplayMode.COLLECTIONS:
@@ -69,7 +69,7 @@ func set_included_tags(tags : Array[DBTag]) -> void:
 	elif current_display_mode == DisplayMode.COLLECTIONS:
 		internal_included_tags_collections = tags
 
-func set_excluded_tags(tags):
+func set_excluded_tags(tags) -> void:
 	if current_display_mode == DisplayMode.IMAGES:
 		internal_excluded_tags_images = tags
 	elif current_display_mode == DisplayMode.COLLECTIONS:
@@ -89,24 +89,24 @@ func get_excluded_tags():
 	elif current_display_mode == DisplayMode.COLLECTIONS:
 		return internal_excluded_tags_collections
 
-func set_last_used_collection(collection):
+func set_last_used_collection(collection) -> void:
 	last_used_collection = collection
 	last_used_collection_changed.emit(last_used_collection)
 
-func notify_tags_changed():
+func notify_tags_changed() -> void:
 	tags_changed.emit()
 
-func notify_help_called():
+func notify_help_called() -> void:
 	help.emit()
 
-func notify_db_tags_changed():
+func notify_db_tags_changed() -> void:
 	db_tags_changed.emit()
 
-func notify_media_deleted(id):
+func notify_media_deleted(id) -> void:
 	media_deleted.emit(id)
 
-func notify_db_collections_changed():
+func notify_db_collections_changed() -> void:
 	db_collections_changed.emit()
 
-func notify_collection_deleted(id):
+func notify_collection_deleted(id) -> void:
 	collection_deleted.emit(id)

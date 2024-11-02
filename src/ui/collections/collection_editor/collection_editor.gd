@@ -51,7 +51,7 @@ func tile_delete(media : DBMedia) -> void:
 	delete_confirmation.media = media
 	delete_confirmation.popup_centered()
 
-func rebuild_grid():
+func rebuild_grid() -> void:
 	for tile in get_tree().get_nodes_in_group("collection_editor_grid_tiles"):
 		tile.remove_from_group("collection_editor_grid_tiles")
 		tile.queue_free()
@@ -62,25 +62,25 @@ func rebuild_grid():
 		var tile = collection_editor_tile.instantiate()
 		tile.media = media
 		tile.collection_id = collection["id"]
-		tile.connect("move_left", tile_move_left)
-		tile.connect("move_right", tile_move_right)
-		tile.connect("delete", tile_delete)
+		tile.move_left.connect(tile_move_left)
+		tile.move_right.connect(tile_move_right)
+		tile.delete.connect(tile_delete)
 		tile.add_to_group("collection_editor_grid_tiles")
 		grid.add_child(tile)
 
-func compare_by_position(a, b):
+func compare_by_position(a : DBMedia, b : DBMedia) -> bool:
 	return a.position < b.position
 
-func _on_name_edit_text_changed(new_text):
+func _on_name_edit_text_changed(new_text : String) -> void:
 	apply_name_button.disabled = new_text.is_empty()
 
-func _on_apply_button_pressed():
+func _on_apply_button_pressed() -> void:
 	DB.set_collection_name(collection["id"], name_edit.text)
 
-func _on_close_requested():
+func _on_close_requested() -> void:
 	hide()
 
-func _on_about_to_popup():
+func _on_about_to_popup() -> void:
 	side_bar.focus()
 	side_bar.clear_filter_text()
 

@@ -29,14 +29,14 @@ var load_selected_thread_id : int = -1
 
 func _ready() -> void:
 	rebuild_tag_lists()
-	GlobalData.connect("display_mode_changed", _on_display_changed)
-	GlobalData.connect("db_tags_changed", _on_db_tags_changed)
-	connect("load_all_done", merge_loader_threads)
-	connect("load_selected_done", merge_loader_threads)
+	GlobalData.display_mode_changed.connect(_on_display_changed)
+	GlobalData.db_tags_changed.connect(_on_db_tags_changed)
+	load_all_done.connect(merge_loader_threads)
+	load_selected_done.connect(merge_loader_threads)
 	tag_buttons.visible = show_add_delete_buttons
 
 func merge_loader_threads(id : int) -> void:
-		WorkerThreadPool.wait_for_task_completion(id)
+	WorkerThreadPool.wait_for_task_completion(id)
 
 func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
@@ -64,31 +64,31 @@ func async_build_tag_items_all() -> void:
 		if mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
 			var item = tag_item_plus_instance.duplicate()
 			item.tag = tag
-			item.connect("add", _on_tag_item_add)
+			item.add.connect(_on_tag_item_add)
 			item.visible = !item.tag.id in assigned_tags_ids
 			if is_instance_valid(all_tags_list):
-				all_tags_list.call_deferred("add_child", item)
+				all_tags_list.add_child.call_deferred(item)
 		elif mode == MODE.GRID:
 			var item = tag_item_plus_minus_instance.duplicate()
 			item.tag = tag
-			item.connect("add", _on_tag_item_add)
-			item.connect("remove", _on_tag_item_remove)
+			item.add.connect(_on_tag_item_add)
+			item.remove.connect(_on_tag_item_remove)
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 			if is_instance_valid(all_tags_list):
-				all_tags_list.call_deferred("add_child", item)
+				all_tags_list.add_child.call_deferred(item)
 		
 	tag_item_plus_instance.queue_free()
 	tag_item_plus_minus_instance.queue_free()
 	load_all_done.emit.call_deferred(load_all_thread_id)
 
-func async_build_tag_items_selected():
+func async_build_tag_items_selected() -> void:
 	var tag_item_instance = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
 	for tag in all_tags:
 		if exiting: # crash fix
 			return
 		var item = tag_item_instance.duplicate()
 		item.tag = tag
-		item.connect("x", _on_tag_item_x)
+		item.x.connect(_on_tag_item_x)
 		if mode == MODE.GRID:
 			item.color_mode = true
 			item.visible = (item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
@@ -97,12 +97,12 @@ func async_build_tag_items_selected():
 			item.visible = item.tag.id in assigned_tags_ids
 		
 		if is_instance_valid(selected_tags_list):
-			selected_tags_list.call_deferred("add_child", item)
+			selected_tags_list.add_child.call_deferred(item)
 	tag_item_instance.queue_free()
 	load_selected_done.emit.call_deferred(load_selected_thread_id)
 
 # optional parameter allows direct call from filter linedit signal
-func update_all_tags_list(_from_text_changed = ""):
+func update_all_tags_list(_from_text_changed : String = "") -> void:
 	var filter = input_box.text
 	if filter != last_filter:
 		last_filter = filter
@@ -121,7 +121,7 @@ func update_all_tags_list(_from_text_changed = ""):
 		if !item.visible:
 			continue # item is in a selection, no more filters apply
 		
-		item.visible = filter in item.tag["tag"].to_lower()
+		item.visible = filter in item.tag.tag.to_lower()
 		
 		if filter == "":
 			item.visible = true
@@ -139,7 +139,7 @@ func update_all_tags_list(_from_text_changed = ""):
 			else:
 				selection_offset_temp = selection_offset_temp - 1
 
-func update_selected_tags_list():
+func update_selected_tags_list() -> void:
 	for item in selected_tags_list.get_children():
 		item.reset()
 		if mode == MODE.GRID:
@@ -147,11 +147,11 @@ func update_selected_tags_list():
 		elif mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
 			item.visible = item.tag.id in assigned_tags_ids
 
-func _on_display_changed():
+func _on_display_changed() -> void:
 	update_all_tags_list()
 	update_selected_tags_list()
 
-func _on_LineEdit_gui_input(event):
+func _on_LineEdit_gui_input(event) -> void:
 	if event.is_action_pressed("ui_up"):
 		selection_offset = selection_offset - 1
 		if selection_offset < 0:
@@ -163,11 +163,11 @@ func _on_LineEdit_gui_input(event):
 			selection_offset = visible_tags_count - 1
 		update_all_tags_list()
 
-func _on_tag_preview_list_gui_input(event):
+func _on_tag_preview_list_gui_input(event) -> void:
 	if event.is_action_pressed("ui_accept"):
 		_on_LineEdit_gui_input(event)
 
-func _on_tag_item_add(tag):
+func _on_tag_item_add(tag) -> void:
 	if mode == MODE.GRID:
 		GlobalData.included_tags.append(tag)
 	elif mode == MODE.TAG_EDITOR:
@@ -187,13 +187,13 @@ func _on_tag_item_add(tag):
 	if mode == MODE.GRID:
 		GlobalData.notify_tags_changed()
 
-func _on_tag_item_remove(tag):
+func _on_tag_item_remove(tag) -> void:
 	GlobalData.excluded_tags.append(tag)
 	update_selected_tags_list()
 	update_all_tags_list()
 	GlobalData.notify_tags_changed()
 
-func _on_tag_item_x(tag):
+func _on_tag_item_x(tag) -> void:
 	if mode == MODE.GRID:
 		for included_tag in GlobalData.included_tags:
 			if included_tag["id"] == tag["id"]:
@@ -218,7 +218,7 @@ func _on_tag_item_x(tag):
 	if mode == MODE.GRID:
 		GlobalData.notify_tags_changed()
 
-func _on_filter_text_submitted(new_text):
+func _on_filter_text_submitted(new_text : String) -> void:
 	var remove = new_text.begins_with("-")
 	
 	var tag
@@ -238,17 +238,17 @@ func _on_filter_text_submitted(new_text):
 	input_box.text = ""
 	update_all_tags_list()
 
-func _on_db_tags_changed():
+func _on_db_tags_changed() -> void:
 	rebuild_tag_lists()
 
-func focus():
+func focus() -> void:
 	input_box.grab_focus()
 
-func clear_filter_text():
+func clear_filter_text() -> void:
 	input_box.text = ""
 	_on_display_changed()
 
-func set_media_id(id : int):
+func set_media_id(id : int) -> void:
 	media_id = id
 	if mode == MODE.GRID || mode == MODE.TAG_EDITOR:
 		var assigned : Array[int] = []
@@ -261,11 +261,11 @@ func set_media_id(id : int):
 			assigned.append(entry.id)
 		assigned_tags_ids = assigned
 
-func sort_by_count(a, b):
+func sort_by_count(a, b) -> bool:
 	if all_tag_counts[a.id] > all_tag_counts[b.id]:
 		return true
 	return false
 
 # catch premature window closing and stop initializing ui to prevent crash
-func _on_tree_exiting():
+func _on_tree_exiting() -> void:
 	exiting = true
