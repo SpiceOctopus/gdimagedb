@@ -4,7 +4,6 @@ class_name ImageGrid
 
 signal tag_edit(id : int)
 signal grid_updated
-signal file_replaced
 signal initialize_grid_finished
 
 var db_media : Array[DBMedia] = []
@@ -14,7 +13,6 @@ var previews : Dictionary = {}
 var previews_mutex : Mutex = Mutex.new()
 
 var initialize_grid_thread_id : int = -1
-var thumbnail_load_thread_id : int = -1
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
@@ -77,34 +75,35 @@ func load_missing_previews():
 	db_media = DB.get_all_media()
 	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
 
-func on_initialize_grid_finished():
+func on_initialize_grid_finished() -> void:
 	WorkerThreadPool.wait_for_group_task_completion(initialize_grid_thread_id)
 	manage_preview_visibility()
 
-func manage_preview_visibility():
+func manage_preview_visibility() -> void:
 	current_media.clear()
 	for preview in previews.values():
 		preview.visible = false
 	
-	var images_without_tags : Array[int] = []
+	var images_without_tags : Dictionary = {}
 	if GlobalData.show_untagged: # no need to run this if it's not in use
 		images_without_tags = DB.get_ids_images_without_tags()
 	
-	var images_in_collections : Array[int] = DB.get_all_image_ids_in_collections()
-	for image in get_images_for_current_view():
-		if GlobalData.show_favorites && !image.favorite:
+	var images_in_collections : Dictionary = DB.get_all_image_ids_in_collections()
+	
+	for media in get_images_for_current_view():
+		if GlobalData.show_favorites && !media.favorite:
 			pass
-		elif GlobalData.show_untagged && !(image.id in images_without_tags):
+		elif GlobalData.show_untagged && !images_without_tags.has(media.id):
 			pass
-		elif Settings.hide_images_collections && (image.id in images_in_collections):
+		elif Settings.hide_images_collections && images_in_collections.has(media.id):
 			pass
 		else:
-			previews[image.id].visible = true
-			current_media.append(image)
+			previews[media.id].visible = true
+			current_media.append(media)
 	grid_updated.emit()
 
-func trigger_visibility_update():
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
+func trigger_visibility_update() -> void:
+	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES:
 		manage_preview_visibility()
 
 func window_size_changed() -> void:
@@ -199,7 +198,10 @@ func _on_replace_file_window_confirmed() -> void:
 		await get_tree().create_timer(0.1).timeout
 	
 	db_media = DB.get_all_media()
-	file_replaced.emit()
+	CacheManager.thumb_mutex.lock()
+	CacheManager.thumb_cache.erase(replace_file_window.media.id)
+	CacheManager.thumb_mutex.unlock()
+	previews[replace_file_window.media.id].load_thumbnail()
 
 func _on_popup_menu_delete(media : DBMedia) -> void:
 	delete_file.media = media

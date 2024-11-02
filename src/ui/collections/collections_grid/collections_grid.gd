@@ -70,7 +70,7 @@ func refresh_grid():
 		else:
 			tile.visible = true
 		
-		if GlobalData.current_display_mode != GlobalData.DisplayMode.Collections: # overrides all other possibilites
+		if GlobalData.current_display_mode != GlobalData.DisplayMode.COLLECTIONS: # overrides all other possibilites
 			tile.visible = false
 	
 	grid_tile_instance.queue_free()

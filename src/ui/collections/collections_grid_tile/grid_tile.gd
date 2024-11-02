@@ -36,7 +36,16 @@ func _gui_input(ev) -> void:
 	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
 		click.emit(self)
 
+func _exit_tree() -> void:
+	if image != null:
+		image.free()
+	collection = null
+
 func set_collection(collection_param) -> void:
+	if collection_param == null:
+		collection = null
+		return
+	
 	lbl_name.text = collection_param["collection"]
 	collection = collection_param
 	image = DB.get_first_image_in_collection(collection["id"])

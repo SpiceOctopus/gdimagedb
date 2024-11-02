@@ -40,8 +40,8 @@ func replace_file(db_file_to_replace : DBMedia, replacement_path : String) -> Er
 	if DB.is_hash_in_db(file_hash):
 		return ERR_ALREADY_EXISTS
 
-	var target_path = db_file_to_replace.path
-	var dir = DirAccess.open(OS.get_executable_path().get_base_dir())
+	var target_path : String = db_file_to_replace.path
+	var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
 	dir.remove(target_path) # remove original file
 	target_path = target_path.split(".")[0] + "." + replacement_path.get_extension()
 	dir.copy(replacement_path, target_path)
@@ -86,7 +86,7 @@ func create_thumbnail(path: String) -> void:
 		player.stop()
 		player.queue_free()
 
-func resize_thumbnail(image : Image):
+func resize_thumbnail(image : Image) -> void:
 	var sizeX : int = image.get_size().x
 	var sizeY : int = image.get_size().y
 	

@@ -254,7 +254,7 @@ func get_images_for_tags(includedTags : Array = [], excludedTags : Array = []) -
 	db_access_mutex.unlock()
 	return result
 
-func get_collections_for_tags(includedTags, excludedTags):
+func get_collections_for_tags(includedTags : Array[DBTag], excludedTags : Array[DBTag]):
 	db_access_mutex.lock()
 	var result
 	
@@ -294,12 +294,13 @@ func update_position(id : int, position : int) -> void:
 	query_with_bindings("UPDATE images set position=? WHERE id=?", [position, id])
 	db_access_mutex.unlock()
 
-func get_ids_images_without_tags() -> Array[int]:
+# Using a Dictionary is much faster than array in this case.
+func get_ids_images_without_tags() -> Dictionary:
 	db_access_mutex.lock()
 	query("SELECT id FROM images t1 LEFT JOIN tags_images t2 ON t2.image_id = t1.id WHERE t2.image_id IS NULL")
-	var retval : Array[int] = []
+	var retval : Dictionary = {}
 	for result in query_result:
-		retval.append(result["id"])
+		retval[result["id"]] = false
 	db_access_mutex.unlock()
 	return retval
 
@@ -325,7 +326,7 @@ func get_setting_grid_image_size() -> int:
 	db_access_mutex.unlock()
 	return retval
 
-func set_setting_grid_image_size(value : int):
+func set_setting_grid_image_size(value : int) -> void:
 	db_access_mutex.lock()
 	query_with_bindings("UPDATE settings SET grid_image_size=?", [value])
 	db_access_mutex.unlock()
@@ -368,10 +369,10 @@ func get_all_collections():
 	db_access_mutex.unlock()
 	return retval
 
-func get_all_collection_names():
+func get_all_collection_names() -> Array[String]:
 	db_access_mutex.lock()
 	query("SELECT collection FROM collections")
-	var collection_names : Array
+	var collection_names : Array[String] = []
 	for entry in query_result:
 		collection_names.append(entry["collection"])
 	db_access_mutex.unlock()
@@ -384,7 +385,7 @@ func get_collection_by_name(collection_name : String):
 	db_access_mutex.unlock()
 	return retval
 
-func add_image_to_collection(collection_id, image_id):
+func add_image_to_collection(collection_id : int, image_id : int) -> void:
 	db_access_mutex.lock()
 	query_with_bindings("SELECT * from collections_images WHERE collection_id=?", [collection_id])
 	query_with_bindings("INSERT INTO collections_images (collection_id, image_id, position) VALUES (?, ?, ?)", [collection_id, image_id, query_result.size()])
@@ -499,12 +500,13 @@ func remove_image_from_collection(image_id : int, collection_id : int) -> void:
 	query_with_bindings("DELETE FROM collections_images WHERE image_id=? and collection_id=?", [image_id, collection_id])
 	db_access_mutex.unlock()
 
-func get_all_image_ids_in_collections() -> Array[int]:
+# Using a Dictionary is much faster than array in this case.
+func get_all_image_ids_in_collections() -> Dictionary:
 	db_access_mutex.lock()
 	query("SELECT DISTINCT image_id FROM collections_images")
-	var retval : Array[int] = []
+	var retval : Dictionary = {}
 	for id in query_result:
-		retval.append(id["image_id"])
+		retval[id["image_id"]] = false
 	db_access_mutex.unlock()
 	return retval
 

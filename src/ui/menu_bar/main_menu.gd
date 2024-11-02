@@ -28,11 +28,11 @@ func _on_tags_changed():
 		GlobalData.show_untagged = false
 
 func _on_display_mode_changed():
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
+	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES:
 		favorites_checkbox.button_pressed = GlobalData.show_favorites
 		untagged_checkbox.button_pressed = GlobalData.show_untagged
 		btn_switch_grids.text = "Collections"
-	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
+	elif GlobalData.current_display_mode == GlobalData.DisplayMode.COLLECTIONS:
 		favorites_checkbox.button_pressed = GlobalData.show_favorites
 		untagged_checkbox.button_pressed = GlobalData.show_untagged
 		btn_switch_grids.text = "Images"
@@ -53,9 +53,9 @@ func _on_tags_menu_selection(id):
 		delete_tag_window.popup_centered()
 
 func _on_untagged_check_box_toggled(button_pressed):
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
+	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES:
 		GlobalData.show_untagged = button_pressed
-	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
+	elif GlobalData.current_display_mode == GlobalData.DisplayMode.COLLECTIONS:
 		GlobalData.show_untagged = button_pressed
 
 func _on_FavoritesCheckBox_toggled(button_pressed):

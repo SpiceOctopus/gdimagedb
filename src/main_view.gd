@@ -14,12 +14,8 @@ func _ready() -> void:
 	get_tree().root.connect("files_dropped",Callable(self,"_on_files_dropped"))
 
 func _input(_event) -> void:
-	if Input.is_action_just_pressed("ui_filedialog_refresh") && not Input.is_key_pressed(KEY_SHIFT):
+	if Input.is_action_just_pressed("ui_filedialog_refresh"): # ui_filedialog_refresh <- happens to be assigned to F5 per default
 		refresh()
-	if Input.is_action_just_pressed("clear_thumb_cache_refresh"):
-		CacheManager.clear_thumb_cache()
-		CacheManager.reload_thumbcache()
-		refresh(true)
 	if Input.is_action_just_pressed("help"):
 		GlobalData.notify_help_called()
 
@@ -65,33 +61,29 @@ func update_grid_info_panel() -> void:
 	if side_bar == null:
 		return
 	
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
+	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES:
 		grid_info_panel.set_grid_items_count(image_grid.current_media.size())
-	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
+	elif GlobalData.current_display_mode == GlobalData.DisplayMode.COLLECTIONS:
 		grid_info_panel.set_grid_items_count(collections_grid.grid_item_count())
 
 # hard refresh = clear cache
-func refresh(hard : bool = false) -> void:
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images:
-		image_grid.queue_refresh_grid(hard)
-	elif GlobalData.current_display_mode == GlobalData.DisplayMode.Collections:
+func refresh() -> void:
+	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES:
+		image_grid.trigger_visibility_update()
+	elif GlobalData.current_display_mode == GlobalData.DisplayMode.COLLECTIONS:
 		collections_grid.refresh_grid()
 
 func _on_menu_bar_switch_grids() -> void:
-	if GlobalData.current_display_mode == GlobalData.DisplayMode.Images: # switch to collections
+	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES: # switch to collections
 		image_grid.visible = false
 		collections_grid.visible = true
-		GlobalData.current_display_mode = GlobalData.DisplayMode.Collections
+		GlobalData.current_display_mode = GlobalData.DisplayMode.COLLECTIONS
 	else:
 		collections_grid.visible = false
 		image_grid.visible = true
-		GlobalData.current_display_mode = GlobalData.DisplayMode.Images
+		GlobalData.current_display_mode = GlobalData.DisplayMode.IMAGES
 	
 	update_grid_info_panel()
-
-func _on_image_grid_file_replaced() -> void:
-	CacheManager.clear_thumb_cache()
-	refresh(true)
 
 func _on_collections_grid_edit_collection(collection) -> void:
 	if collection_editor.min_size.x > DisplayServer.window_get_size().x || collection_editor.min_size.y > DisplayServer.window_get_size().y:
