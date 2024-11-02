@@ -1,9 +1,10 @@
 extends Node
 
+const current_db_version : int = 3
+
 var db_path : String = OS.get_executable_path().get_base_dir() + "/main.db"
 var db = SQLite.new()
 var query_result
-var current_db_version = 3
 var db_access_mutex = Mutex.new()
 
 # Called when the node enters the scene tree for the first time.
@@ -317,9 +318,7 @@ func get_setting_grid_image_size() -> int:
 	return retval
 
 func set_setting_grid_image_size(value : int) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE settings SET grid_image_size=?", [value])
-	db_access_mutex.unlock()
+	execute_non_query("UPDATE settings SET grid_image_size=?", [value])
 
 # 0 = dynamic
 # 1 = always fit to window
@@ -332,9 +331,7 @@ func get_setting_media_viewer_stretch_mode() -> int:
 	return retval
 
 func set_setting_media_viewer_stretch_mode(value : int) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE settings SET stretch_mode=?", [value])
-	db_access_mutex.unlock()
+	execute_non_query("UPDATE settings SET stretch_mode=?", [value])
 
 func get_setting_hide_collection_images() -> bool:
 	db_access_mutex.lock()
@@ -343,14 +340,10 @@ func get_setting_hide_collection_images() -> bool:
 	return retval
 
 func set_setting_hide_collection_images(value : bool) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE settings SET hide_images_collections=?", [int(value)])
-	db_access_mutex.unlock()
+	execute_non_query("UPDATE settings SET hide_images_collections=?", [int(value)])
 
 func create_new_collection(collection_name : String) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("INSERT INTO collections (collection) VALUES (?)", [collection_name])
-	db_access_mutex.unlock()
+	execute_non_query("INSERT INTO collections (collection) VALUES (?)", [collection_name])
 
 func get_all_collections():
 	db_access_mutex.lock()
