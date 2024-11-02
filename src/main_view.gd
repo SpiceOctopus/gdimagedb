@@ -12,7 +12,6 @@ extends Control
 func _ready() -> void:
 	get_parent().min_size = custom_minimum_size
 	get_tree().root.connect("files_dropped",Callable(self,"_on_files_dropped"))
-	_on_grid_grid_updated()
 
 func _input(_event) -> void:
 	if Input.is_action_just_pressed("ui_filedialog_refresh") && not Input.is_key_pressed(KEY_SHIFT):
@@ -47,8 +46,7 @@ func _on_files_dropped(files : PackedStringArray) -> void:
 			await get_tree().create_timer(0.1).timeout
 	
 	if import_counter > 0:
-		image_grid.refresh_grid()
-		image_grid.trigger_load_thumbnails(CacheManager.load_missing_thumbnails())
+		image_grid.load_missing_previews()
 
 func _on_grid_tag_edit(id : int) -> void:
 	if tag_editor.min_size.x > DisplayServer.window_get_size().x || tag_editor.min_size.y > DisplayServer.window_get_size().y:
@@ -63,7 +61,7 @@ func _on_grid_tag_edit(id : int) -> void:
 func _on_menu_bar_refresh_grid() -> void:
 	refresh()
 
-func _on_grid_grid_updated() -> void:
+func update_grid_info_panel() -> void:
 	if side_bar == null:
 		return
 	
@@ -89,7 +87,7 @@ func _on_menu_bar_switch_grids() -> void:
 		image_grid.visible = true
 		GlobalData.current_display_mode = GlobalData.DisplayMode.Images
 	
-	_on_grid_grid_updated()
+	update_grid_info_panel()
 
 func _on_image_grid_file_replaced() -> void:
 	CacheManager.clear_thumb_cache()

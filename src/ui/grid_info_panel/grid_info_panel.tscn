@@ -37,6 +37,7 @@ theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+visible = false
 layout_mode = 2
 
 [node name="LabelsContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
@@ -53,3 +54,7 @@ layout_mode = 2
 [node name="ItemCountValue" type="Label" parent="MarginContainer/HBoxContainer/ValuesContainer"]
 layout_mode = 2
 text = "0"
+
+[node name="LoadingLabel" type="Label" parent="MarginContainer"]
+layout_mode = 2
+text = "Loading..."

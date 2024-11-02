@@ -4,8 +4,7 @@ signal double_click
 signal right_click
 signal click
 
-var collection : set=set_collection, get=get_collection
-var collection_internal
+var collection : set=set_collection
 var image : DBMedia
 
 @onready var lbl_name = $CollectionNameLabel
@@ -39,20 +38,13 @@ func _gui_input(ev) -> void:
 
 func set_collection(collection_param) -> void:
 	lbl_name.text = collection_param["collection"]
-	collection_internal = collection_param
+	collection = collection_param
 	image = DB.get_first_image_in_collection(collection["id"])
-
-func load_thumbnail() -> void:
-	if image == null: 
-		title_image.call_deferred("set_texture", load("res://gfx/collection_placeholder_icon.png"))
-		return
-	if CacheManager.thumb_cache.has(image.id):
-		title_image.call_deferred("set_texture", CacheManager.thumb_cache[image.id])
-	elif image.path.get_extension() in Settings.supported_video_files:
-		title_image.call_deferred("set_texture", load("res://gfx/video_placeholder.png"))
-
-func get_collection():
-	return collection_internal
+	var img = CacheManager.get_thumbnail(image)
+	if img != null:
+		title_image.texture = img
+	else:
+		title_image.texture = load("res://gfx/collection_placeholder_icon.png")
 
 func set_selected(is_selected : bool) -> void:
 	if(is_selected):

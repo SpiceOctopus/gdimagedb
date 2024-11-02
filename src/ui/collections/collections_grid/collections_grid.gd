@@ -20,7 +20,6 @@ func _ready():
 	GlobalData.connect("tags_changed", refresh_grid)
 	GlobalData.connect("db_collections_changed", refresh_grid)
 	GlobalData.connect("collection_deleted", _on_collection_deleted)
-	CacheManager.connect("thumb_cache_loading_complete", trigger_tile_thumbnail_loads)
 
 func _process(_delta):
 	var new_size = DisplayServer.window_get_size()
@@ -76,10 +75,6 @@ func refresh_grid():
 	
 	grid_tile_instance.queue_free()
 	grid_updated.emit()
-
-func trigger_tile_thumbnail_loads() -> void:
-	for tile in tiles.values():
-		tile.load_thumbnail()
 
 func tile_double_click(collection):
 	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()

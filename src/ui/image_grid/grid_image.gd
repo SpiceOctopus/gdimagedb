@@ -22,10 +22,7 @@ func set_media(media : DBMedia) -> void:
 	texture = load("res://gfx/loading.png")
 
 func load_thumbnail() -> void:
-	if CacheManager.thumb_cache.has(current_media.id):
-		call_deferred("set_texture", CacheManager.thumb_cache[current_media.id])
-	elif current_media.path.get_extension() in Settings.supported_video_files:
-		call_deferred("set_texture", load("res://gfx/video_placeholder.png"))
+	texture = CacheManager.get_thumbnail(current_media)
 
 func _gui_input(ev) -> void:
 	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
