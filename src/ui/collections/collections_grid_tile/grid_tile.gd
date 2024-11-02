@@ -15,7 +15,7 @@ func _ready() -> void:
 	var stylebox = StyleBoxFlat.new()
 	stylebox.bg_color = Color("DARK_SLATE_GRAY", 0.9)
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
-	GlobalData.connect("db_collections_changed", queue_thumbnail_refresh)
+	GlobalData.db_collections_changed.connect(queue_thumbnail_refresh)
 	title_image.texture = load("res://gfx/loading.png")
 
 func _input(event) -> void:
