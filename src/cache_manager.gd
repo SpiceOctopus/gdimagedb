@@ -28,4 +28,6 @@ func get_thumbnail(media : DBMedia) -> ImageTexture:
 			thumb_cache[media.id] = tmp
 			thumb_mutex.unlock()
 			return tmp
+		elif media.path.get_extension() in Settings.supported_video_files:
+			return load("res://gfx/video_placeholder.png")
 	return null
