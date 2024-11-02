@@ -122,10 +122,15 @@ func get_images_for_current_view() -> Array[DBMedia]:
 
 func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 	var instance : MediaViewer = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
-	instance.media_set = current_media.duplicate()
-	for image : DBMedia in current_media:
+	var image_set : Array[DBMedia] = []
+	for preview in previews.values():
+		if preview.visible:
+			image_set.append(preview.current_media)
+	
+	instance.media_set = image_set#current_media.duplicate()
+	for image : DBMedia in image_set:
 		if image.id == sender_media.id:
-			instance.current_image = current_media.find(image)
+			instance.current_image = image_set.find(image)
 	
 	var window : Window = Window.new()
 	window.hide()
