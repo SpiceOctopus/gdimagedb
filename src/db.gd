@@ -27,6 +27,14 @@ func query_with_bindings(cmd, bindings):
 	query_result = db.query_result
 	return retval
 
+func execute_non_query(cmd : String, bindings : Array = []) -> void:
+	db_access_mutex.lock()
+	if bindings.size() > 0:
+		db.query_with_bindings(cmd, bindings)
+	else:
+		db.query(cmd)
+	db_access_mutex.unlock()
+
 func create_database():
 	var dir = DirAccess.open(OS.get_executable_path().get_base_dir())
 	db.path = OS.get_executable_path().get_base_dir() + "/main"
@@ -77,14 +85,6 @@ func update_database():
 
 func db_path_to_full_path(path):
 	return path.insert(0, OS.get_executable_path().get_base_dir() + "/content/")
-
-func db_path_to_full_thumb_path(path):
-	var thumb_path = db_path_to_full_path(path)
-	thumb_path = thumb_path.insert(thumb_path.find(thumb_path.get_extension()) - 1, "_thumb")
-	thumb_path = thumb_path.replace(thumb_path.get_extension(), "png")
-	if(OS.get_name() == "Linux"):
-		thumb_path = thumb_path.replace("\\", "/")
-	return thumb_path
 
 func get_all_media() -> Array[DBMedia]:
 	db_access_mutex.lock()
@@ -146,19 +146,13 @@ func is_tag_in_db(tag : String) -> bool:
 
 # tag is the tag in string form, not the id!
 func add_tag_to_db(tag : String) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("INSERT INTO tags (tag) VALUES (?)", [tag])
-	db_access_mutex.unlock()
+	execute_non_query("INSERT INTO tags (tag) VALUES (?)", [tag])
 
 func add_tag_to_image(tag_id : int, image_id : int) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("INSERT INTO tags_images (tag_id, image_id) VALUES (?, ?)", [tag_id, image_id])
-	db_access_mutex.unlock()
+	execute_non_query("INSERT INTO tags_images (tag_id, image_id) VALUES (?, ?)", [tag_id, image_id])
 
 func remove_tag_from_image(tag_id : int, image_id : int) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("DELETE FROM tags_images WHERE tag_id=? AND image_id=?", [tag_id, image_id])
-	db_access_mutex.unlock()
+	execute_non_query("DELETE FROM tags_images WHERE tag_id=? AND image_id=?", [tag_id, image_id])
 
 func delete_image(image_id : int) -> void:
 	db_access_mutex.lock()
@@ -197,10 +191,8 @@ func get_tag_by_name(tag_name : String) -> DBTag:
 	return tag
 
 # status = int 0 or 1
-func set_fav(id, status):
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE images set fav=? WHERE ID=?", [status, id])
-	db_access_mutex.unlock()
+func set_fav(id : int, status : int) -> void:
+	execute_non_query("UPDATE images set fav=? WHERE ID=?", [status, id])
 
 func is_hash_in_db(file_hash : String) -> bool:
 	db_access_mutex.lock()
@@ -290,9 +282,7 @@ func get_siblings(id):
 	print(query_result)
 
 func update_position(id : int, position : int) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE images set position=? WHERE id=?", [position, id])
-	db_access_mutex.unlock()
+	execute_non_query("UPDATE images set position=? WHERE id=?", [position, id])
 
 # Using a Dictionary is much faster than array in this case.
 func get_ids_images_without_tags() -> Dictionary:
@@ -439,11 +429,9 @@ func swap_positions_in_collection(image1 : DBMedia, image2, collection):
 	set_position_in_collection(image2["id"], collection["id"], image_1_pos)
 
 func set_collection_name(id : int, collection_name : String) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE collections SET collection=? WHERE id=?", [collection_name, id])
-	db_access_mutex.unlock()
+	execute_non_query("UPDATE collections SET collection=? WHERE id=?", [collection_name, id])
 
-# for fetching the title image
+# for fetching the title images
 func get_first_image_in_collection(collection_id : int) -> DBMedia:
 	db_access_mutex.lock()
 	query_with_bindings("SELECT * FROM collections_images WHERE collection_id=? AND position='0'", [collection_id])
@@ -460,9 +448,7 @@ func get_first_image_in_collection(collection_id : int) -> DBMedia:
 		return retval
 
 func set_collection_favorite(collection_id : int, fav : bool) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("UPDATE collections SET fav=? WHERE id=?", [int(fav), collection_id])
-	db_access_mutex.unlock()
+	execute_non_query("UPDATE collections SET fav=? WHERE id=?", [int(fav), collection_id])
 
 func delete_collection(collection_id : int) -> void:
 	db_access_mutex.lock()
@@ -486,19 +472,13 @@ func get_tags_for_collection(id : int) -> Array[DBTag]:
 	return retval
 
 func add_tag_to_collection(tag_id, collection_id):
-	db_access_mutex.lock()
-	query_with_bindings("INSERT INTO tags_collections (tag_id, collection_id) VALUES (?, ?)", [tag_id, collection_id])
-	db_access_mutex.unlock()
+	execute_non_query("INSERT INTO tags_collections (tag_id, collection_id) VALUES (?, ?)", [tag_id, collection_id])
 
 func remove_tag_from_collection(tag_id, collection_id):
-	db_access_mutex.lock()
-	query_with_bindings("DELETE FROM tags_collections WHERE tag_id=? AND collection_id=?", [tag_id, collection_id])
-	db_access_mutex.unlock()
+	execute_non_query("DELETE FROM tags_collections WHERE tag_id=? AND collection_id=?", [tag_id, collection_id])
 
 func remove_image_from_collection(image_id : int, collection_id : int) -> void:
-	db_access_mutex.lock()
-	query_with_bindings("DELETE FROM collections_images WHERE image_id=? and collection_id=?", [image_id, collection_id])
-	db_access_mutex.unlock()
+	execute_non_query("DELETE FROM collections_images WHERE image_id=? and collection_id=?", [image_id, collection_id])
 
 # Using a Dictionary is much faster than array in this case.
 func get_all_image_ids_in_collections() -> Dictionary:
