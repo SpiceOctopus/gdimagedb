@@ -5,6 +5,7 @@
 
 [node name="AddTagDialog" type="Window"]
 title = "Add Tag"
+position = Vector2i(0, 36)
 size = Vector2i(280, 400)
 min_size = Vector2i(250, 200)
 script = ExtResource("1")

@@ -26,15 +26,15 @@ func set_media(media : DBMedia) -> void:
 func load_thumbnail() -> void:
 	texture = CacheManager.get_thumbnail(current_media)
 
-func _gui_input(ev) -> void:
-	if ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and !ev.double_click:
-		if ev.shift_pressed:
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and not event.double_click:
+		if event.shift_pressed:
 			multi_select.emit(self)
 		else:
 			click.emit(self)
-	elif ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_LEFT and ev.double_click:
+	elif event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and event.double_click:
 		double_click.emit(current_media)
-	elif ev is InputEventMouseButton and ev.is_pressed() and ev.button_index == MOUSE_BUTTON_RIGHT:
+	elif event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_RIGHT:
 		right_click.emit(current_media)
 
 func set_selected(is_selected : bool) -> void:

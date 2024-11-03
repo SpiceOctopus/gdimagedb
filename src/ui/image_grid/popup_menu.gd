@@ -1,27 +1,27 @@
 extends PopupMenu
 
-signal favorite_changed
-signal tag_edit(id)
-signal properties
-signal add_to_collection
-signal export(image)
-signal replace_file
-signal delete(image)
+signal favorite_changed(id : int, state : int)
+signal tag_edit(id : int)
+signal properties(media : DBMedia)
+signal add_to_collection(id : int)
+signal export(media : DBMedia)
+signal replace_file(media : DBMedia)
+signal delete(media : DBMedia)
 
 var media : DBMedia = null : set = _set_media
-var last_used_collection
+var last_used_collection : DBCollection
 
-func _ready():
-	GlobalData.connect("last_used_collection_changed", update_last_used_collection)
+func _ready() -> void:
+	GlobalData.last_used_collection_changed.connect(update_last_used_collection)
 
-func update_last_used_collection(collection):
+func update_last_used_collection(collection : DBCollection) -> void:
 	set_item_disabled(get_item_index(7), collection == null) # 7 = add item to last collection
 	last_used_collection = collection
-	set_item_text(get_item_index(7), "Add to " + collection["collection"])
+	set_item_text(get_item_index(7), "Add to " + collection.name)
 
 # Use ID instead of text comparison.
 # It's translation save and get_text() is confusing since it uses order instead of ID.
-func _on_PopupMenu_id_pressed(id):
+func _on_PopupMenu_id_pressed(id : int) -> void:
 	if id == 5: # delete
 		delete.emit(media)
 	elif id == 2: # edit tags
@@ -35,7 +35,7 @@ func _on_PopupMenu_id_pressed(id):
 	elif id == 6: # add to collection
 		add_to_collection.emit(media.id)
 	elif id == 7: # add to last used collection
-		var collection = DB.get_collection_by_name(last_used_collection["collection"])[0]
+		var collection : DBCollection = DB.get_collection_by_name(last_used_collection.name)
 		if !DB.is_image_in_collection(media.id, collection["id"]):
 			DB.add_image_to_collection(collection["id"], media.id)
 			GlobalData.notify_tags_changed() # not technically correct but will cause the grid to refresh

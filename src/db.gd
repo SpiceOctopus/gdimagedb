@@ -369,10 +369,13 @@ func get_all_collection_names() -> Array[String]:
 	db_access_mutex.unlock()
 	return collection_names
 
-func get_collection_by_name(collection_name : String):
+func get_collection_by_name(collection_name : String) -> DBCollection:
 	db_access_mutex.lock()
 	query_with_bindings("SELECT * FROM collections WHERE collection=?", [collection_name])
-	var retval = query_result.duplicate()
+	var retval = DBCollection.new()
+	retval.id = query_result[0]["id"]
+	retval.name = query_result[0]["collection"]
+	retval.fav = bool(query_result[0]["fav"])
 	db_access_mutex.unlock()
 	return retval
 

@@ -1,5 +1,7 @@
 extends Window
 
+# To be filled with DB.get_all_tags().
+# Used to check for similar existing tags.
 var tags : Array[DBTag]
 
 @onready var new_tag_input = $MarginContainer/VBoxContainer/VBoxContainer/HBoxContainer/NewTagInput
@@ -23,12 +25,14 @@ func _on_NewTagInput_text_changed(new_text : String) -> void:
 	add_tag_button.disabled = (new_text == "")
 	similar_tags_list.clear()
 	
-	for tag in tags:
-		if tag["tag"].similarity(new_tag_input.text) > 0.27:
-			similar_tags_list.add_item(tag["tag"])
-		if tag["tag"] == new_tag_input.text:
+	for tag : DBTag in tags:
+		if tag.tag.similarity(new_tag_input.text) > 0.27: # might require more fine tuning
+			similar_tags_list.add_item(tag.tag)
+		if tag.tag == new_tag_input.text:
 			add_tag_button.disabled = true
 
+# text submitted = enter pressed
+# No point in passing on _new_text, text will be read from the textbox.
 func _on_new_tag_input_text_submitted(_new_text : String) -> void:
 	_on_AddTagButton_pressed()
 

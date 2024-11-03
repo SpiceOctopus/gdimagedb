@@ -17,8 +17,7 @@ var initialize_grid_thread_id : int = -1
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
 @onready var add_to_collection_window = $AddToCollection
-@onready var media_properties_window = $MediaPropertiesWindow
-@onready var media_properties_control = $MediaPropertiesWindow/MediaProperties
+@onready var media_properties_window = $MediaProperties
 @onready var replace_file_window = $ReplaceFileWindow
 @onready var drop_files_label = $DropFilesLabel
 @onready var import_log = $ImportLog
@@ -28,7 +27,7 @@ var initialize_grid_thread_id : int = -1
 @onready var last_window_size = Vector2i(0,0)
 
 func _ready() -> void:
-	drop_files_label.visible = (DB.count_images_in_db() == 0)
+	drop_files_label.visible = (DB.count_images_in_db() <= 0)
 	await get_tree().create_timer(0.01).timeout # give the ui a moment to display
 	initialize_grid_finished.connect(on_initialize_grid_finished)
 	GlobalData.favorites_changed.connect(trigger_visibility_update)
@@ -39,16 +38,13 @@ func _ready() -> void:
 	GlobalData.db_collections_changed.connect(trigger_visibility_update)
 	db_media = DB.get_all_media()
 	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
-	media_properties_window.connect('close_requested', Callable(media_properties_window,'hide'))
-	media_properties_window.min_size = media_properties_control.custom_minimum_size
 
-func _process(_delta) -> void:
-	var new_size = DisplayServer.window_get_size()
-	if new_size != last_window_size:
-		last_window_size = new_size
+func _process(_delta : float) -> void:
+	if DisplayServer.window_get_size() != last_window_size:
+		last_window_size = DisplayServer.window_get_size()
 		window_size_changed()
 
-func initialize_grid_async(i : int):
+func initialize_grid_async(i : int) -> void:
 	if !previews.has(db_media[i].id):
 		var gridImageInstance = GridImage.new()
 		gridImageInstance.set_media(db_media[i])
@@ -67,7 +63,7 @@ func initialize_grid_async(i : int):
 	if i >= (db_media.size() - 1):
 		initialize_grid_finished.emit.call_deferred()
 
-func load_missing_previews():
+func load_missing_previews() -> void:
 	db_media = DB.get_all_media()
 	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
 
@@ -86,7 +82,7 @@ func manage_preview_visibility() -> void:
 	
 	var images_in_collections : Dictionary = DB.get_all_image_ids_in_collections()
 	
-	for media in get_images_for_current_view():
+	for media : DBMedia in get_images_for_current_view():
 		if GlobalData.show_favorites && !media.favorite:
 			pass
 		elif GlobalData.show_untagged && !images_without_tags.has(media.id):
@@ -154,7 +150,7 @@ func _on_PopupMenu_tag_edit(id : int) -> void:
 	tag_edit.emit(id)
 
 func _on_PopupMenu_properties(media : DBMedia) -> void:
-	media_properties_control.media = media
+	media_properties_window.media = media
 	media_properties_window.popup_centered()
 
 func on_grid_image_click(grid_image : GridImage) -> void:
@@ -176,7 +172,7 @@ func _on_popup_menu_replace_file(media : DBMedia) -> void:
 	replace_file_window.popup_centered()
 
 func _on_replace_file_window_confirmed() -> void:
-	var error = ImportUtil.replace_file(replace_file_window.media, replace_file_window.current_path)
+	var error : Error = ImportUtil.replace_file(replace_file_window.media, replace_file_window.current_path)
 	
 	import_log.clear_messages()
 	import_log.popup_centered()
@@ -194,9 +190,7 @@ func _on_replace_file_window_confirmed() -> void:
 		await get_tree().create_timer(0.1).timeout
 	
 	db_media = DB.get_all_media()
-	CacheManager.thumb_mutex.lock()
-	CacheManager.thumb_cache.erase(replace_file_window.media.id)
-	CacheManager.thumb_mutex.unlock()
+	CacheManager.remove_thumbnail(replace_file_window.media.id)
 	previews[replace_file_window.media.id].load_thumbnail()
 
 func _on_popup_menu_delete(media : DBMedia) -> void:

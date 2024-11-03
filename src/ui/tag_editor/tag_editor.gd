@@ -6,7 +6,7 @@ var current_media : int = 0
 @onready var preview = $MarginContainer/GridContainer2/Preview
 @onready var sidebar = $MarginContainer/GridContainer2/VBoxContainer/SideBar
 
-func set_current(id):
+func set_current(id : int) -> void:
 	preview.media_set = media_set
 	
 	for media in media_set:
@@ -18,7 +18,7 @@ func set_current(id):
 	sidebar.media_id = media_set[current_media].id
 	sidebar._on_display_changed() # updates both tag lists
 
-func _input(event):
+func _input(event : InputEvent) -> void:
 	if !event is InputEventKey:
 		return
 	if Input.is_action_just_pressed("ui_right"):

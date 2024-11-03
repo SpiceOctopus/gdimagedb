@@ -45,7 +45,7 @@ func _ready() -> void:
 			if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
 				preload_previous_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(media_set[preload_id]), true)
 
-func _input(event) -> void:
+func _input(event : InputEvent) -> void:
 	if !hotkeys_active:
 		return
 	
@@ -101,7 +101,7 @@ func _input(event) -> void:
 		if dragging and not event.pressed:
 			dragging = false
 
-func _process(_delta) -> void:
+func _process(_delta : float) -> void:
 	if dragging:
 		if current_mode == MODE.PICTURE:
 			$ImageDisplay.position = get_global_mouse_position() + drag_offset

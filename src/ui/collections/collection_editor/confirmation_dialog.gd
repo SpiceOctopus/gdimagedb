@@ -1,3 +1,0 @@
-extends ConfirmationDialog
-
-var image

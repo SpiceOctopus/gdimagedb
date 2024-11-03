@@ -1,8 +1,7 @@
 extends Control
 
-signal load_all_done
-signal load_selected_done
-
+signal load_all_done(thread_id : int)
+signal load_selected_done(thread_id : int)
 
 enum MODE {GRID, TAG_EDITOR, COLLECTION_EDITOR}
 

@@ -1,29 +1,24 @@
 extends Window
 
-var media : DBMedia : set=set_media
+var media : DBMedia : 
+	set(media_in):
+		media = media_in
+		message.text = "Delete %s?" % media.path
 
 @onready var message = $MarginContainer/VBoxContainer/MessageLabel
 
-func set_media(media_in : DBMedia) -> void:
-	media = media_in
-	message.text = "Delete %s?" % media.path
-
-func _on_cancel_button_pressed():
+func _on_cancel_button_pressed() -> void:
 	hide()
 
-func _on_ok_button_pressed():
-	var dir = DirAccess.open(DB.db_path.get_base_dir())
+func _on_ok_button_pressed() -> void:
+	var dir : DirAccess = DirAccess.open(DB.db_path.get_base_dir())
 	dir.remove(media.thumb_path) # thumbnail
 	dir.remove(media.path) # image
 	DB.delete_image(media.id)
-	CacheManager.image_mutex.lock()
-	CacheManager.image_cache.erase(media.id) # Does not fail if entry does not exists. Just returns false.
-	CacheManager.image_mutex.unlock()
-	CacheManager.thumb_mutex.lock()
-	CacheManager.thumb_cache.erase(media.id)
-	CacheManager.thumb_mutex.unlock()
+	CacheManager.remove_image(media.id)
+	CacheManager.remove_thumbnail(media.id)
 	GlobalData.notify_media_deleted(media.id)
 	hide()
 
-func _on_close_requested():
+func _on_close_requested() -> void:
 	hide()

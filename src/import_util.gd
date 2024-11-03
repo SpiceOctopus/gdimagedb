@@ -8,14 +8,14 @@ func import_image(imagePath: String) -> Error:
 	if DB.is_hash_in_db(file_hash):
 		return ERR_ALREADY_EXISTS
 
-	var imageFolder = OS.get_executable_path().get_base_dir() + "/content"
-	var folderCountStr = str(count_sub_directories(imageFolder))
-	var currentImageFolder = imageFolder + "/" + folderCountStr
+	var imageFolder : String = OS.get_executable_path().get_base_dir() + "/content"
+	var folderCountStr : String = str(count_sub_directories(imageFolder))
+	var currentImageFolder : String = imageFolder + "/" + folderCountStr
 
 	# create new subfolder as needed
-	var files = DirAccess.open(currentImageFolder)
+	var files : DirAccess = DirAccess.open(currentImageFolder)
 	if files.get_files().size() >= 2048:
-		var newSubDir = DirAccess.open(imageFolder)
+		var newSubDir : DirAccess = DirAccess.open(imageFolder)
 		newSubDir.make_dir(imageFolder + "/" + str(count_sub_directories(imageFolder) + 1))
 
 	# update target folder

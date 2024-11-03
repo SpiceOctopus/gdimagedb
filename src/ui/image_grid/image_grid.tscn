@@ -103,11 +103,8 @@ text = "Drop files here to start importing."
 [node name="AddToCollection" parent="." instance=ExtResource("5_inbqb")]
 visible = false
 
-[node name="MediaPropertiesWindow" type="Window" parent="."]
-title = "Properties"
+[node name="MediaProperties" parent="." instance=ExtResource("6_ge5n3")]
 visible = false
-
-[node name="MediaProperties" parent="MediaPropertiesWindow" instance=ExtResource("6_ge5n3")]
 
 [node name="ReplaceFileWindow" type="FileDialog" parent="."]
 size = Vector2i(678, 400)

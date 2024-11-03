@@ -1,6 +1,6 @@
 extends Window
 
-var all_collections
+var all_collections : Array[DBCollection]
 var image_id : int:
 	set(val):
 		image_id = val
@@ -13,9 +13,9 @@ var image_id : int:
 @onready var btn_add = $MarginContainer/VBoxContainer/AddButton
 
 func _on_btn_add_pressed() -> void:
-	var collection = DB.get_collection_by_name(collections_list.get_item_text(collections_list.get_selected_items()[0]))[0]
-	if !DB.is_image_in_collection(image_id, collection["id"]):
-		DB.add_image_to_collection(collection["id"], image_id)
+	var collection : DBCollection = DB.get_collection_by_name(collections_list.get_item_text(collections_list.get_selected_items()[0]))
+	if !DB.is_image_in_collection(image_id, collection.id):
+		DB.add_image_to_collection(collection.id, image_id)
 		GlobalData.last_used_collection = collection
 		GlobalData.notify_db_collections_changed()
 		hide()
@@ -28,15 +28,15 @@ func _on_edit_filter_text_changed(_new_text : String) -> void:
 func rebuild_list() -> void:
 	collections_list.clear()
 	
-	var counter = 0
+	var counter : int = 0
 	if edit_filter.text.is_empty():
-		for collection in all_collections:
-			collections_list.add_item(collection["collection"])
+		for collection : DBCollection in all_collections:
+			collections_list.add_item(collection.name)
 			counter += 1
 	else:
-		for collection in all_collections:
-			if edit_filter.text.to_lower() in collection["collection"].to_lower():
-				collections_list.add_item(collection["collection"])
+		for collection : DBCollection in all_collections:
+			if edit_filter.text.to_lower() in collection.name.to_lower():
+				collections_list.add_item(collection.name)
 				counter += 1
 	
 	if counter > 0:

@@ -3,18 +3,12 @@
 [ext_resource type="Script" path="res://ui/media_properties/media_properties.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_frn5q"]
 
-[node name="MediaPropertiesControl" type="Control"]
-custom_minimum_size = Vector2(400, 114)
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MediaPropertiesDialog" type="Window"]
+size = Vector2i(400, 110)
+min_size = Vector2i(400, 110)
 script = ExtResource("2")
 
 [node name="TextureRect" type="TextureRect" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,7 +17,6 @@ grow_vertical = 2
 texture = ExtResource("2_frn5q")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -81,6 +74,7 @@ layout_mode = 2
 layout_mode = 2
 text = "Regenerate Thumbnail"
 
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/IDContainer/IDCopy" to="." method="_on_id_copy_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/PathContainer/PathCopy" to="." method="_on_path_copy_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/BottomButtons/RegenerateThumbButton" to="." method="_on_regenerate_thumb_button_pressed"]

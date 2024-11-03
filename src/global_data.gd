@@ -9,17 +9,20 @@ signal db_collections_changed
 signal media_deleted
 signal collection_deleted
 signal help
-signal last_used_collection_changed
+signal last_used_collection_changed(collection : DBCollection)
 
 enum DisplayMode {IMAGES, COLLECTIONS}
 
-var current_display_mode : DisplayMode : set=set_current_display_mode
+var current_display_mode : DisplayMode : 
+	set(mode):
+		current_display_mode = mode
+		display_mode_changed.emit()
 
 var show_favorites : bool : set=set_show_favorites, get=get_show_favorites
 var show_untagged : bool : set=set_show_untagged, get=get_show_untagged
 var included_tags : Array[DBTag] : set=set_included_tags, get=get_included_tags
 var excluded_tags : Array[DBTag] : set=set_excluded_tags, get=get_excluded_tags
-var last_used_collection : set=set_last_used_collection
+var last_used_collection : DBCollection : set=set_last_used_collection
 
 var internal_current_display_mode : DisplayMode = DisplayMode.IMAGES
 var internal_show_favorites_images : bool = false
@@ -59,10 +62,6 @@ func get_show_untagged():
 	elif current_display_mode == DisplayMode.COLLECTIONS:
 		return internal_show_untagged_collections
 
-func set_current_display_mode(mode : DisplayMode) -> void:
-	current_display_mode = mode
-	display_mode_changed.emit()
-
 func set_included_tags(tags : Array[DBTag]) -> void:
 	if current_display_mode == DisplayMode.IMAGES:
 		internal_included_tags_images = tags
@@ -89,7 +88,7 @@ func get_excluded_tags():
 	elif current_display_mode == DisplayMode.COLLECTIONS:
 		return internal_excluded_tags_collections
 
-func set_last_used_collection(collection) -> void:
+func set_last_used_collection(collection : DBCollection) -> void:
 	last_used_collection = collection
 	last_used_collection_changed.emit(last_used_collection)
 
@@ -108,5 +107,5 @@ func notify_media_deleted(id) -> void:
 func notify_db_collections_changed() -> void:
 	db_collections_changed.emit()
 
-func notify_collection_deleted(id) -> void:
+func notify_collection_deleted(id : int) -> void:
 	collection_deleted.emit(id)

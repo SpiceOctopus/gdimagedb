@@ -9,7 +9,7 @@ signal stretch_mode_changed
 func _ready() -> void:
 	stretch_mode_selector.selected = DB.get_setting_media_viewer_stretch_mode()
 
-func _input(_event) -> void:
+func _input(_event : InputEvent) -> void:
 	if Input.is_action_just_pressed("menu_bar_1"):
 		fit_to_window.emit()
 	elif Input.is_action_just_pressed("menu_bar_2"):

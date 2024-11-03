@@ -29,3 +29,13 @@ func get_thumbnail(media : DBMedia) -> ImageTexture:
 		elif media.path.get_extension() in Settings.supported_video_files:
 			return load("res://gfx/video_placeholder.png")
 	return null
+
+func remove_image(id : int) -> void:
+	image_mutex.lock()
+	image_cache.erase(id) # Does not fail if entry does not exists. Just returns false.
+	image_mutex.unlock()
+
+func remove_thumbnail(id : int) -> void:
+	thumb_mutex.lock()
+	thumb_cache.erase(id)
+	thumb_mutex.unlock()
