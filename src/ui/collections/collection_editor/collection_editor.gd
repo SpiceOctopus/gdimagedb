@@ -1,9 +1,11 @@
 extends Window
 
+signal name_changed(collection : DBCollection)
+
 var collection_editor_tile = load("res://ui/collections/collection_editor_tile/collection_editor_tile.tscn")
 
 var last_window_size : Vector2i
-var collection : set=set_collection # row from the collections table
+var collection : DBCollection : set=set_collection # row from the collections table
 
 @onready var grid = $HBoxContainer/Panel/MarginContainer/ScrollContainer/Grid
 @onready var scroll_container = $HBoxContainer/Panel/MarginContainer/ScrollContainer
@@ -12,16 +14,16 @@ var collection : set=set_collection # row from the collections table
 @onready var name_edit = $HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/NameEdit
 @onready var apply_name_button = $HBoxContainer/VBoxContainer/Panel/MarginContainer/HBoxContainer/ApplyButton
 
-func _process(_delta):
+func _process(_delta : float) -> void:
 	var new_size = size
 	if new_size != last_window_size:
 		last_window_size = new_size
 		window_size_changed()
 
-func set_collection(collection_in):
+func set_collection(collection_in : DBCollection) -> void:
 	collection = collection_in
-	name_edit.text = collection["collection"]
-	side_bar.media_id = collection["id"]
+	name_edit.text = collection.name
+	side_bar.media_id = collection.id
 	side_bar._on_display_changed()
 	rebuild_grid()
 
@@ -33,18 +35,18 @@ func window_size_changed() -> void:
 		grid.columns = columns
 
 func tile_move_left(media : DBMedia) -> void:
-	var image_pos = DB.get_position_in_collection(media.id, collection["id"])
-	DB.swap_positions_in_collection(media, DB.get_collection_image_by_position(collection["id"], (image_pos - 1)), collection)
+	var image_pos = DB.get_position_in_collection(media.id, collection.id)
+	DB.swap_positions_in_collection(media, DB.get_collection_image_by_position(collection.id, (image_pos - 1)), collection)
 	rebuild_grid()
-	if DB.get_position_in_collection(media.id, collection["id"]) == 0:
+	if DB.get_position_in_collection(media.id, collection.id) == 0:
 		GlobalData.notify_db_collections_changed()
 
 func tile_move_right(media : DBMedia) -> void:
-	var image_pos = DB.get_position_in_collection(media.id, collection["id"])
-	DB.swap_positions_in_collection(media, DB.get_collection_image_by_position(collection["id"], (image_pos + 1)), collection)
+	var image_pos = DB.get_position_in_collection(media.id, collection.id)
+	DB.swap_positions_in_collection(media, DB.get_collection_image_by_position(collection.id, (image_pos + 1)), collection)
 	rebuild_grid()
 	GlobalData.notify_db_collections_changed()
-	if DB.get_position_in_collection(media.id, collection["id"]) == 0:
+	if DB.get_position_in_collection(media.id, collection.id) == 0:
 		GlobalData.notify_db_collections_changed()
 
 func tile_delete(media : DBMedia) -> void:
@@ -56,12 +58,12 @@ func rebuild_grid() -> void:
 		tile.remove_from_group("collection_editor_grid_tiles")
 		tile.queue_free()
 	
-	var db_media : Array[DBMedia] = DB.get_all_images_in_collection(collection["id"])
+	var db_media : Array[DBMedia] = DB.get_all_images_in_collection(collection.id)
 	db_media.sort_custom(compare_by_position)
-	for media in db_media:
+	for media : DBMedia in db_media:
 		var tile = collection_editor_tile.instantiate()
 		tile.media = media
-		tile.collection_id = collection["id"]
+		tile.collection_id = collection.id
 		tile.move_left.connect(tile_move_left)
 		tile.move_right.connect(tile_move_right)
 		tile.delete.connect(tile_delete)
@@ -75,7 +77,9 @@ func _on_name_edit_text_changed(new_text : String) -> void:
 	apply_name_button.disabled = new_text.is_empty()
 
 func _on_apply_button_pressed() -> void:
-	DB.set_collection_name(collection["id"], name_edit.text)
+	DB.set_collection_name(collection.id, name_edit.text)
+	collection.name = name_edit.text
+	name_changed.emit(collection)
 
 func _on_close_requested() -> void:
 	hide()
@@ -86,13 +90,13 @@ func _on_about_to_popup() -> void:
 
 # confirmed = remove image from collection
 func _on_remove_from_collection_confirmed() -> void:
-	DB.remove_image_from_collection(delete_confirmation.media.id, collection["id"])
-	var media : Array[DBMedia] = DB.get_all_images_in_collection(collection["id"])
+	DB.remove_image_from_collection(delete_confirmation.media.id, collection.id)
+	var media : Array[DBMedia] = DB.get_all_images_in_collection(collection.id)
 	media.sort_custom(compare_by_position)
 	
 	var counter = 0
 	for entry in media:
-		DB.set_position_in_collection(entry.id, collection["id"], counter)
+		DB.set_position_in_collection(entry.id, collection.id, counter)
 		counter += 1
 	
 	rebuild_grid()

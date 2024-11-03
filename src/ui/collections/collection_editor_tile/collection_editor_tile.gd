@@ -4,7 +4,6 @@ signal delete(media : DBMedia)
 signal move_left(media : DBMedia)
 signal move_right(media : DBMedia)
 
-var load_thread : Thread = Thread.new()
 var media : DBMedia
 var collection_id : int
 

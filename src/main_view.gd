@@ -93,3 +93,6 @@ func _on_collections_grid_edit_collection(collection) -> void:
 	
 	collection_editor.collection = collection
 	collection_editor.popup_centered()
+
+func _on_collection_editor_name_changed(collection: DBCollection) -> void:
+	collections_grid.update_tile(collection)

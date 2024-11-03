@@ -111,3 +111,4 @@ visible = false
 [connection signal="tag_edit" from="VBoxContainer/HBoxContainer/Content/ImageGrid" to="." method="_on_grid_tag_edit"]
 [connection signal="edit_collection" from="VBoxContainer/HBoxContainer/Content/CollectionsGrid" to="." method="_on_collections_grid_edit_collection"]
 [connection signal="grid_updated" from="VBoxContainer/HBoxContainer/Content/CollectionsGrid" to="." method="update_grid_info_panel"]
+[connection signal="name_changed" from="CollectionEditor" to="." method="_on_collection_editor_name_changed"]

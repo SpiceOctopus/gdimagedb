@@ -1,10 +1,10 @@
 extends Control
 
-signal double_click
-signal right_click
+signal double_click(collection : DBCollection)
+signal right_click(collection : DBCollection)
 signal click
 
-var collection : set=set_collection
+var collection : DBCollection : set=set_collection
 var image : DBMedia
 
 @onready var lbl_name = $CollectionNameLabel
@@ -25,7 +25,7 @@ func _input(event) -> void:
 		return
 	
 	if event.double_click:
-		if DB.get_all_images_in_collection(collection["id"]).size() > 0:
+		if DB.get_all_images_in_collection(collection.id).size() > 0:
 			double_click.emit(collection)
 	elif event.is_pressed() and event.button_index == MOUSE_BUTTON_RIGHT:
 		right_click.emit(collection)
@@ -39,16 +39,17 @@ func _gui_input(ev) -> void:
 func _exit_tree() -> void:
 	if image != null:
 		image.free()
-	collection = null
+	if collection != null:
+		collection.free()
 
-func set_collection(collection_param) -> void:
+func set_collection(collection_param : DBCollection) -> void:
 	if collection_param == null:
 		collection = null
 		return
 	
-	lbl_name.text = collection_param["collection"]
+	lbl_name.text = collection_param.name
 	collection = collection_param
-	image = DB.get_first_image_in_collection(collection["id"])
+	image = DB.get_first_image_in_collection(collection.id)
 	var img = CacheManager.get_thumbnail(image)
 	if img != null:
 		title_image.texture = img
@@ -62,9 +63,8 @@ func set_selected(is_selected : bool) -> void:
 		title_image.set_material(null)
 
 func queue_thumbnail_refresh() -> void:
-	image = DB.get_first_image_in_collection(collection["id"])
+	image = DB.get_first_image_in_collection(collection.id)
 	if not image == null:
-		if CacheManager.thumb_cache.has(image.id):
-			title_image.texture = CacheManager.thumb_cache[image.id]
+		CacheManager.get_thumbnail(image)
 	else:
 		title_image.texture = load("res://gfx/collection_placeholder_icon.png")

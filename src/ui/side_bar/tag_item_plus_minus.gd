@@ -1,7 +1,7 @@
 extends Control
 
-signal add(tag)
-signal remove(tag)
+signal add(tag : DBTag)
+signal remove(tag : DBTag)
 
 var selected : bool = false : set=set_selected
 

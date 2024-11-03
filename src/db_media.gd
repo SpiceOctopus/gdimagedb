@@ -9,6 +9,8 @@ var thumb_path : String = "" # Full path to the thumbnail file in the OS file sy
 var favorite : int = 0 # Integer to represent the DB. SQLite does not have a bool type.
 var position : int = -1 # Only relevant for collection sorting.
 
+# parsing hash and date fields might make sense for future features
+
 # Takes the relative path provided by the database and sets both path and 
 # thumb_path as absolute paths in the OS file system.
 func set_path(relative_path_from_db : String) -> void:

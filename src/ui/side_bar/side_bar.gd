@@ -41,7 +41,7 @@ func merge_loader_threads(id : int) -> void:
 func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
 	all_tag_counts = DB.get_all_tag_counts()
-	for tag in all_tags:
+	for tag : DBTag in all_tags:
 		if !all_tag_counts.has(tag.id):
 			all_tag_counts[tag.id] = 0
 	all_tags.sort_custom(sort_by_count)
@@ -57,7 +57,7 @@ func rebuild_tag_lists() -> void:
 func async_build_tag_items_all() -> void:
 	var tag_item_plus_instance = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
 	var tag_item_plus_minus_instance = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
-	for tag in all_tags:
+	for tag : DBTag in all_tags:
 		if exiting: # crash fix
 			return
 		
@@ -167,7 +167,7 @@ func _on_tag_preview_list_gui_input(event) -> void:
 	if event.is_action_pressed("ui_accept"):
 		_on_LineEdit_gui_input(event)
 
-func _on_tag_item_add(tag) -> void:
+func _on_tag_item_add(tag : DBTag) -> void:
 	if mode == MODE.GRID:
 		GlobalData.included_tags.append(tag)
 	elif mode == MODE.TAG_EDITOR:
@@ -187,13 +187,13 @@ func _on_tag_item_add(tag) -> void:
 	if mode == MODE.GRID:
 		GlobalData.notify_tags_changed()
 
-func _on_tag_item_remove(tag) -> void:
+func _on_tag_item_remove(tag : DBTag) -> void:
 	GlobalData.excluded_tags.append(tag)
 	update_selected_tags_list()
 	update_all_tags_list()
 	GlobalData.notify_tags_changed()
 
-func _on_tag_item_x(tag) -> void:
+func _on_tag_item_x(tag : DBTag) -> void:
 	if mode == MODE.GRID:
 		for included_tag in GlobalData.included_tags:
 			if included_tag["id"] == tag["id"]:
@@ -219,7 +219,7 @@ func _on_tag_item_x(tag) -> void:
 		GlobalData.notify_tags_changed()
 
 func _on_filter_text_submitted(new_text : String) -> void:
-	var remove = new_text.begins_with("-")
+	var remove : bool = new_text.begins_with("-")
 	
 	var tag
 	for item in all_tags_list.get_children():
@@ -252,16 +252,16 @@ func set_media_id(id : int) -> void:
 	media_id = id
 	if mode == MODE.GRID || mode == MODE.TAG_EDITOR:
 		var assigned : Array[int] = []
-		for entry in DB.get_tags_for_image(media_id):
+		for entry : DBTag in DB.get_tags_for_image(media_id):
 			assigned.append(entry.id)
 		assigned_tags_ids = assigned
 	else:
 		var assigned : Array[int] = []
-		for entry in DB.get_tags_for_collection(media_id):
+		for entry : DBTag in DB.get_tags_for_collection(media_id):
 			assigned.append(entry.id)
 		assigned_tags_ids = assigned
 
-func sort_by_count(a, b) -> bool:
+func sort_by_count(a : DBTag, b : DBTag) -> bool:
 	if all_tag_counts[a.id] > all_tag_counts[b.id]:
 		return true
 	return false

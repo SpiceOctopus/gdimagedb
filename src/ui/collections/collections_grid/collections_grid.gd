@@ -1,11 +1,11 @@
 extends Control
 
 signal grid_updated
-signal edit_collection
+signal edit_collection(collection : DBCollection)
 
 var new_button_instance = load("res://ui/collections/collections_grid_new_button/new_button.tscn").instantiate()
 
-var db_collections : Array = [] # to be filled with all collections available in the database
+var db_collections : Array[DBCollection] = [] # to be filled with all collections available in the database
 var tiles : Dictionary = {} # cached tiles for the grid
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
@@ -38,18 +38,17 @@ func refresh_grid() -> void:
 	
 	db_collections = DB.get_all_collections()
 	
-	for collection in db_collections:
-		if !tiles.has(collection["id"]):
+	for collection : DBCollection in db_collections:
+		if !tiles.has(collection.id):
 			var instance = grid_tile_instance.duplicate()
 			instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-			instance.connect("double_click", tile_double_click)
-			instance.connect("right_click", tile_right_click)
-			instance.connect("click", on_grid_tile_click)
+			instance.double_click.connect(tile_double_click)
+			instance.right_click.connect(tile_right_click)
+			instance.click.connect(on_grid_tile_click)
 			instance.visible = false
 			grid_container.add_child(instance)
 			instance.collection = collection
-			tiles[collection["id"]] = instance
-	
+			tiles[collection.id] = instance
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 	grid_container.add_child(new_button_instance)
 	
@@ -59,13 +58,13 @@ func refresh_grid() -> void:
 	if !((GlobalData.included_tags.size() > 0) || (GlobalData.excluded_tags.size() > 0)):
 		current_tiles = tiles
 	else:
-		for collection in DB.get_collections_for_tags(GlobalData.included_tags, GlobalData.excluded_tags):
+		for collection : DBCollection in DB.get_collections_for_tags(GlobalData.included_tags, GlobalData.excluded_tags):
 			current_tiles[collection["id"]] = tiles[collection["id"]]
 	
 	for tile in current_tiles.values():
-		if GlobalData.show_favorites && !tile.collection["fav"]:
+		if GlobalData.show_favorites && !tile.collection.fav:
 			pass
-		elif GlobalData.show_untagged && !(tile.collection["id"] in collections_without_tags):
+		elif GlobalData.show_untagged && !(tile.collection.id in collections_without_tags):
 			pass
 		else:
 			tile.visible = true
@@ -76,9 +75,9 @@ func refresh_grid() -> void:
 	grid_tile_instance.queue_free()
 	grid_updated.emit()
 
-func tile_double_click(collection) -> void:
+func tile_double_click(collection : DBCollection) -> void:
 	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
-	var images = DB.get_all_images_in_collection(collection["id"])
+	var images : Array[DBMedia] = DB.get_all_images_in_collection(collection.id)
 	images.sort_custom(compare_by_position)
 	instance.media_set = images
 	
@@ -88,7 +87,7 @@ func tile_double_click(collection) -> void:
 	#	if image["id"] == senderImage["id"]:
 	#		instance.current_image = images.find(image)
 	
-	var window = Window.new()
+	var window : Window = Window.new()
 	window.hide()
 	get_tree().get_root().add_child(window)
 	window.size = DisplayServer.window_get_size()
@@ -97,14 +96,14 @@ func tile_double_click(collection) -> void:
 	window.add_child(instance)
 	instance.closing.connect(window.queue_free) # required to allow closing with esc key
 	instance.visible = true
-	window.title = collection["collection"]
+	window.title = collection.name
 	window.close_requested.connect(window.queue_free)
 	window.popup_centered()
 
-func compare_by_position(a, b) -> bool:
+func compare_by_position(a : DBMedia, b : DBMedia) -> bool:
 	return a.position < b.position
 
-func tile_right_click(collection) -> void:
+func tile_right_click(collection : DBCollection) -> void:
 	$PopupMenu.position = DisplayServer.mouse_get_position()
 	$PopupMenu.collection = collection
 	$PopupMenu.popup()
@@ -132,7 +131,7 @@ func _on_visibility_changed() -> void:
 	for child in grid_container.get_children():
 		child.visible = visible
 
-func _on_collection_deleted(id) -> void:
+func _on_collection_deleted(id : int) -> void:
 	tiles[id].queue_free()
 	tiles.erase(id)
 	refresh_grid()
@@ -141,3 +140,6 @@ func on_grid_tile_click(grid_tile) -> void:
 	for tile in tiles.values():
 		tile.set_selected(false)
 	grid_tile.set_selected(true)
+
+func update_tile(collection : DBCollection) -> void:
+	tiles[collection.id].collection = collection

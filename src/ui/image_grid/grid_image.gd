@@ -4,7 +4,7 @@ class_name GridImage
 
 signal double_click(media : DBMedia)
 signal right_click(media : DBMedia)
-signal click
+signal click(grid_image : GridImage)
 signal multi_select
 
 var current_media : DBMedia

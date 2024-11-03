@@ -6,8 +6,6 @@ var image_mutex : Mutex = Mutex.new()
 var thumb_cache : Dictionary = {}
 var image_cache : Dictionary = {}
 
-var thumb_cache_loader_id : int = -1
-
 var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
 
 func clear_thumb_cache() -> void:
