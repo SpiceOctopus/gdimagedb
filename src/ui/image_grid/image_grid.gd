@@ -47,7 +47,7 @@ func _process(_delta : float) -> void:
 func initialize_grid_async(i : int) -> void:
 	if !previews.has(db_media[i].id):
 		var gridImageInstance = GridImage.new()
-		gridImageInstance.set_media(db_media[i])
+		gridImageInstance.current_media = db_media[i]
 		gridImageInstance.double_click.connect(_on_grid_image_double_click)
 		gridImageInstance.right_click.connect(grid_image_right_click)
 		gridImageInstance.click.connect(on_grid_image_click)
@@ -154,10 +154,10 @@ func _on_PopupMenu_properties(media : DBMedia) -> void:
 	media_properties_window.popup_centered()
 
 func on_grid_image_click(grid_image : GridImage) -> void:
-	grid_image.set_selected(true)
+	grid_image.selected = true
 	for preview in get_tree().get_nodes_in_group("previews"):
 		if preview != grid_image:
-			preview.set_selected(false)
+			preview.selected = false
 
 func _on_popup_menu_add_to_collection(image_id : int) -> void:
 	add_to_collection_window.image_id = image_id
