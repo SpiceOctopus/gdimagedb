@@ -20,10 +20,6 @@ func _on_x_pressed():
 	x.emit(tag)
 	hide()
 
-func _exit_tree() -> void:
-	if tag != null:
-		tag.free()
-
 func set_selected(value : bool):
 	selected = value
 	if value:

@@ -18,10 +18,6 @@ func _on_add_pressed() -> void:
 	add.emit(tag)
 	hide()
 
-func _exit_tree() -> void:
-	if tag != null:
-		tag.free()
-
 func set_selected(value : bool) -> void:
 	selected = value
 	if value:
