@@ -20,11 +20,11 @@ func _ready() -> void:
 	GlobalData.tags_changed.connect(refresh_grid)
 	GlobalData.db_collections_changed.connect(refresh_grid)
 	GlobalData.collection_deleted.connect(_on_collection_deleted)
+	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 
 func _process(_delta : float) -> void:
-	var new_size = DisplayServer.window_get_size()
-	if new_size != last_window_size:
-		last_window_size = new_size
+	if DisplayServer.window_get_size() != last_window_size:
+		last_window_size = DisplayServer.window_get_size()
 		window_size_changed()
 
 func refresh_grid() -> void:
@@ -45,9 +45,8 @@ func refresh_grid() -> void:
 			instance.click.connect(on_grid_tile_click)
 			instance.visible = false
 			instance.collection = collection
-			grid_container.add_child.call_deferred(instance)
+			grid_container.add_child(instance)
 			tiles[collection.id] = instance
-	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 	grid_container.add_child(new_button_instance)
 	
 	var collections_without_tags : Array[int] = DB.get_ids_collections_without_tags()
@@ -57,7 +56,7 @@ func refresh_grid() -> void:
 		current_tiles = tiles
 	else:
 		for collection : DBCollection in DB.get_collections_for_tags(GlobalData.included_tags, GlobalData.excluded_tags):
-			current_tiles[collection["id"]] = tiles[collection["id"]]
+			current_tiles[collection.id] = tiles[collection.id]
 	
 	for tile in current_tiles.values():
 		if GlobalData.show_favorites && !tile.collection.fav:
