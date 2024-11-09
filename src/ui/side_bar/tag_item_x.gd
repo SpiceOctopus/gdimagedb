@@ -31,8 +31,8 @@ func reset():
 	visible = true
 	selected = false
 	if tag in GlobalData.excluded_tags && color_mode:
-		tag_label.set("theme_override_colors/font_color", Color.ORANGE_RED)
+		tag_label.add_theme_color_override("font_color", Color.ORANGE_RED)
 	elif tag in GlobalData.included_tags && color_mode:
-		tag_label.set("theme_override_colors/font_color", Color.LIME_GREEN)
+		tag_label.add_theme_color_override("font_color", Color.LIME_GREEN)
 	else:
-		tag_label.set("theme_override_colors/font_color", Color.WHITE)
+		tag_label.add_theme_color_override("font_color", Color.WHITE)

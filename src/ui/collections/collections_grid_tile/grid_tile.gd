@@ -38,12 +38,13 @@ func _ready() -> void:
 	stylebox.bg_color = Color("DARK_SLATE_GRAY", 0.9)
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
 	GlobalData.db_collections_changed.connect(queue_thumbnail_refresh)
-	title_image.texture = load("res://gfx/loading.png")
+	title_image.set_texture.call_deferred(load("res://gfx/loading.png"))
 	if load_on_ready:
 		lbl_name.text = collection.name
 		var img = CacheManager.get_thumbnail(image)
 		if img != null:
-			title_image.texture = img
+			#title_image.texture = img
+			title_image.set_texture.call_deferred(img)
 		else:
 			title_image.texture = load("res://gfx/collection_placeholder_icon.png")
 
