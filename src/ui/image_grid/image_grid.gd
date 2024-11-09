@@ -11,7 +11,6 @@ var current_media : Array[DBMedia] = []
 var previews : Dictionary = {}
 
 var previews_mutex : Mutex = Mutex.new()
-var initialize_grid_thread_id : int = -1
 var exiting : bool = false
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
@@ -38,7 +37,7 @@ func _ready() -> void:
 	GlobalData.media_deleted.connect(_on_media_deleted)
 	GlobalData.db_collections_changed.connect(trigger_visibility_update)
 	db_media = DB.get_all_media()
-	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
+	WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:
@@ -61,20 +60,18 @@ func initialize_grid_async(i : int) -> void:
 		gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 		gridImageInstance.visible = true
 		gridImageInstance.load_thumbnail()
-		gridImageInstance.add_to_group("previews")
-		grid_container.add_child.call_deferred(gridImageInstance)
 		previews_mutex.lock()
 		previews[db_media[i].id] = gridImageInstance
+		grid_container.add_child.call_deferred(gridImageInstance)
 		previews_mutex.unlock()
 	if i >= (db_media.size() - 1):
 		initialize_grid_finished.emit.call_deferred()
 
 func load_missing_previews() -> void:
 	db_media = DB.get_all_media()
-	initialize_grid_thread_id = WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
+	WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
 
 func on_initialize_grid_finished() -> void:
-	WorkerThreadPool.wait_for_group_task_completion(initialize_grid_thread_id)
 	manage_preview_visibility()
 
 func manage_preview_visibility() -> void:
@@ -124,7 +121,7 @@ func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 		if preview.visible:
 			image_set.append(preview.current_media)
 	
-	instance.media_set = image_set#current_media.duplicate()
+	instance.media_set = image_set
 	for image : DBMedia in image_set:
 		if image.id == sender_media.id:
 			instance.current_image = image_set.find(image)
@@ -133,7 +130,7 @@ func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 	window.hide()
 	add_child(window)
 	window.size = DisplayServer.window_get_size()
-	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MAXIMIZED:
 		window.mode = Window.MODE_MAXIMIZED
 	instance.closing.connect(window.queue_free) # required to allow closing with esc key
 	instance.visible = true
@@ -161,7 +158,7 @@ func _on_PopupMenu_properties(media : DBMedia) -> void:
 
 func on_grid_image_click(grid_image : GridImage) -> void:
 	grid_image.selected = true
-	for preview in get_tree().get_nodes_in_group("previews"):
+	for preview in previews.values():
 		if preview != grid_image:
 			preview.selected = false
 
