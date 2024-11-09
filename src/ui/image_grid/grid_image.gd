@@ -25,8 +25,6 @@ func _ready() -> void:
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _exit_tree() -> void:
-	if current_media != null:
-		current_media.free()
 	texture = null
 
 func load_thumbnail() -> void:

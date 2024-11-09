@@ -1,8 +1,5 @@
 extends Control
 
-signal load_all_done(thread_id : int)
-signal load_selected_done(thread_id : int)
-
 enum MODE {GRID, TAG_EDITOR, COLLECTION_EDITOR}
 
 @export var mode : MODE = MODE.GRID
@@ -17,8 +14,8 @@ var assigned_tags_ids : Array[int] = []
 var all_tag_counts : Dictionary
 var exiting : bool = false # fix for crash on premature closing
 
-var load_all_thread_id : int = -1
-var load_selected_thread_id : int = -1
+var load_all_thread : Thread = Thread.new()
+var load_selected_thread : Thread = Thread.new()
 
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
@@ -30,12 +27,11 @@ func _ready() -> void:
 	rebuild_tag_lists()
 	GlobalData.display_mode_changed.connect(_on_display_changed)
 	GlobalData.db_tags_changed.connect(_on_db_tags_changed)
-	load_all_done.connect(merge_loader_threads)
-	load_selected_done.connect(merge_loader_threads)
 	tag_buttons.visible = show_add_delete_buttons
 
-func merge_loader_threads(id : int) -> void:
-	WorkerThreadPool.wait_for_task_completion(id)
+func _exit_tree() -> void:
+	load_all_thread.wait_to_finish()
+	load_selected_thread.wait_to_finish()
 
 func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
@@ -50,8 +46,8 @@ func rebuild_tag_lists() -> void:
 	for item in selected_tags_list.get_children():
 		item.queue_free()
 
-	load_all_thread_id = WorkerThreadPool.add_task(async_build_tag_items_all)
-	load_selected_thread_id = WorkerThreadPool.add_task(async_build_tag_items_selected)
+	load_all_thread.start(async_build_tag_items_all)
+	load_selected_thread.start(async_build_tag_items_selected)
 
 func async_build_tag_items_all() -> void:
 	for tag : DBTag in all_tags:
@@ -73,8 +69,6 @@ func async_build_tag_items_all() -> void:
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 			if is_instance_valid(all_tags_list):
 				all_tags_list.add_child.call_deferred(item)
-		
-	load_all_done.emit.call_deferred(load_all_thread_id)
 
 func async_build_tag_items_selected() -> void:
 	for tag in all_tags:
@@ -92,7 +86,6 @@ func async_build_tag_items_selected() -> void:
 		
 		if is_instance_valid(selected_tags_list):
 			selected_tags_list.add_child.call_deferred(item)
-	load_selected_done.emit.call_deferred(load_selected_thread_id)
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed : String = "") -> void:

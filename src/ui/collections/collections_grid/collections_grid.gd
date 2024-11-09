@@ -28,8 +28,6 @@ func _process(_delta : float) -> void:
 		window_size_changed()
 
 func refresh_grid() -> void:
-	var grid_tile_instance = load("res://ui/collections/collections_grid_tile/grid_tile.tscn").instantiate()
-	
 	if grid_container.get_children().has(new_button_instance):
 		grid_container.remove_child(new_button_instance) # remove here, add back to the end
 	
@@ -40,13 +38,13 @@ func refresh_grid() -> void:
 	
 	for collection : DBCollection in db_collections:
 		if !tiles.has(collection.id):
-			var instance = grid_tile_instance.duplicate()
+			var instance = load("res://ui/collections/collections_grid_tile/grid_tile.tscn").instantiate()
 			instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 			instance.double_click.connect(tile_double_click)
 			instance.right_click.connect(tile_right_click)
 			instance.click.connect(on_grid_tile_click)
 			instance.visible = false
-			grid_container.add_child(instance)
+			grid_container.add_child.call_deferred(instance)
 			instance.collection = collection
 			tiles[collection.id] = instance
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
@@ -72,7 +70,6 @@ func refresh_grid() -> void:
 		if GlobalData.current_display_mode != GlobalData.DisplayMode.COLLECTIONS: # overrides all other possibilites
 			tile.visible = false
 	
-	grid_tile_instance.queue_free()
 	grid_updated.emit()
 
 func tile_double_click(collection : DBCollection) -> void:
