@@ -21,11 +21,11 @@ func get_thumbnail(media : DBMedia) -> ImageTexture:
 		return thumb_cache[media.id]
 	else:
 		if dir.file_exists(media.thumb_path):
-			var tmp = ImageUtil.TextureFromFile(media.thumb_path)
+			var tmp = ImageTexture.create_from_image(Image.load_from_file(media.thumb_path))
 			thumb_mutex.lock()
 			thumb_cache[media.id] = tmp
 			thumb_mutex.unlock()
-			return tmp
+			return thumb_cache[media.id]
 		elif media.path.get_extension() in Settings.supported_video_files:
 			return load("res://gfx/video_placeholder.png")
 	return null

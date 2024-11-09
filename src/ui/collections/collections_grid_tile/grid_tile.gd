@@ -54,6 +54,7 @@ func _exit_tree() -> void:
 		image.free()
 	if collection != null:
 		collection.free()
+	title_image.texture = null
 
 func set_selected(is_selected : bool) -> void:
 	if(is_selected):

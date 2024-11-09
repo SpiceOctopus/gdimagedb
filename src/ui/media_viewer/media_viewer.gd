@@ -240,14 +240,14 @@ func async_load_display(media : DBMedia) -> void:
 	if CacheManager.image_cache.has(media.id):
 			call_deferred("set_image_internal", CacheManager.image_cache[media.id])
 	else:
-		var texture = ImageUtil.TextureFromFile(media.path)
+		var texture = ImageTexture.create_from_image(Image.load_from_file(media.path))
 		call_deferred("set_image_internal", texture)
 		CacheManager.image_mutex.lock()
 		CacheManager.image_cache[media.id] = texture
 		CacheManager.image_mutex.unlock()
 
 func preload_image(media : DBMedia) -> void:
-	var texture = ImageUtil.TextureFromFile(media.path)
+	var texture = ImageTexture.create_from_image(Image.load_from_file(media.path))
 	CacheManager.image_mutex.lock()
 	CacheManager.image_cache[media.id] = texture
 	CacheManager.image_mutex.unlock()

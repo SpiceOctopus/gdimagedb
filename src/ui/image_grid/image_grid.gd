@@ -11,8 +11,8 @@ var current_media : Array[DBMedia] = []
 var previews : Dictionary = {}
 
 var previews_mutex : Mutex = Mutex.new()
-
 var initialize_grid_thread_id : int = -1
+var exiting : bool = false
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
@@ -44,7 +44,12 @@ func _process(_delta : float) -> void:
 		last_window_size = DisplayServer.window_get_size()
 		window_size_changed()
 
+func _exit_tree():
+	exiting = true
+
 func initialize_grid_async(i : int) -> void:
+	if exiting:
+		return
 	if !previews.has(db_media[i].id):
 		var gridImageInstance = GridImage.new()
 		gridImageInstance.current_media = db_media[i]

@@ -53,6 +53,7 @@ layout_mode = 2
 text = "Settings"
 item_count = 2
 popup/item_0/text = "Grid Image Size"
+popup/item_0/id = 0
 popup/item_1/text = "Hide images in collections"
 popup/item_1/checkable = 1
 popup/item_1/id = 2
@@ -62,6 +63,7 @@ layout_mode = 2
 text = "Tags"
 item_count = 2
 popup/item_0/text = "Add Tag"
+popup/item_0/id = 0
 popup/item_1/text = "Delete Tag"
 popup/item_1/id = 1
 

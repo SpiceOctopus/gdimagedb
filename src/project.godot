@@ -105,7 +105,3 @@ video_play_pause={
 [physics]
 
 common/enable_pause_aware_picking=true
-
-[rendering]
-
-environment/defaults/default_environment="res://default_env.tres"
