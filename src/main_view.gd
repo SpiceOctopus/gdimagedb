@@ -17,7 +17,7 @@ func _input(_event) -> void:
 	if Input.is_action_just_pressed("ui_filedialog_refresh"): # ui_filedialog_refresh <- happens to be assigned to F5 per default
 		refresh()
 	if Input.is_action_just_pressed("help"):
-		GlobalData.notify_help_called()
+		GlobalData.help.emit()
 
 # The timers in this function are required to give the ui time to update.
 # Without the timer the import log will just be a black window.
@@ -85,10 +85,11 @@ func _on_menu_bar_switch_grids() -> void:
 	
 	update_grid_info_panel()
 
-func _on_collections_grid_edit_collection(collection) -> void:
-	if collection_editor.min_size.x > DisplayServer.window_get_size().x || collection_editor.min_size.y > DisplayServer.window_get_size().y:
-		collection_editor.size = collection_editor.min_size
+func _on_collections_grid_edit_collection(collection : DBCollection) -> void:
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MAXIMIZED:
+		collection_editor.mode = Window.MODE_MAXIMIZED
 	else:
+		collection_editor.mode = Window.MODE_WINDOWED
 		collection_editor.size = Vector2( get_window().get_size().x * 0.9, get_window().get_size().y * 0.9 )
 	
 	collection_editor.collection = collection

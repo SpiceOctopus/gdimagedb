@@ -8,7 +8,8 @@ signal db_tags_changed
 signal db_collections_changed
 signal media_deleted
 signal collection_deleted
-signal help
+@warning_ignore("unused_signal")
+signal help # signal is called from the main view
 signal last_used_collection_changed(collection : DBCollection)
 
 enum DisplayMode {IMAGES, COLLECTIONS}
@@ -94,9 +95,6 @@ func set_last_used_collection(collection : DBCollection) -> void:
 
 func notify_tags_changed() -> void:
 	tags_changed.emit()
-
-func notify_help_called() -> void:
-	help.emit()
 
 func notify_db_tags_changed() -> void:
 	db_tags_changed.emit()
