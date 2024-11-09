@@ -54,21 +54,19 @@ func rebuild_tag_lists() -> void:
 	load_selected_thread_id = WorkerThreadPool.add_task(async_build_tag_items_selected)
 
 func async_build_tag_items_all() -> void:
-	var tag_item_plus_instance = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
-	var tag_item_plus_minus_instance = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
 	for tag : DBTag in all_tags:
 		if exiting: # crash fix
 			return
 		
 		if mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
-			var item = tag_item_plus_instance.duplicate()
+			var item = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
 			item.tag = tag
 			item.add.connect(_on_tag_item_add)
 			item.visible = !item.tag.id in assigned_tags_ids
 			if is_instance_valid(all_tags_list):
 				all_tags_list.add_child.call_deferred(item)
 		elif mode == MODE.GRID:
-			var item = tag_item_plus_minus_instance.duplicate()
+			var item = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
 			item.tag = tag
 			item.add.connect(_on_tag_item_add)
 			item.remove.connect(_on_tag_item_remove)
@@ -76,16 +74,13 @@ func async_build_tag_items_all() -> void:
 			if is_instance_valid(all_tags_list):
 				all_tags_list.add_child.call_deferred(item)
 		
-	tag_item_plus_instance.queue_free()
-	tag_item_plus_minus_instance.queue_free()
 	load_all_done.emit.call_deferred(load_all_thread_id)
 
 func async_build_tag_items_selected() -> void:
-	var tag_item_instance = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
 	for tag in all_tags:
 		if exiting: # crash fix
 			return
-		var item = tag_item_instance.duplicate()
+		var item = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
 		item.tag = tag
 		item.x.connect(_on_tag_item_x)
 		if mode == MODE.GRID:
@@ -97,7 +92,6 @@ func async_build_tag_items_selected() -> void:
 		
 		if is_instance_valid(selected_tags_list):
 			selected_tags_list.add_child.call_deferred(item)
-	tag_item_instance.queue_free()
 	load_selected_done.emit.call_deferred(load_selected_thread_id)
 
 # optional parameter allows direct call from filter linedit signal
