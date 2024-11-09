@@ -4,21 +4,30 @@ signal double_click(collection : DBCollection)
 signal right_click(collection : DBCollection)
 signal click
 
+var load_on_ready : bool = false
 var image : DBMedia
 var collection : DBCollection :
 	set(collection_param):
 		if collection_param == null:
 			collection = null
 			return
-
-		lbl_name.text = collection_param.name
+		
 		collection = collection_param
 		image = DB.get_first_image_in_collection(collection.id)
-		var img = CacheManager.get_thumbnail(image)
-		if img != null:
-			title_image.texture = img
-		else:
-			title_image.texture = load("res://gfx/collection_placeholder_icon.png")
+		
+		if get_parent() == null:
+			load_on_ready = true
+			return
+		
+		if is_instance_valid(lbl_name):
+			lbl_name.text = collection_param.name
+		
+		if is_instance_valid(title_image):
+			var img = CacheManager.get_thumbnail(image)
+			if img != null:
+				title_image.texture = img
+			else:
+				title_image.texture = load("res://gfx/collection_placeholder_icon.png")
 
 @onready var lbl_name = $CollectionNameLabel
 @onready var title_image = $TitleImage
@@ -30,6 +39,13 @@ func _ready() -> void:
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
 	GlobalData.db_collections_changed.connect(queue_thumbnail_refresh)
 	title_image.texture = load("res://gfx/loading.png")
+	if load_on_ready:
+		lbl_name.text = collection.name
+		var img = CacheManager.get_thumbnail(image)
+		if img != null:
+			title_image.texture = img
+		else:
+			title_image.texture = load("res://gfx/collection_placeholder_icon.png")
 
 func _input(event: InputEvent) -> void:
 	if not visible:
@@ -50,10 +66,6 @@ func _gui_input(event: InputEvent) -> void:
 		click.emit(self)
 
 func _exit_tree() -> void:
-	if image != null:
-		image.free()
-	if collection != null:
-		collection.free()
 	title_image.texture = null
 
 func set_selected(is_selected : bool) -> void:

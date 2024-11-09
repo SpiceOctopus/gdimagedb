@@ -44,8 +44,8 @@ func refresh_grid() -> void:
 			instance.right_click.connect(tile_right_click)
 			instance.click.connect(on_grid_tile_click)
 			instance.visible = false
-			grid_container.add_child.call_deferred(instance)
 			instance.collection = collection
+			grid_container.add_child.call_deferred(instance)
 			tiles[collection.id] = instance
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 	grid_container.add_child(new_button_instance)
