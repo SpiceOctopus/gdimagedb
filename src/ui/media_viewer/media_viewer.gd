@@ -28,6 +28,7 @@ var preload_previous_id : int = -1
 @onready var video_time_update_timer = $VideoTimeUpdate
 @onready var gif_display = $GIFDisplay
 @onready var loading_label = $LoadingLabel
+@onready var image_display = $ImageDisplay
 
 func _ready() -> void:
 	if media_set != null && media_set.size() > 0:
@@ -37,13 +38,13 @@ func _ready() -> void:
 			if preload_id > media_set.size() - 1:
 				preload_id = 0
 			if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
-				preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(media_set[preload_id]), true)
+				preload_next_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 		if media_set.size() > 2:
 			var preload_id = current_image - 1
 			if preload_id < 0:
 				preload_id = media_set.size() - 1
 			if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
-				preload_previous_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(media_set[preload_id]), true)
+				preload_previous_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 
 func _input(event : InputEvent) -> void:
 	if !hotkeys_active:
@@ -70,20 +71,20 @@ func _input(event : InputEvent) -> void:
 		top_menu.visible = !top_menu.visible
 	elif Input.is_action_pressed("scroll_up"):
 		if current_mode == MODE.PICTURE:
-			var offset = $ImageDisplay.position - get_global_mouse_position()
-			$ImageDisplay.position = $ImageDisplay.position + (offset * zoom_factor)
-			$ImageDisplay.size = $ImageDisplay.size * (1 + zoom_factor)
+			var offset = image_display.position - get_global_mouse_position()
+			image_display.position = image_display.position + (offset * zoom_factor)
+			image_display.size = image_display.size * (1 + zoom_factor)
 		elif current_mode == MODE.GIF:
 			var offset = gif_display.position - get_global_mouse_position()
 			gif_display.position = gif_display.position + (offset * zoom_factor)
 			gif_display.scale = gif_display.scale * (1 + zoom_factor)
 	elif Input.is_action_pressed("scroll_down"):
 		if current_mode == MODE.PICTURE:
-			var offset = $ImageDisplay.position - get_global_mouse_position()
-			$ImageDisplay.position = $ImageDisplay.position - (offset * zoom_factor)
-			$ImageDisplay.size = $ImageDisplay.size * (1 - zoom_factor)
-			if $ImageDisplay.size < zoom_min_size:
-				$ImageDisplay.size = zoom_min_size
+			var offset = image_display.position - get_global_mouse_position()
+			image_display.position = image_display.position - (offset * zoom_factor)
+			image_display.size = image_display.size * (1 - zoom_factor)
+			if image_display.size < zoom_min_size:
+				image_display.size = zoom_min_size
 		elif current_mode == MODE.GIF:
 			var offset = gif_display.position - get_global_mouse_position()
 			gif_display.position = gif_display.position - (offset * zoom_factor)
@@ -95,7 +96,7 @@ func _input(event : InputEvent) -> void:
 		if not dragging and event.pressed and input_workaround.get_rect().has_point(event.position):
 			dragging = true
 			if current_mode == MODE.PICTURE:
-				drag_offset = $ImageDisplay.position - get_global_mouse_position()
+				drag_offset = image_display.position - get_global_mouse_position()
 			elif current_mode == MODE.GIF:
 				drag_offset = gif_display.position - get_global_mouse_position()
 		if dragging and not event.pressed:
@@ -104,7 +105,7 @@ func _input(event : InputEvent) -> void:
 func _process(_delta : float) -> void:
 	if dragging:
 		if current_mode == MODE.PICTURE:
-			$ImageDisplay.position = get_global_mouse_position() + drag_offset
+			image_display.position = get_global_mouse_position() + drag_offset
 		elif current_mode == MODE.GIF:
 			gif_display.position = get_global_mouse_position() + drag_offset
 
@@ -125,7 +126,7 @@ func set_next_image() -> void:
 	if preload_id > media_set.size() - 1:
 		preload_id = 0
 	if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
-		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(media_set[preload_id]), true)
+		preload_next_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 
 func set_previous_image() -> void:
 	if preload_previous_id > 0:
@@ -142,7 +143,7 @@ func set_previous_image() -> void:
 	if preload_id < 0:
 		preload_id = media_set.size() - 1
 	if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
-		preload_next_id = WorkerThreadPool.add_task(Callable(self, "preload_image").bind(media_set[preload_id]), true)
+		preload_next_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 
 func set_video_display_rect() -> void:
 	if !current_mode == MODE.VIDEO:
@@ -168,26 +169,28 @@ func set_video_display_rect() -> void:
 func set_image_display_rect() -> void:
 	if !current_mode == MODE.PICTURE:
 		return
-	if !$ImageDisplay.texture: # null check since the function can be called when the window opens with no image set
+	if !image_display: # null check since the function can be called before the control exists
+		return
+	if !image_display.texture: # null check since the function can be called when the window opens with no image set
 		return
 	
-	var image_size = $ImageDisplay.texture.get_size()
+	var image_size = image_display.texture.get_size()
 	
 	if (image_size.x <= size.x && image_size.y <= size.y && (DB.get_setting_media_viewer_stretch_mode() != 1)) || (DB.get_setting_media_viewer_stretch_mode() == 2): # center, no stretch
-		$ImageDisplay.size = image_size
-		$ImageDisplay.position.x = (size.x / 2) - (image_size.x / 2)
-		$ImageDisplay.position.y = (size.y / 2) - (image_size.y / 2)
+		image_display.size = image_size
+		image_display.position.x = (size.x / 2) - (image_size.x / 2)
+		image_display.position.y = (size.y / 2) - (image_size.y / 2)
 	else: # center, stretch, keep aspect ratio
 		if image_size.x > image_size.y: # wide screen
 			var ratio = image_size.x / image_size.y
-			$ImageDisplay.position = Vector2(0, (size.y / 2) - ((size.x / ratio) / 2))
-			$ImageDisplay.size = Vector2(size.x, size.x / ratio)
-			fit_oversized_display_into_window($ImageDisplay, ratio)
+			image_display.position = Vector2(0, (size.y / 2) - ((size.x / ratio) / 2))
+			image_display.size = Vector2(size.x, size.x / ratio)
+			fit_oversized_display_into_window(image_display, ratio)
 		else: # portrait
 			var ratio = image_size.y / image_size.x
-			$ImageDisplay.size = Vector2(size.y / ratio, size.y)
-			$ImageDisplay.position = Vector2((size.x / 2) - ($ImageDisplay.size.x / 2), 0)
-			fit_oversized_display_into_window($ImageDisplay, ratio)
+			image_display.size = Vector2(size.y / ratio, size.y)
+			image_display.position = Vector2((size.x / 2) - (image_display.size.x / 2), 0)
+			fit_oversized_display_into_window(image_display, ratio)
 
 func set_gif_display_rect() -> void:
 	if current_mode != MODE.GIF:
@@ -214,9 +217,9 @@ func set_display(media : DBMedia) -> void:
 	set_mode(current_mode)
 	
 	if current_mode == MODE.PICTURE:
-		$ImageDisplay.hide()
+		image_display.hide()
 		loading_label.show()
-		WorkerThreadPool.add_task(Callable(self, "async_load_display").bind(media), true)
+		WorkerThreadPool.add_task(async_load_display.bind(media), true)
 	elif current_mode == MODE.VIDEO:
 		loading_label.show()
 		$VideoStreamPlayer.stream = null # Solves a hard crash.
@@ -237,14 +240,10 @@ func set_display(media : DBMedia) -> void:
 		_on_MediaViewer_resized()
 
 func async_load_display(media : DBMedia) -> void:
-	if CacheManager.image_cache.has(media.id):
-			call_deferred("set_image_internal", CacheManager.image_cache[media.id])
-	else:
-		var texture = ImageTexture.create_from_image(Image.load_from_file(media.path))
-		call_deferred("set_image_internal", texture)
-		CacheManager.image_mutex.lock()
-		CacheManager.image_cache[media.id] = texture
-		CacheManager.image_mutex.unlock()
+	image_display.set_texture.call_deferred(CacheManager.get_image(media))
+	loading_label.hide.call_deferred()
+	image_display.show.call_deferred()
+	_on_MediaViewer_resized.call_deferred()
 
 func preload_image(media : DBMedia) -> void:
 	var texture = ImageTexture.create_from_image(Image.load_from_file(media.path))
@@ -252,15 +251,9 @@ func preload_image(media : DBMedia) -> void:
 	CacheManager.image_cache[media.id] = texture
 	CacheManager.image_mutex.unlock()
 
-func set_image_internal(img : ImageTexture) -> void:
-	loading_label.hide()
-	$ImageDisplay.texture = img
-	$ImageDisplay.show()
-	_on_MediaViewer_resized()
-
 func set_mode(mode : MODE) -> void:
 	if mode == MODE.PICTURE:
-		$ImageDisplay.show()
+		image_display.show()
 		$VideoStreamPlayer.hide()
 		$VideoStreamPlayer.stop()
 		video_player_controls.hide()
@@ -268,12 +261,12 @@ func set_mode(mode : MODE) -> void:
 		video_playing = false
 	elif mode == MODE.VIDEO:
 		$VideoStreamPlayer.stop()
-		$ImageDisplay.hide()
+		image_display.hide()
 		gif_display.hide()
 		$VideoStreamPlayer.show()
 		video_player_controls.show()
 	elif mode == MODE.GIF:
-		$ImageDisplay.hide()
+		image_display.hide()
 		$VideoStreamPlayer.stop()
 		$VideoStreamPlayer.hide()
 		video_playing = false
@@ -314,19 +307,19 @@ func _on_video_player_controls_play_pause() -> void:
 
 func _on_media_viewer_top_menu_fit_to_window() -> void:
 	if current_mode == MODE.PICTURE:
-		var image_size = $ImageDisplay.texture.get_size()
+		var image_size = image_display.texture.get_size()
 		if image_size.x > image_size.y: #landscape
 			var ratio = image_size.x / image_size.y
-			$ImageDisplay.size.x = size.x
-			$ImageDisplay.size.y = size.x * ratio
-			$ImageDisplay.position = Vector2(0, (size.y / 2) - ($ImageDisplay.size.y / 2))
-			fit_oversized_display_into_window($ImageDisplay, ratio)
+			image_display.size.x = size.x
+			image_display.size.y = size.x * ratio
+			image_display.position = Vector2(0, (size.y / 2) - (image_display.size.y / 2))
+			fit_oversized_display_into_window(image_display, ratio)
 		else: # portrait
 			var ratio = image_size.y / image_size.x
-			$ImageDisplay.size.y = size.y
-			$ImageDisplay.size.x = size.y * ratio
-			$ImageDisplay.position = Vector2((size.x / 2) - ($ImageDisplay.size.x / 2), 0)
-			fit_oversized_display_into_window($ImageDisplay, ratio)
+			image_display.size.y = size.y
+			image_display.size.x = size.y * ratio
+			image_display.position = Vector2((size.x / 2) - (image_display.size.x / 2), 0)
+			fit_oversized_display_into_window(image_display, ratio)
 
 # The display parameter is dynamic as the same code works for both ImageDisplay and VideoPlayer.
 func fit_oversized_display_into_window(display, ratio : float) -> void:
@@ -345,8 +338,8 @@ func _on_media_viewer_top_menu_original_size() -> void:
 	if not hotkeys_active:
 		return
 	
-	$ImageDisplay.size = $ImageDisplay.texture.get_size()
-	$ImageDisplay.position = Vector2((size.x / 2) - ($ImageDisplay.size.x / 2), (size.y / 2) - ($ImageDisplay.size.y / 2))
+	image_display.size = image_display.texture.get_size()
+	image_display.position = Vector2((size.x / 2) - (image_display.size.x / 2), (size.y / 2) - (image_display.size.y / 2))
 
 func _on_media_viewer_top_menu_stretch_mode_changed() -> void:
 	if current_mode == MODE.PICTURE:

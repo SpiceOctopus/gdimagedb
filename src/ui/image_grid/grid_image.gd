@@ -24,9 +24,6 @@ func _ready() -> void:
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
-func _exit_tree() -> void:
-	texture = null
-
 func load_thumbnail() -> void:
 	texture = CacheManager.get_thumbnail(current_media)
 

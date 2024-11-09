@@ -23,6 +23,7 @@ var exiting : bool = false
 @onready var import_log = $ImportLog
 @onready var delete_file = $DeleteFile
 @onready var export_file = $ExportFileDialog
+@onready var right_click_menu = $PopupMenu
 
 @onready var last_window_size = Vector2i(0,0)
 
@@ -44,7 +45,7 @@ func _process(_delta : float) -> void:
 		last_window_size = DisplayServer.window_get_size()
 		window_size_changed()
 
-func _exit_tree():
+func _exit_tree() -> void:
 	exiting = true
 
 func initialize_grid_async(i : int) -> void:
@@ -142,9 +143,9 @@ func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 	window.popup_centered()
 
 func grid_image_right_click(media : DBMedia) -> void:
-	$PopupMenu.position = DisplayServer.mouse_get_position()
-	$PopupMenu.media = media
-	$PopupMenu.popup()
+	right_click_menu.position = DisplayServer.mouse_get_position()
+	right_click_menu.media = media
+	right_click_menu.popup()
 
 func _on_PopupMenu_favorite_changed(id : int, fav : bool) -> void:
 	for preview in previews.values():

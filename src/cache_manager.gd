@@ -30,6 +30,23 @@ func get_thumbnail(media : DBMedia) -> ImageTexture:
 			return load("res://gfx/video_placeholder.png")
 	return null
 
+func get_image(media : DBMedia) -> ImageTexture:
+	if media == null:
+		return null
+	
+	if image_cache.has(media.id):
+		return image_cache[media.id]
+	else:
+		if dir.file_exists(media.path):
+			var tmp = ImageTexture.create_from_image(Image.load_from_file(media.path))
+			image_mutex.lock()
+			image_cache[media.id] = tmp
+			image_mutex.unlock()
+			return image_cache[media.id]
+		elif media.path.get_extension() in Settings.supported_video_files:
+			return load("res://gfx/video_placeholder.png")
+	return null
+
 func remove_image(id : int) -> void:
 	image_mutex.lock()
 	image_cache.erase(id) # Does not fail if entry does not exists. Just returns false.

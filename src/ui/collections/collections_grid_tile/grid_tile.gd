@@ -65,9 +65,6 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and !event.double_click:
 		click.emit(self)
 
-func _exit_tree() -> void:
-	title_image.texture = null
-
 func set_selected(is_selected : bool) -> void:
 	if(is_selected):
 		title_image.set_material(load("res://ui/image_grid/outline_material.tres"))

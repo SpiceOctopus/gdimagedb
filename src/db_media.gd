@@ -20,3 +20,4 @@ func set_path(relative_path_from_db : String) -> void:
 	thumb_path = temp_thumb_path.replace(temp_thumb_path.get_extension(), "png")
 	if(OS.get_name() == "Linux"): # Windows does not care about mixed slashes, Linux does.
 		thumb_path = thumb_path.replace("\\", "/") 
+		path = path.replace("\\", "/") 

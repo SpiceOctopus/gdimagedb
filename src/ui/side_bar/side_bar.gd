@@ -69,6 +69,7 @@ func async_build_tag_items_all() -> void:
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 			if is_instance_valid(all_tags_list):
 				all_tags_list.add_child.call_deferred(item)
+	all_tags_list.get_child(0).set_selected.call_deferred(true)
 
 func async_build_tag_items_selected() -> void:
 	for tag in all_tags:
