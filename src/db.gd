@@ -244,6 +244,40 @@ func get_images_for_tags(includedTags : Array = [], excludedTags : Array = []) -
 	db_access_mutex.unlock()
 	return result
 
+func get_media_ids_for_tags(includedTags : Array = [], excludedTags : Array = []) -> Array[int]:
+	db_access_mutex.lock()
+	var result : Array[int] = []
+	var ids_to_exclude : Array[int] = []
+	
+	if excludedTags.size() > 0:
+		var cmd = "SELECT DISTINCT images.id FROM images JOIN tags_images ON tags_images.image_id = images.id JOIN tags ON tags_images.tag_id = tags.id WHERE"
+		for tag in excludedTags:
+			cmd += " tags.id = '%s' OR" % tag.id
+		cmd = cmd.trim_suffix("OR")
+		query(cmd)
+		for entry : Dictionary in query_result:
+			ids_to_exclude.append(entry["id"])
+	
+	if includedTags.size() > 0:
+		var tagString : String = ""
+		var tagCount : int = 0
+		for tag in includedTags:
+			tagString += " %s," % tag["id"]
+			tagCount += 1
+		tagString = tagString.trim_suffix(",") # remove the last colon
+		query("SELECT img.id FROM images AS img JOIN tags_images AS tgimg ON tgimg.image_id = img.id AND tgimg.tag_id IN( %s ) " % tagString + "GROUP BY img.id HAVING COUNT(img.id) = %s" % tagCount)
+		for id in query_result:
+			if id["id"] in ids_to_exclude:
+				continue
+			result.append(id["id"])
+	else:
+		for media : DBMedia in get_all_media():
+			if media.id not in ids_to_exclude:
+				result.append(media.id)
+		
+	db_access_mutex.unlock()
+	return result
+
 func get_collections_for_tags(includedTags : Array[DBTag], excludedTags : Array[DBTag]) -> Array[DBCollection]:
 	db_access_mutex.lock()
 	var result : Array[DBCollection] = []

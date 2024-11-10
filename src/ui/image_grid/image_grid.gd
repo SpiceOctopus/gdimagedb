@@ -4,14 +4,14 @@ class_name ImageGrid
 
 signal tag_edit(id : int)
 signal grid_updated
-signal initialize_grid_finished
 
 var db_media : Array[DBMedia] = []
 var current_media : Array[DBMedia] = []
-var previews : Dictionary = {}
+var previews : Array[GridImage] = []
 
 var previews_mutex : Mutex = Mutex.new()
 var exiting : bool = false
+var loader_threads : Array[Thread] = []
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
@@ -29,7 +29,6 @@ var exiting : bool = false
 func _ready() -> void:
 	drop_files_label.visible = (DB.count_images_in_db() <= 0)
 	await get_tree().create_timer(0.01).timeout # give the ui a moment to display
-	initialize_grid_finished.connect(on_initialize_grid_finished)
 	GlobalData.favorites_changed.connect(trigger_visibility_update)
 	GlobalData.untagged_changed.connect(trigger_visibility_update)
 	GlobalData.tags_changed.connect(trigger_visibility_update)
@@ -37,7 +36,28 @@ func _ready() -> void:
 	GlobalData.media_deleted.connect(_on_media_deleted)
 	GlobalData.db_collections_changed.connect(trigger_visibility_update)
 	db_media = DB.get_all_media()
-	WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
+	
+	for i in OS.get_processor_count():
+		var data : Array[DBMedia] = []
+		if i == OS.get_processor_count() - 1: # last thread
+			@warning_ignore("integer_division")
+			data = db_media.slice(i * (db_media.size() / OS.get_processor_count()), db_media.size())
+		else:
+			@warning_ignore("integer_division")
+			data = db_media.slice(i * (db_media.size() / OS.get_processor_count()), (i + 1) * (db_media.size() / OS.get_processor_count()))
+		var thread = Thread.new()
+		thread.start(initialize_grid_chunk.bind(data))
+		loader_threads.append(thread)
+	
+	for thread : Thread in loader_threads:
+		thread.wait_to_finish()
+	
+	previews.sort_custom(sort_by_id_asc)
+	
+	for preview : GridImage in previews:
+		grid_container.add_child(preview)
+	
+	manage_preview_visibility()
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:
@@ -47,12 +67,13 @@ func _process(_delta : float) -> void:
 func _exit_tree() -> void:
 	exiting = true
 
-func initialize_grid_async(i : int) -> void:
-	if exiting:
-		return
-	if !previews.has(db_media[i].id):
+func initialize_grid_chunk(chunk : Array[DBMedia]):
+	for media : DBMedia in chunk:
+		if exiting:
+			return
+		
 		var gridImageInstance = GridImage.new()
-		gridImageInstance.current_media = db_media[i]
+		gridImageInstance.current_media = media
 		gridImageInstance.double_click.connect(_on_grid_image_double_click)
 		gridImageInstance.right_click.connect(grid_image_right_click)
 		gridImageInstance.click.connect(on_grid_image_click)
@@ -61,22 +82,52 @@ func initialize_grid_async(i : int) -> void:
 		gridImageInstance.visible = true
 		gridImageInstance.load_thumbnail()
 		previews_mutex.lock()
-		previews[db_media[i].id] = gridImageInstance
-		grid_container.add_child.call_deferred(gridImageInstance)
+		previews.append(gridImageInstance)
 		previews_mutex.unlock()
-	if i >= (db_media.size() - 1):
-		initialize_grid_finished.emit.call_deferred()
+
+func sort_by_id_desc(a, b) -> bool:
+	if a.current_media.id > b.current_media.id:
+		return true
+	return false
+
+func sort_by_id_asc(a, b) -> bool:
+	if a.current_media.id < b.current_media.id:
+		return true
+	return false
 
 func load_missing_previews() -> void:
 	db_media = DB.get_all_media()
-	WorkerThreadPool.add_group_task(initialize_grid_async, db_media.size())
-
-func on_initialize_grid_finished() -> void:
+	var preview_ids : Array[int] = []
+	for preview : GridImage in previews:
+		preview_ids.append(preview.current_media.id)
+	
+	for media : DBMedia in db_media:
+		if media.id not in preview_ids:
+			var gridImageInstance = GridImage.new()
+			gridImageInstance.current_media = media
+			gridImageInstance.double_click.connect(_on_grid_image_double_click)
+			gridImageInstance.right_click.connect(grid_image_right_click)
+			gridImageInstance.click.connect(on_grid_image_click)
+			#gridImageInstance.multi_select.connect(_on_grid_image_multi_select) # feature not implemented yet
+			gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
+			gridImageInstance.visible = true
+			gridImageInstance.load_thumbnail()
+			previews.append(gridImageInstance)
+	
+	sort_grid()
 	manage_preview_visibility()
+
+func sort_grid() -> void:
+	for node in grid_container.get_children():
+		grid_container.remove_child(node)
+	previews.sort_custom(sort_by_id_asc)
+	for preview : GridImage in previews:
+		grid_container.add_child(preview)
+	grid_updated.emit()
 
 func manage_preview_visibility() -> void:
 	current_media.clear()
-	for preview in previews.values():
+	for preview in previews:
 		preview.visible = false
 	
 	var images_without_tags : Dictionary = {}
@@ -84,17 +135,21 @@ func manage_preview_visibility() -> void:
 		images_without_tags = DB.get_ids_images_without_tags()
 	
 	var images_in_collections : Dictionary = DB.get_all_image_ids_in_collections()
+	var current_media_ids : Array[int] = DB.get_media_ids_for_tags(GlobalData.included_tags, GlobalData.excluded_tags)
 	
-	for media : DBMedia in get_images_for_current_view():
-		if GlobalData.show_favorites && !media.favorite:
+	for preview : GridImage in previews:
+		if preview.current_media.id not in current_media_ids:
 			pass
-		elif GlobalData.show_untagged && !images_without_tags.has(media.id):
+		elif GlobalData.show_favorites && !preview.current_media.favorite:
 			pass
-		elif Settings.hide_images_collections && images_in_collections.has(media.id):
+		elif GlobalData.show_untagged && !images_without_tags.has(preview.current_media.id):
+			pass
+		elif Settings.hide_images_collections && images_in_collections.has(preview.current_media.id):
 			pass
 		else:
-			previews[media.id].visible = true
-			current_media.append(media)
+			preview.visible = true
+			current_media.append(preview.current_media)
+	
 	grid_updated.emit()
 
 func trigger_visibility_update() -> void:
@@ -117,7 +172,7 @@ func get_images_for_current_view() -> Array[DBMedia]:
 func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 	var instance : MediaViewer = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
 	var image_set : Array[DBMedia] = []
-	for preview in previews.values():
+	for preview in previews:
 		if preview.visible:
 			image_set.append(preview.current_media)
 	
@@ -145,7 +200,7 @@ func grid_image_right_click(media : DBMedia) -> void:
 	right_click_menu.popup()
 
 func _on_PopupMenu_favorite_changed(id : int, fav : bool) -> void:
-	for preview in previews.values():
+	for preview in previews:
 		if preview.current_media.id == id:
 			preview.current_media.favorite = fav
 
@@ -155,10 +210,11 @@ func _on_PopupMenu_tag_edit(id : int) -> void:
 func _on_PopupMenu_properties(media : DBMedia) -> void:
 	media_properties_window.media = media
 	media_properties_window.popup_centered()
+	sort_grid()
 
 func on_grid_image_click(grid_image : GridImage) -> void:
 	grid_image.selected = true
-	for preview in previews.values():
+	for preview in previews:
 		if preview != grid_image:
 			preview.selected = false
 
