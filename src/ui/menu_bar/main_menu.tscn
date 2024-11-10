@@ -79,7 +79,7 @@ text = "Untagged"
 layout_mode = 2
 text = "Sort by:"
 
-[node name="OptionButton" type="OptionButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
+[node name="SortingSelection" type="OptionButton" parent="MarginContainer/HBoxContainer2/HBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 4
 selected = 0
@@ -125,7 +125,7 @@ visible = false
 
 [connection signal="toggled" from="MarginContainer/HBoxContainer2/HBoxContainer/FavoritesCheckBox" to="." method="_on_FavoritesCheckBox_toggled"]
 [connection signal="toggled" from="MarginContainer/HBoxContainer2/HBoxContainer/UntaggedCheckBox" to="." method="_on_untagged_check_box_toggled"]
-[connection signal="item_selected" from="MarginContainer/HBoxContainer2/HBoxContainer/OptionButton" to="." method="_on_option_button_item_selected"]
+[connection signal="item_selected" from="MarginContainer/HBoxContainer2/HBoxContainer/SortingSelection" to="." method="_on_option_button_item_selected"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer2/HBoxContainer2/RefreshButton" to="." method="_on_RefreshButton_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer2/HBoxContainer2/HelpButton" to="." method="_on_help_button_pressed"]
 [connection signal="pressed" from="MarginContainer/HBoxContainer2/HBoxContainer2/SwitchGridsButton" to="." method="_on_btn_switch_grids_pressed"]

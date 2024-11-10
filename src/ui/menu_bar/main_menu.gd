@@ -12,6 +12,7 @@ signal switch_grids
 @onready var delete_tag_window = $DeleteTagDialog
 @onready var grid_image_size = $GridImageSizeCtrl
 @onready var help = $Help
+@onready var sorting_selection = $MarginContainer/HBoxContainer2/HBoxContainer/SortingSelection
 
 func _ready() -> void:
 	settings_menu.get_popup().id_pressed.connect(_on_settings_menu_selection)
@@ -32,10 +33,12 @@ func _on_display_mode_changed() -> void:
 		favorites_checkbox.button_pressed = GlobalData.show_favorites
 		untagged_checkbox.button_pressed = GlobalData.show_untagged
 		btn_switch_grids.text = "Collections"
+		sorting_selection.disabled = false
 	elif GlobalData.current_display_mode == GlobalData.DisplayMode.COLLECTIONS:
 		favorites_checkbox.button_pressed = GlobalData.show_favorites
 		untagged_checkbox.button_pressed = GlobalData.show_untagged
 		btn_switch_grids.text = "Images"
+		sorting_selection.disabled = true
 	untagged_checkbox.disabled = (GlobalData.included_tags.size() > 0 || GlobalData.excluded_tags.size() > 0)
 
 func _on_settings_menu_selection(id : int) -> void:
