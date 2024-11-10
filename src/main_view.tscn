@@ -18,7 +18,7 @@ bg_color = Color(0.223529, 0.239216, 0.25098, 1)
 PopupMenu/styles/panel = SubResource("StyleBoxFlat_pl8um")
 
 [node name="MainView" type="Control"]
-custom_minimum_size = Vector2(600, 300)
+custom_minimum_size = Vector2(850, 300)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

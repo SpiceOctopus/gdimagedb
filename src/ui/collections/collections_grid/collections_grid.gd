@@ -12,6 +12,7 @@ var tiles : Dictionary = {} # cached tiles for the grid
 @onready var last_window_size = Vector2i(0,0)
 @onready var delete_dialog = $DeleteCollection
 @onready var popup_menu = $PopupMenu
+@onready var margin_container = $MarginContainer
 
 func _ready() -> void:
 	refresh_grid()
@@ -95,19 +96,19 @@ func compare_by_position(a : DBMedia, b : DBMedia) -> bool:
 	return a.position < b.position
 
 func tile_right_click(collection : DBCollection) -> void:
-	$PopupMenu.position = DisplayServer.mouse_get_position()
-	$PopupMenu.collection = collection
-	$PopupMenu.popup()
+	popup_menu.position = DisplayServer.mouse_get_position()
+	popup_menu.collection = collection
+	popup_menu.popup()
 
 func window_size_changed() -> void:
-	var columns = floor($MarginContainer.size.x / Settings.grid_image_size)
+	var columns = floor(margin_container.size.x / Settings.grid_image_size)
 	if  columns < 1:
 		grid_container.columns = 1
 	else:
 		grid_container.columns = columns
 
 func _on_popup_menu_edit() -> void:
-	edit_collection.emit($PopupMenu.collection)
+	edit_collection.emit(popup_menu.collection)
 
 func _on_popup_menu_delete() -> void:
 	delete_dialog.collection = popup_menu.collection
