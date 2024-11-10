@@ -69,7 +69,6 @@ func async_build_tag_items_all() -> void:
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 			if is_instance_valid(all_tags_list):
 				all_tags_list.add_child.call_deferred(item)
-	all_tags_list.get_child(0).set_selected.call_deferred(true)
 
 func async_build_tag_items_selected() -> void:
 	for tag in all_tags:
@@ -256,3 +255,6 @@ func sort_by_count(a : DBTag, b : DBTag) -> bool:
 # catch premature window closing and stop initializing ui to prevent crash
 func _on_tree_exiting() -> void:
 	exiting = true
+
+func _on_filter_focus_entered() -> void:
+	update_all_tags_list()

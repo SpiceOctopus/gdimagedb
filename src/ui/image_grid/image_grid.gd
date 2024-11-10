@@ -11,7 +11,6 @@ var previews : Array[GridImage] = []
 
 var previews_mutex : Mutex = Mutex.new()
 var exiting : bool = false
-var loader_threads : Array[Thread] = []
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
@@ -35,7 +34,10 @@ func _ready() -> void:
 	GlobalData.db_tags_changed.connect(trigger_visibility_update)
 	GlobalData.media_deleted.connect(_on_media_deleted)
 	GlobalData.db_collections_changed.connect(trigger_visibility_update)
+	GlobalData.sort_mode_changed.connect(sort_grid)
 	db_media = DB.get_all_media()
+	
+	var loader_threads : Array[Thread] = []
 	
 	for i in OS.get_processor_count():
 		var data : Array[DBMedia] = []
@@ -120,7 +122,15 @@ func load_missing_previews() -> void:
 func sort_grid() -> void:
 	for node in grid_container.get_children():
 		grid_container.remove_child(node)
-	previews.sort_custom(sort_by_id_asc)
+	
+	match GlobalData.grid_sort_mode:
+		GlobalData.GridSortMode.IMPORT_ASC:
+			previews.sort_custom(sort_by_id_asc)
+		GlobalData.GridSortMode.IMPORT_DESC:
+			previews.sort_custom(sort_by_id_desc)
+		GlobalData.GridSortMode.RANDOM:
+			previews.shuffle()
+	
 	for preview : GridImage in previews:
 		grid_container.add_child(preview)
 	grid_updated.emit()

@@ -72,3 +72,13 @@ func _on_help_button_pressed() -> void:
 
 func _on_grid_image_size_ctrl_refresh_grid() -> void:
 	_on_RefreshButton_pressed()
+
+func _on_option_button_item_selected(index: int) -> void:
+	match index:
+		0:
+			GlobalData.grid_sort_mode = GlobalData.GridSortMode.IMPORT_ASC
+		1:
+			GlobalData.grid_sort_mode = GlobalData.GridSortMode.IMPORT_DESC
+		2:
+			GlobalData.grid_sort_mode = GlobalData.GridSortMode.RANDOM
+	GlobalData.sort_mode_changed.emit()

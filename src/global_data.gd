@@ -10,9 +10,12 @@ signal media_deleted
 signal collection_deleted
 @warning_ignore("unused_signal")
 signal help # signal is called from the main view
+@warning_ignore("unused_signal")
+signal sort_mode_changed
 signal last_used_collection_changed(collection : DBCollection)
 
 enum DisplayMode {IMAGES, COLLECTIONS}
+enum GridSortMode {IMPORT_ASC, IMPORT_DESC, RANDOM}
 
 var current_display_mode : DisplayMode : 
 	set(mode):
@@ -24,6 +27,7 @@ var show_untagged : bool : set=set_show_untagged, get=get_show_untagged
 var included_tags : Array[DBTag] : set=set_included_tags, get=get_included_tags
 var excluded_tags : Array[DBTag] : set=set_excluded_tags, get=get_excluded_tags
 var last_used_collection : DBCollection : set=set_last_used_collection
+var grid_sort_mode : GridSortMode = GridSortMode.IMPORT_ASC
 
 var internal_current_display_mode : DisplayMode = DisplayMode.IMAGES
 var internal_show_favorites_images : bool = false

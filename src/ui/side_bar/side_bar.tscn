@@ -102,6 +102,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_7pd5m")
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]
+[connection signal="focus_entered" from="MarginContainer/VBoxContainer/Filter" to="." method="_on_filter_focus_entered"]
 [connection signal="gui_input" from="MarginContainer/VBoxContainer/Filter" to="." method="_on_LineEdit_gui_input"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/Filter" to="." method="update_all_tags_list"]
 [connection signal="text_submitted" from="MarginContainer/VBoxContainer/Filter" to="." method="_on_filter_text_submitted"]
