@@ -72,10 +72,10 @@ func refresh_grid() -> void:
 	grid_updated.emit()
 
 func tile_double_click(collection : DBCollection) -> void:
-	var instance = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
+	var viewer_window = load("res://ui/media_viewer/media_viewer_window.tscn").instantiate()
 	var images : Array[DBMedia] = DB.get_all_images_in_collection(collection.id)
 	images.sort_custom(compare_by_position)
-	instance.media_set = images
+	viewer_window.media_set = images
 	
 	# add code to resume collection from last seen image
 	
@@ -83,18 +83,13 @@ func tile_double_click(collection : DBCollection) -> void:
 	#	if image["id"] == senderImage["id"]:
 	#		instance.current_image = images.find(image)
 	
-	var window : Window = Window.new()
-	window.hide()
-	get_tree().get_root().add_child(window)
-	window.size = DisplayServer.window_get_size()
+	viewer_window.hide()
+	get_tree().get_root().add_child(viewer_window)
+	viewer_window.size = DisplayServer.window_get_size()
 	if DisplayServer.window_get_mode() == 2: # 2 = maximized. Not sure how to address the enum properly
-		window.mode = Window.MODE_MAXIMIZED
-	window.add_child(instance)
-	instance.closing.connect(window.queue_free) # required to allow closing with esc key
-	instance.visible = true
-	window.title = collection.name
-	window.close_requested.connect(window.queue_free)
-	window.popup_centered()
+		viewer_window.mode = Window.MODE_MAXIMIZED
+	viewer_window.title = collection.name
+	viewer_window.popup_centered()
 
 func compare_by_position(a : DBMedia, b : DBMedia) -> bool:
 	return a.position < b.position

@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bofppoem1r1g2"]
+
+[ext_resource type="Script" path="res://ui/media_viewer/media_viewer_window.gd" id="1_6tvec"]
+[ext_resource type="PackedScene" uid="uid://bejhnh5pkveek" path="res://ui/media_viewer/media_viewer.tscn" id="1_cf4hl"]
+
+[node name="MediaViewerWindow" type="Window"]
+title = "Media Viewer"
+position = Vector2i(0, 36)
+size = Vector2i(400, 300)
+min_size = Vector2i(400, 300)
+script = ExtResource("1_6tvec")
+
+[node name="MediaViewer" parent="." instance=ExtResource("1_cf4hl")]
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="closing" from="MediaViewer" to="." method="_on_close_requested"]

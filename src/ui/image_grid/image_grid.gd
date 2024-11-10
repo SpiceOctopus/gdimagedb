@@ -180,29 +180,25 @@ func get_images_for_current_view() -> Array[DBMedia]:
 		return DB.get_images_for_tags(GlobalData.included_tags, GlobalData.excluded_tags)
 
 func _on_grid_image_double_click(sender_media : DBMedia) -> void:
-	var instance : MediaViewer = load("res://ui/media_viewer/media_viewer.tscn").instantiate()
+	var viewer_window = load("res://ui/media_viewer/media_viewer_window.tscn").instantiate()
+	
 	var image_set : Array[DBMedia] = []
 	for preview in previews:
 		if preview.visible:
 			image_set.append(preview.current_media)
 	
-	instance.media_set = image_set
+	viewer_window.media_set = image_set
 	for image : DBMedia in image_set:
 		if image.id == sender_media.id:
-			instance.current_image = image_set.find(image)
+			viewer_window.current_image = image_set.find(image)
 	
-	var window : Window = Window.new()
-	window.hide()
-	add_child(window)
-	window.size = DisplayServer.window_get_size()
+	add_child(viewer_window)
+	viewer_window.hide()
+	viewer_window.size = DisplayServer.window_get_size()
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MAXIMIZED:
-		window.mode = Window.MODE_MAXIMIZED
-	instance.closing.connect(window.queue_free) # required to allow closing with esc key
-	instance.visible = true
-	window.add_child(instance)
-	window.title = "Media Viewer"
-	window.close_requested.connect(window.queue_free)
-	window.popup_centered()
+		viewer_window.mode = Window.MODE_MAXIMIZED
+	
+	viewer_window.popup_centered()
 
 func grid_image_right_click(media : DBMedia) -> void:
 	right_click_menu.position = DisplayServer.mouse_get_position()
