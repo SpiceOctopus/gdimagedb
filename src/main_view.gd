@@ -33,13 +33,13 @@ func _on_files_dropped(files : PackedStringArray) -> void:
 		if error == OK:
 			import_counter += 1
 			import_log.add_message("File %s successfully imported." % file)
-			await get_tree().create_timer(0.1).timeout
+			await get_tree().create_timer(0.01).timeout
 		elif error == ERR_ALREADY_EXISTS:
 			import_log.add_message("File %s already in db." % file)
-			await get_tree().create_timer(0.1).timeout
+			await get_tree().create_timer(0.01).timeout
 		elif error == ERR_FILE_UNRECOGNIZED:
 			import_log.add_message("File type %s not supported." % file.get_extension())
-			await get_tree().create_timer(0.1).timeout
+			await get_tree().create_timer(0.01).timeout
 	
 	if import_counter > 0:
 		image_grid.load_missing_previews()
