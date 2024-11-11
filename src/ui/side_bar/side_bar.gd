@@ -1,5 +1,8 @@
 extends Control
 
+signal rebuild_list_all_done
+signal rebuild_list_selected_done
+
 enum MODE {GRID, TAG_EDITOR, COLLECTION_EDITOR}
 
 @export var mode : MODE = MODE.GRID
@@ -24,14 +27,20 @@ var load_selected_thread : Thread = Thread.new()
 @onready var tag_buttons = $MarginContainer/VBoxContainer/TagButtons
 
 func _ready() -> void:
+	rebuild_list_all_done.connect(tag_list_all_loaded)
+	rebuild_list_selected_done.connect(tag_list_selected_loaded)
 	rebuild_tag_lists()
 	GlobalData.display_mode_changed.connect(_on_display_changed)
 	GlobalData.db_tags_changed.connect(_on_db_tags_changed)
 	tag_buttons.visible = show_add_delete_buttons
 
-func _exit_tree() -> void:
-	load_all_thread.wait_to_finish()
-	load_selected_thread.wait_to_finish()
+func tag_list_all_loaded() -> void:
+	for item in load_all_thread.wait_to_finish():
+		all_tags_list.add_child(item)
+
+func tag_list_selected_loaded() -> void:
+	for item in load_selected_thread.wait_to_finish():
+		selected_tags_list.add_child(item)
 
 func rebuild_tag_lists() -> void:
 	all_tags = DB.get_all_tags()
@@ -49,31 +58,34 @@ func rebuild_tag_lists() -> void:
 	load_all_thread.start(async_build_tag_items_all)
 	load_selected_thread.start(async_build_tag_items_selected)
 
-func async_build_tag_items_all() -> void:
+func async_build_tag_items_all() -> Array:
+	var tag_items : Array = []
 	for tag : DBTag in all_tags:
-		if exiting: # crash fix
-			return
+		if exiting: # program closed while loading
+			return []
 		
 		if mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
 			var item = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
 			item.tag = tag
 			item.add.connect(_on_tag_item_add)
 			item.visible = !item.tag.id in assigned_tags_ids
-			if is_instance_valid(all_tags_list):
-				all_tags_list.add_child.call_deferred(item)
+			tag_items.append(item)
 		elif mode == MODE.GRID:
 			var item = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
 			item.tag = tag
 			item.add.connect(_on_tag_item_add)
 			item.remove.connect(_on_tag_item_remove)
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
-			if is_instance_valid(all_tags_list):
-				all_tags_list.add_child.call_deferred(item)
+			tag_items.append(item)
+	rebuild_list_all_done.emit.call_deferred()
+	return tag_items
 
-func async_build_tag_items_selected() -> void:
+func async_build_tag_items_selected() -> Array:
+	var tag_items : Array = []
 	for tag in all_tags:
-		if exiting: # crash fix
-			return
+		if exiting: # program closed while loading
+			return []
+		
 		var item = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
 		item.tag = tag
 		item.x.connect(_on_tag_item_x)
@@ -84,8 +96,9 @@ func async_build_tag_items_selected() -> void:
 			item.color_mode = false
 			item.visible = item.tag.id in assigned_tags_ids
 		
-		if is_instance_valid(selected_tags_list):
-			selected_tags_list.add_child.call_deferred(item)
+		tag_items.append(item)
+	rebuild_list_selected_done.emit.call_deferred()
+	return tag_items
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed : String = "") -> void:

@@ -9,7 +9,6 @@ var db_media : Array[DBMedia] = []
 var current_media : Array[DBMedia] = []
 var previews : Array[GridImage] = []
 
-var previews_mutex : Mutex = Mutex.new()
 var exiting : bool = false
 
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
@@ -52,7 +51,7 @@ func _ready() -> void:
 		loader_threads.append(thread)
 	
 	for thread : Thread in loader_threads:
-		thread.wait_to_finish()
+		previews.append_array(thread.wait_to_finish())
 	
 	previews.sort_custom(sort_by_id_asc)
 	
@@ -69,10 +68,11 @@ func _process(_delta : float) -> void:
 func _exit_tree() -> void:
 	exiting = true
 
-func initialize_grid_chunk(chunk : Array[DBMedia]):
+func initialize_grid_chunk(chunk : Array[DBMedia]) -> Array[GridImage]:
+	var previews_chunk : Array[GridImage] = []
 	for media : DBMedia in chunk:
-		if exiting:
-			return
+		if exiting: # program closed while loading
+			return []
 		
 		var gridImageInstance = GridImage.new()
 		gridImageInstance.current_media = media
@@ -83,9 +83,8 @@ func initialize_grid_chunk(chunk : Array[DBMedia]):
 		gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 		gridImageInstance.visible = true
 		gridImageInstance.load_thumbnail()
-		previews_mutex.lock()
-		previews.append(gridImageInstance)
-		previews_mutex.unlock()
+		previews_chunk.append(gridImageInstance)
+	return previews_chunk
 
 func sort_by_id_desc(a, b) -> bool:
 	if a.current_media.id > b.current_media.id:
@@ -192,8 +191,8 @@ func _on_grid_image_double_click(sender_media : DBMedia) -> void:
 		if image.id == sender_media.id:
 			viewer_window.current_image = image_set.find(image)
 	
-	add_child(viewer_window)
 	viewer_window.hide()
+	add_child(viewer_window)
 	viewer_window.size = DisplayServer.window_get_size()
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_MAXIMIZED:
 		viewer_window.mode = Window.MODE_MAXIMIZED
@@ -264,9 +263,7 @@ func _on_popup_menu_delete(media : DBMedia) -> void:
 
 func _on_media_deleted(id : int) -> void:
 	previews[id].queue_free()
-	previews_mutex.lock()
 	previews.erase(id)
-	previews_mutex.unlock()
 	db_media = DB.get_all_media()
 
 func _on_popup_menu_export(image : DBMedia) -> void:
