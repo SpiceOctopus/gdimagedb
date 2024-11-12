@@ -4,7 +4,6 @@ signal double_click(collection : DBCollection)
 signal right_click(collection : DBCollection)
 signal click
 
-var load_on_ready : bool = false
 var image : DBMedia
 var collection : DBCollection :
 	set(collection_param):
@@ -14,20 +13,6 @@ var collection : DBCollection :
 		
 		collection = collection_param
 		image = DB.get_first_image_in_collection(collection.id)
-		
-		if get_parent() == null:
-			load_on_ready = true
-			return
-		
-		if is_instance_valid(lbl_name):
-			lbl_name.text = collection_param.name
-		
-		if is_instance_valid(title_image):
-			var img = CacheManager.get_thumbnail(image)
-			if img != null:
-				title_image.texture = img
-			else:
-				title_image.texture = load("res://gfx/collection_placeholder_icon.png")
 
 @onready var lbl_name = $CollectionNameLabel
 @onready var title_image = $TitleImage
@@ -38,15 +23,14 @@ func _ready() -> void:
 	stylebox.bg_color = Color("DARK_SLATE_GRAY", 0.9)
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
 	GlobalData.db_collections_changed.connect(queue_thumbnail_refresh)
-	title_image.set_texture.call_deferred(load("res://gfx/loading.png"))
-	if load_on_ready:
-		lbl_name.text = collection.name
-		var img = CacheManager.get_thumbnail(image)
-		if img != null:
-			#title_image.texture = img
-			title_image.set_texture.call_deferred(img)
-		else:
-			title_image.texture = load("res://gfx/collection_placeholder_icon.png")
+	title_image.texture = CacheManager.loading_placeholder
+	custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
+	lbl_name.text = collection.name
+	var img = CacheManager.get_thumbnail(image)
+	if img != null:
+		title_image.texture = img
+	else:
+		title_image.texture = CacheManager.collection_placeholder
 
 func _input(event: InputEvent) -> void:
 	if not visible:
@@ -68,13 +52,13 @@ func _gui_input(event: InputEvent) -> void:
 
 func set_selected(is_selected : bool) -> void:
 	if(is_selected):
-		title_image.set_material(load("res://ui/image_grid/outline_material.tres"))
+		title_image.material = CacheManager.outline_material
 	else:
-		title_image.set_material(null)
+		title_image.material = null
 
 func queue_thumbnail_refresh() -> void:
 	image = DB.get_first_image_in_collection(collection.id)
 	if not image == null:
 		CacheManager.get_thumbnail(image)
 	else:
-		title_image.texture = load("res://gfx/collection_placeholder_icon.png")
+		title_image.texture = CacheManager.collection_placeholder

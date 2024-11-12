@@ -60,7 +60,6 @@ func _on_menu_bar_refresh_grid() -> void:
 func update_grid_info_panel() -> void:
 	if side_bar == null:
 		return
-	
 	if GlobalData.current_display_mode == GlobalData.DisplayMode.IMAGES:
 		grid_info_panel.set_grid_items_count(image_grid.current_media.size())
 	elif GlobalData.current_display_mode == GlobalData.DisplayMode.COLLECTIONS:

@@ -1,6 +1,6 @@
 extends Control
 
-signal add(tag)
+signal add(tag : DBTag)
 
 var selected : bool = false : set=set_selected
 
@@ -11,8 +11,7 @@ var tag : DBTag
 
 func _ready() -> void:
 	custom_minimum_size.y = add_button.size.y
-	if tag != null && is_instance_valid(tag):
-		tag_label.text = tag.tag
+	tag_label.text = tag.tag
 
 func _on_add_pressed() -> void:
 	add.emit(tag)

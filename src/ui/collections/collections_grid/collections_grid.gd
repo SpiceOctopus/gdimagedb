@@ -4,6 +4,7 @@ signal grid_updated
 signal edit_collection(collection : DBCollection)
 
 var new_button_instance = load("res://ui/collections/collections_grid_new_button/new_button.tscn").instantiate()
+var collection_tile_scene= load("res://ui/collections/collections_grid_tile/grid_tile.tscn")
 
 var db_collections : Array[DBCollection] = [] # to be filled with all collections available in the database
 var tiles : Dictionary = {} # cached tiles for the grid
@@ -15,13 +16,16 @@ var tiles : Dictionary = {} # cached tiles for the grid
 @onready var margin_container = $MarginContainer
 
 func _ready() -> void:
-	#refresh_grid()
+	CacheManager.ensure_cache_preload()
+	var start = Time.get_ticks_msec()
+	refresh_grid()
 	GlobalData.favorites_changed.connect(refresh_grid)
 	GlobalData.untagged_changed.connect(refresh_grid)
 	GlobalData.tags_changed.connect(refresh_grid)
 	GlobalData.db_collections_changed.connect(refresh_grid)
 	GlobalData.collection_deleted.connect(_on_collection_deleted)
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
+	print("collection grid load time: " + str(Time.get_ticks_msec() - start))
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:
@@ -39,8 +43,7 @@ func refresh_grid() -> void:
 	
 	for collection : DBCollection in db_collections:
 		if !tiles.has(collection.id):
-			var instance = load("res://ui/collections/collections_grid_tile/grid_tile.tscn").instantiate()
-			instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
+			var instance = collection_tile_scene.instantiate()
 			instance.double_click.connect(tile_double_click)
 			instance.right_click.connect(tile_right_click)
 			instance.click.connect(on_grid_tile_click)

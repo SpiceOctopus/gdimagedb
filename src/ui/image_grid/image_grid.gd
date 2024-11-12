@@ -38,12 +38,13 @@ func _ready() -> void:
 	initialize_grid_images()
 	previews.sort_custom(sort_by_id_asc)
 	CacheManager.ensure_cache_preload()
-	
+	var after_cache = Time.get_ticks_msec()
 	for preview : GridImage in previews:
 		grid_container.add_child(preview)
 	
 	manage_preview_visibility()
 	print("image grid load time: " + str(Time.get_ticks_msec() - start))
+	print("image grid after cache await: " + str(Time.get_ticks_msec() - after_cache))
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:

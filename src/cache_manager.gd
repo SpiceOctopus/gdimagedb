@@ -11,6 +11,12 @@ var db_media : Array[DBMedia] = []
 var load_thread_id : int = -1
 var cache_preload_complete : bool = false
 
+var loading_placeholder = load("res://gfx/loading.png")
+var collection_placeholder = load("res://gfx/collection_placeholder_icon.png")
+var outline_material = load("res://ui/image_grid/outline_material.tres")
+var shader_minus_red = load("res://ui/side_bar/shader_button_minus/shader_material_minus_red.tres")
+var shader_minus_normal = load("res://ui/side_bar/shader_button_minus/shader_material_minus.tres")
+
 func _ready():
 	db_media = DB.get_all_media()
 	load_thread_id = WorkerThreadPool.add_group_task(loader, db_media.size())
