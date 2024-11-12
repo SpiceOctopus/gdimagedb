@@ -29,7 +29,7 @@ var load_selected_thread : Thread = Thread.new()
 func _ready() -> void:
 	rebuild_list_all_done.connect(tag_list_all_loaded)
 	rebuild_list_selected_done.connect(tag_list_selected_loaded)
-	rebuild_tag_lists()
+	#rebuild_tag_lists()
 	GlobalData.display_mode_changed.connect(_on_display_changed)
 	GlobalData.db_tags_changed.connect(_on_db_tags_changed)
 	tag_buttons.visible = show_add_delete_buttons

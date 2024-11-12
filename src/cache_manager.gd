@@ -7,6 +7,25 @@ var thumb_cache : Dictionary = {}
 var image_cache : Dictionary = {}
 
 var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
+var db_media : Array[DBMedia] = []
+var load_thread_id : int = -1
+var cache_preload_complete : bool = false
+
+func _ready():
+	db_media = DB.get_all_media()
+	load_thread_id = WorkerThreadPool.add_group_task(loader, db_media.size())
+
+func loader(i : int) -> void:
+	var tmp = ImageTexture.create_from_image(Image.load_from_file(db_media[i].thumb_path))
+	thumb_mutex.lock()
+	thumb_cache[db_media[i].id] = tmp
+	thumb_mutex.unlock()
+
+func ensure_cache_preload():
+	if cache_preload_complete:
+		return
+	WorkerThreadPool.wait_for_group_task_completion(load_thread_id)
+	cache_preload_complete = true
 
 func clear_thumb_cache() -> void:
 	thumb_mutex.lock()

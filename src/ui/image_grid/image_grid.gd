@@ -26,7 +26,6 @@ var exiting : bool = false
 
 func _ready() -> void:
 	drop_files_label.visible = (DB.count_images_in_db() <= 0)
-	await get_tree().create_timer(0.01).timeout # give the ui a moment to display
 	GlobalData.favorites_changed.connect(trigger_visibility_update)
 	GlobalData.untagged_changed.connect(trigger_visibility_update)
 	GlobalData.tags_changed.connect(trigger_visibility_update)
@@ -35,25 +34,9 @@ func _ready() -> void:
 	GlobalData.db_collections_changed.connect(trigger_visibility_update)
 	GlobalData.sort_mode_changed.connect(sort_grid)
 	db_media = DB.get_all_media()
-	
-	var loader_threads : Array[Thread] = []
-	
-	for i in OS.get_processor_count():
-		var data : Array[DBMedia] = []
-		if i == OS.get_processor_count() - 1: # last thread
-			@warning_ignore("integer_division")
-			data = db_media.slice(i * (db_media.size() / OS.get_processor_count()), db_media.size())
-		else:
-			@warning_ignore("integer_division")
-			data = db_media.slice(i * (db_media.size() / OS.get_processor_count()), (i + 1) * (db_media.size() / OS.get_processor_count()))
-		var thread = Thread.new()
-		thread.start(initialize_grid_chunk.bind(data))
-		loader_threads.append(thread)
-	
-	for thread : Thread in loader_threads:
-		previews.append_array(thread.wait_to_finish())
-	
+	initialize_grid_images()
 	previews.sort_custom(sort_by_id_asc)
+	CacheManager.ensure_cache_preload()
 	
 	for preview : GridImage in previews:
 		grid_container.add_child(preview)
@@ -68,12 +51,10 @@ func _process(_delta : float) -> void:
 func _exit_tree() -> void:
 	exiting = true
 
-func initialize_grid_chunk(chunk : Array[DBMedia]) -> Array[GridImage]:
-	var previews_chunk : Array[GridImage] = []
-	for media : DBMedia in chunk:
+func initialize_grid_images() -> void:
+	for media : DBMedia in db_media:
 		if exiting: # program closed while loading
-			return []
-		
+			return
 		var gridImageInstance = GridImage.new()
 		gridImageInstance.current_media = media
 		gridImageInstance.double_click.connect(_on_grid_image_double_click)
@@ -82,9 +63,7 @@ func initialize_grid_chunk(chunk : Array[DBMedia]) -> Array[GridImage]:
 		#gridImageInstance.multi_select.connect(_on_grid_image_multi_select) # feature not implemented yet
 		gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 		gridImageInstance.visible = true
-		gridImageInstance.load_thumbnail()
-		previews_chunk.append(gridImageInstance)
-	return previews_chunk
+		previews.append(gridImageInstance)
 
 func sort_by_id_desc(a, b) -> bool:
 	if a.current_media.id > b.current_media.id:

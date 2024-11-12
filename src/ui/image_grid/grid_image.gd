@@ -23,9 +23,7 @@ var selected : bool = false :
 func _ready() -> void:
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-
-func load_thumbnail() -> void:
-	set_texture.call_deferred(CacheManager.get_thumbnail(current_media))
+	texture = CacheManager.get_thumbnail(current_media)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and not event.double_click:

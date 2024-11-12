@@ -15,7 +15,7 @@ var tiles : Dictionary = {} # cached tiles for the grid
 @onready var margin_container = $MarginContainer
 
 func _ready() -> void:
-	refresh_grid()
+	#refresh_grid()
 	GlobalData.favorites_changed.connect(refresh_grid)
 	GlobalData.untagged_changed.connect(refresh_grid)
 	GlobalData.tags_changed.connect(refresh_grid)
