@@ -252,26 +252,27 @@ func preload_image(media : DBMedia) -> void:
 	CacheManager.image_mutex.unlock()
 
 func set_mode(mode : MODE) -> void:
-	if mode == MODE.PICTURE:
-		image_display.show()
-		$VideoStreamPlayer.hide()
-		$VideoStreamPlayer.stop()
-		video_player_controls.hide()
-		gif_display.hide()
-		video_playing = false
-	elif mode == MODE.VIDEO:
-		$VideoStreamPlayer.stop()
-		image_display.hide()
-		gif_display.hide()
-		$VideoStreamPlayer.show()
-		video_player_controls.show()
-	elif mode == MODE.GIF:
-		image_display.hide()
-		$VideoStreamPlayer.stop()
-		$VideoStreamPlayer.hide()
-		video_playing = false
-		video_player_controls.hide()
-		gif_display.show()
+	match mode:
+		MODE.PICTURE:
+			image_display.show()
+			$VideoStreamPlayer.hide()
+			$VideoStreamPlayer.stop()
+			video_player_controls.hide()
+			gif_display.hide()
+			video_playing = false
+		MODE.VIDEO:
+			$VideoStreamPlayer.stop()
+			image_display.hide()
+			gif_display.hide()
+			$VideoStreamPlayer.show()
+			video_player_controls.show()
+		MODE.GIF:
+			image_display.hide()
+			$VideoStreamPlayer.stop()
+			$VideoStreamPlayer.hide()
+			video_playing = false
+			video_player_controls.hide()
+			gif_display.show()
 
 func get_mode_for_file(path : String) -> MODE:
 	if path.get_extension() == "gif":
