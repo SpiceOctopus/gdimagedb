@@ -17,6 +17,10 @@ var assigned_tags_ids : Array[int] = []
 var all_tag_counts : Dictionary
 var exiting : bool = false # fix for crash on premature closing
 
+var tag_item_x_scene = load("res://ui/side_bar/tag_item_x.tscn")
+var tag_item_plus_scene = load("res://ui/side_bar/tag_item_plus.tscn")
+var tag_item_minus_scene = load("res://ui/side_bar/tag_item_plus_minus.tscn")
+
 @onready var input_box = $MarginContainer/VBoxContainer/Filter
 @onready var selected_tags_list = $MarginContainer/VBoxContainer/Panel2/ScrollContainer2/SelectedTags
 @onready var tag_preview_list = $MarginContainer/TagPreviewList
@@ -51,28 +55,30 @@ func build_tag_items_all() -> void:
 	for tag : DBTag in all_tags:
 		if exiting: # program closed while loading
 			return
-		
+		#var start = Time.get_ticks_usec()
 		if mode == MODE.TAG_EDITOR || mode == MODE.COLLECTION_EDITOR:
-			var item = load("res://ui/side_bar/tag_item_plus.tscn").instantiate()
+			var item = tag_item_plus_scene.instantiate()
 			item.tag = tag
 			item.add.connect(_on_tag_item_add)
 			item.visible = !item.tag.id in assigned_tags_ids
 			all_tags_list.add_child(item)
 		elif mode == MODE.GRID:
-			var item = load("res://ui/side_bar/tag_item_plus_minus.tscn").instantiate()
+			var item = tag_item_minus_scene.instantiate()
 			item.tag = tag
 			item.add.connect(_on_tag_item_add)
 			item.remove.connect(_on_tag_item_remove)
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 			all_tags_list.add_child(item)
+		#print("perf: " + str(Time.get_ticks_usec() - start))
 
 func build_tag_items_selected() -> void:
 	for tag in all_tags:
+		var start = Time.get_ticks_usec()
 		if exiting: # program closed while loading
 			return
 		
 		var test = Time.get_ticks_msec()
-		var item = load("res://ui/side_bar/tag_item_x.tscn").instantiate()
+		var item = tag_item_x_scene.instantiate()
 		item.tag = tag
 		item.x.connect(_on_tag_item_x)
 		if mode == MODE.GRID:
@@ -82,6 +88,7 @@ func build_tag_items_selected() -> void:
 			item.color_mode = false
 			item.visible = item.tag.id in assigned_tags_ids
 		selected_tags_list.add_child(item)
+		
 
 # optional parameter allows direct call from filter linedit signal
 func update_all_tags_list(_from_text_changed : String = "") -> void:
