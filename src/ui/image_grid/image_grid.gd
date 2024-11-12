@@ -25,6 +25,7 @@ var exiting : bool = false
 @onready var last_window_size = Vector2i(0,0)
 
 func _ready() -> void:
+	var start = Time.get_ticks_msec()
 	drop_files_label.visible = (DB.count_images_in_db() <= 0)
 	GlobalData.favorites_changed.connect(trigger_visibility_update)
 	GlobalData.untagged_changed.connect(trigger_visibility_update)
@@ -42,6 +43,7 @@ func _ready() -> void:
 		grid_container.add_child(preview)
 	
 	manage_preview_visibility()
+	print("image grid load time: " + str(Time.get_ticks_msec() - start))
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:
@@ -61,8 +63,6 @@ func initialize_grid_images() -> void:
 		gridImageInstance.right_click.connect(grid_image_right_click)
 		gridImageInstance.click.connect(on_grid_image_click)
 		#gridImageInstance.multi_select.connect(_on_grid_image_multi_select) # feature not implemented yet
-		gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-		gridImageInstance.visible = true
 		previews.append(gridImageInstance)
 
 func sort_by_id_desc(a, b) -> bool:
@@ -89,9 +89,6 @@ func load_missing_previews() -> void:
 			gridImageInstance.right_click.connect(grid_image_right_click)
 			gridImageInstance.click.connect(on_grid_image_click)
 			#gridImageInstance.multi_select.connect(_on_grid_image_multi_select) # feature not implemented yet
-			gridImageInstance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-			gridImageInstance.visible = true
-			gridImageInstance.load_thumbnail()
 			previews.append(gridImageInstance)
 	
 	sort_grid()

@@ -24,6 +24,7 @@ func _ready() -> void:
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	texture = CacheManager.get_thumbnail(current_media)
+	custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT and not event.double_click:
