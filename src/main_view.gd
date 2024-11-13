@@ -12,6 +12,7 @@ extends Control
 func _ready() -> void:
 	get_parent().min_size = custom_minimum_size
 	get_tree().root.files_dropped.connect(_on_files_dropped)
+	update_grid_info_panel() # the main scene should have its ready call finish last
 
 func _input(_event) -> void:
 	if Input.is_action_just_pressed("ui_filedialog_refresh"): # ui_filedialog_refresh <- happens to be assigned to F5 per default

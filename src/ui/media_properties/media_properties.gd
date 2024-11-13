@@ -1,5 +1,7 @@
 extends Window
 
+signal regenerate_thumbnail(media : DBMedia)
+
 var media : DBMedia :
 	set(media_in):
 		media = media_in
@@ -16,6 +18,7 @@ func _on_path_copy_pressed() -> void:
 
 func _on_regenerate_thumb_button_pressed() -> void:
 	ImportUtil.create_thumbnail(media.path)
+	regenerate_thumbnail.emit(media)
 
 func _on_close_requested() -> void:
 	hide()

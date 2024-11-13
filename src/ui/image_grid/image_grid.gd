@@ -185,6 +185,7 @@ func _on_PopupMenu_favorite_changed(id : int, fav : bool) -> void:
 	for preview in previews:
 		if preview.current_media.id == id:
 			preview.current_media.favorite = fav
+			break
 
 func _on_PopupMenu_tag_edit(id : int) -> void:
 	tag_edit.emit(id)
@@ -222,27 +223,42 @@ func _on_replace_file_window_confirmed() -> void:
 	
 	if error == OK:
 		import_log.add_message("File %s successfully imported." % replace_file_window.current_path)
-		await get_tree().create_timer(0.1).timeout
+		await get_tree().create_timer(0.01).timeout
 	elif error == ERR_ALREADY_EXISTS:
 		import_log.add_message("File %s already in db." % replace_file_window.current_path)
-		await get_tree().create_timer(0.1).timeout
+		await get_tree().create_timer(0.01).timeout
 	elif error == ERR_FILE_UNRECOGNIZED:
 		import_log.add_message("File type %s not supported." & replace_file_window.current_path.get_extension())
-		await get_tree().create_timer(0.1).timeout
+		await get_tree().create_timer(0.01).timeout
 	
 	db_media = DB.get_all_media()
 	CacheManager.remove_thumbnail(replace_file_window.media.id)
-	previews[replace_file_window.media.id].load_thumbnail()
+	for preview : GridImage in previews:
+		if preview.current_media.id == replace_file_window.media.id:
+			preview.reload_thumbnail()
 
 func _on_popup_menu_delete(media : DBMedia) -> void:
 	delete_file.media = media
 	delete_file.popup_centered()
 
 func _on_media_deleted(id : int) -> void:
-	previews[id].queue_free()
-	previews.erase(id)
+	var index : int = 0
+	var i : int = 0
+	for preview : GridImage in previews:
+		i += 1
+		if preview.current_media.id == id:
+			index = previews.find(preview, i - 1)
+			preview.queue_free()
+			break
+	previews.remove_at(index)
 	db_media = DB.get_all_media()
 
 func _on_popup_menu_export(image : DBMedia) -> void:
 	export_file.media = image
 	export_file.popup_centered()
+
+func _on_media_properties_regenerate_thumbnail(media):
+	CacheManager.remove_thumbnail(media.id)
+	for preview : GridImage in previews:
+		if preview.current_media.id == media.id:
+			preview.reload_thumbnail()

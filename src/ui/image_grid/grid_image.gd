@@ -41,3 +41,6 @@ func _gui_input(event: InputEvent) -> void:
 				double_click.emit(current_media)
 		MOUSE_BUTTON_RIGHT:
 			right_click.emit(current_media)
+
+func reload_thumbnail() -> void:
+	texture = CacheManager.get_thumbnail(current_media)

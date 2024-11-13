@@ -136,6 +136,7 @@ script = ExtResource("9_1r7am")
 [connection signal="properties" from="PopupMenu" to="." method="_on_PopupMenu_properties"]
 [connection signal="replace_file" from="PopupMenu" to="." method="_on_popup_menu_replace_file"]
 [connection signal="tag_edit" from="PopupMenu" to="." method="_on_PopupMenu_tag_edit"]
+[connection signal="regenerate_thumbnail" from="MediaProperties" to="." method="_on_media_properties_regenerate_thumbnail"]
 [connection signal="confirmed" from="ReplaceFileWindow" to="." method="_on_replace_file_window_confirmed"]
 [connection signal="about_to_popup" from="ExportFileDialog" to="ExportFileDialog" method="_on_about_to_popup"]
 [connection signal="confirmed" from="ExportFileDialog" to="ExportFileDialog" method="_on_confirmed"]
