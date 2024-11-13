@@ -11,6 +11,8 @@ var previews : Array[GridImage] = []
 
 var exiting : bool = false
 
+var media_viewer_scene = load("res://ui/media_viewer/media_viewer_window.tscn")
+
 @onready var grid_container = $MarginContainer/ScrollContainer/GridContainer
 @onready var scroll_container = $MarginContainer/ScrollContainer
 @onready var add_to_collection_window = $AddToCollection
@@ -156,7 +158,7 @@ func get_images_for_current_view() -> Array[DBMedia]:
 		return DB.get_images_for_tags(GlobalData.included_tags, GlobalData.excluded_tags)
 
 func _on_grid_image_double_click(sender_media : DBMedia) -> void:
-	var viewer_window = load("res://ui/media_viewer/media_viewer_window.tscn").instantiate()
+	var viewer_window = media_viewer_scene.instantiate()
 	
 	var image_set : Array[DBMedia] = []
 	for preview in previews:
