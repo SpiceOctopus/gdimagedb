@@ -10,4 +10,4 @@ var current : int :
 
 func get_time_string_from_seconds(seconds : float) -> String:
 	var minutes : int = floor(seconds / 60)
-	return str(minutes) + ":" + str(floor((seconds - (minutes * 60))))
+	return "%02d:%02d" % [minutes, seconds - (minutes * 60)]

@@ -193,7 +193,7 @@ func set_image_display_rect() -> void:
 			fit_oversized_display_into_window(image_display, ratio)
 
 func set_gif_display_rect() -> void:
-	if current_mode != MODE.GIF:
+	if current_mode != MODE.GIF || gif_display.sprite_frames == null:
 		return
 	
 	# positioning
@@ -234,7 +234,9 @@ func set_display(media : DBMedia) -> void:
 		_on_MediaViewer_resized()
 	elif current_mode == MODE.GIF:
 		loading_label.show()
-		gif_display.sprite_frames = GifManager.sprite_frames_from_file(media.path)
+		await get_tree().create_timer(0.01).timeout # give the ui a moment to update
+		gif_display.sprite_frames = CacheManager.get_gif(media)
+		gif_display.frame = 0 # with caching, the gif would resume from the last position
 		loading_label.hide()
 		gif_display.play("gif")
 		_on_MediaViewer_resized()

@@ -14,6 +14,7 @@ script = ExtResource("1_i7mrp")
 [node name="TimeCurrent" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
+text = "00"
 vertical_alignment = 1
 
 [node name="Divider" type="Label" parent="."]
@@ -24,4 +25,5 @@ vertical_alignment = 1
 [node name="TimeTotal" type="Label" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
+text = "00"
 vertical_alignment = 1

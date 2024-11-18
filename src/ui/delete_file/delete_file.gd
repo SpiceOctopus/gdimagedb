@@ -17,6 +17,7 @@ func _on_ok_button_pressed() -> void:
 	DB.delete_image(media.id)
 	CacheManager.remove_image(media.id)
 	CacheManager.remove_thumbnail(media.id)
+	CacheManager.remove_gif(media.id)
 	GlobalData.notify_media_deleted(media.id)
 	hide()
 

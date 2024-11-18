@@ -2,9 +2,11 @@ extends Node
 
 var thumb_mutex : Mutex = Mutex.new()
 var image_mutex : Mutex = Mutex.new()
+var gif_mutex : Mutex = Mutex.new()
 
 var thumb_cache : Dictionary = {}
 var image_cache : Dictionary = {}
+var gif_cache : Dictionary = {}
 
 var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
 var db_media : Array[DBMedia] = []
@@ -13,6 +15,7 @@ var cache_preload_complete : bool = false
 
 var loading_placeholder = load("res://gfx/loading.png")
 var collection_placeholder = load("res://gfx/collection_placeholder_icon.png")
+var video_placeholder = load("res://gfx/video_placeholder.png")
 var outline_material = load("res://ui/image_grid/outline_material.tres")
 var shader_minus_red = load("res://ui/side_bar/shader_button_minus/shader_material_minus_red.tres")
 var shader_minus_normal = load("res://ui/side_bar/shader_button_minus/shader_material_minus.tres")
@@ -52,7 +55,7 @@ func get_thumbnail(media : DBMedia) -> ImageTexture:
 			thumb_mutex.unlock()
 			return thumb_cache[media.id]
 		elif media.path.get_extension() in Settings.supported_video_files:
-			return load("res://gfx/video_placeholder.png")
+			return video_placeholder
 	return null
 
 func get_image(media : DBMedia) -> ImageTexture:
@@ -69,8 +72,18 @@ func get_image(media : DBMedia) -> ImageTexture:
 			image_mutex.unlock()
 			return image_cache[media.id]
 		elif media.path.get_extension() in Settings.supported_video_files:
-			return load("res://gfx/video_placeholder.png")
+			return video_placeholder
 	return null
+
+func get_gif(media : DBMedia) -> SpriteFrames:
+	if gif_cache.has(media.id):
+		return gif_cache[media.id]
+	else:
+		var frames = GifManager.sprite_frames_from_file(media.path)
+		gif_mutex.lock()
+		gif_cache[media.id] = frames
+		gif_mutex.unlock()
+		return gif_cache[media.id]
 
 func remove_image(id : int) -> void:
 	image_mutex.lock()
@@ -81,3 +94,8 @@ func remove_thumbnail(id : int) -> void:
 	thumb_mutex.lock()
 	thumb_cache.erase(id)
 	thumb_mutex.unlock()
+
+func remove_gif(id : int) -> void:
+	gif_mutex.lock()
+	gif_cache.erase(id)
+	gif_mutex.unlock()
