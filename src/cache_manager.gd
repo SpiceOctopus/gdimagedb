@@ -15,7 +15,7 @@ var cache_preload_complete : bool = false
 
 var loading_placeholder = load("res://gfx/loading.png")
 var collection_placeholder = load("res://gfx/collection_placeholder_icon.png")
-var video_placeholder = load("res://gfx/video_placeholder.png")
+var video_placeholder : Texture2D = load("res://gfx/video_placeholder.png")
 var outline_material = load("res://ui/image_grid/outline_material.tres")
 var shader_minus_red = load("res://ui/side_bar/shader_button_minus/shader_material_minus_red.tres")
 var shader_minus_normal = load("res://ui/side_bar/shader_button_minus/shader_material_minus.tres")
