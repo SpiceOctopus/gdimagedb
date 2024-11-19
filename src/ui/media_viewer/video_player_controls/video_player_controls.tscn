@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://b4p0ep42wesi1"]
+[gd_scene load_steps=3 format=3 uid="uid://b4p0ep42wesi1"]
 
 [ext_resource type="Script" path="res://ui/media_viewer/video_player_controls/video_player_controls.gd" id="1_pun6c"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_7gwqt"]
-[ext_resource type="PackedScene" uid="uid://da2ycb4o4vxr3" path="res://ui/media_viewer/video_player_controls/time_display.tscn" id="2_fdtwv"]
 
 [node name="VideoPlayerControls" type="Control"]
 custom_minimum_size = Vector2(0, 40)
@@ -35,23 +34,39 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+[node name="Controls" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PlayPause" type="Button" parent="MarginContainer/HBoxContainer"]
+[node name="PlayPause" type="Button" parent="MarginContainer/Controls"]
 layout_mode = 2
 text = "Play / Pause"
 
-[node name="Progress" type="HSlider" parent="MarginContainer/HBoxContainer"]
+[node name="Progress" type="HSlider" parent="MarginContainer/Controls"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
 
-[node name="TimeDisplay" parent="MarginContainer/HBoxContainer" instance=ExtResource("2_fdtwv")]
+[node name="TimeDisplay" type="HBoxContainer" parent="MarginContainer/Controls"]
 layout_mode = 2
-size_flags_horizontal = 1
 
-[connection signal="pressed" from="MarginContainer/HBoxContainer/PlayPause" to="." method="_on_play_pause_pressed"]
-[connection signal="drag_ended" from="MarginContainer/HBoxContainer/Progress" to="." method="_on_progress_drag_ended"]
-[connection signal="drag_started" from="MarginContainer/HBoxContainer/Progress" to="." method="_on_progress_drag_started"]
+[node name="TimeCurrent" type="Label" parent="MarginContainer/Controls/TimeDisplay"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "00"
+vertical_alignment = 1
+
+[node name="Divider" type="Label" parent="MarginContainer/Controls/TimeDisplay"]
+layout_mode = 2
+text = " / "
+vertical_alignment = 1
+
+[node name="TimeTotal" type="Label" parent="MarginContainer/Controls/TimeDisplay"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "00"
+vertical_alignment = 1
+
+[connection signal="pressed" from="MarginContainer/Controls/PlayPause" to="." method="_on_play_pause_pressed"]
+[connection signal="drag_ended" from="MarginContainer/Controls/Progress" to="." method="_on_progress_drag_ended"]
+[connection signal="drag_started" from="MarginContainer/Controls/Progress" to="." method="_on_progress_drag_started"]

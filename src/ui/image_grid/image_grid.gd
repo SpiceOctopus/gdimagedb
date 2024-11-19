@@ -27,7 +27,6 @@ var media_viewer_scene = load("res://ui/media_viewer/media_viewer_window.tscn")
 @onready var last_window_size = Vector2i(0,0)
 
 func _ready() -> void:
-	var start = Time.get_ticks_msec()
 	drop_files_label.visible = (DB.count_images_in_db() <= 0)
 	GlobalData.favorites_changed.connect(trigger_visibility_update)
 	GlobalData.untagged_changed.connect(trigger_visibility_update)
@@ -40,13 +39,9 @@ func _ready() -> void:
 	initialize_grid_images()
 	previews.sort_custom(sort_by_id_asc)
 	CacheManager.ensure_cache_preload()
-	var after_cache = Time.get_ticks_msec()
 	for preview : GridImage in previews:
 		grid_container.add_child(preview)
-	
 	manage_preview_visibility()
-	print("image grid load time: " + str(Time.get_ticks_msec() - start))
-	print("image grid after cache await: " + str(Time.get_ticks_msec() - after_cache))
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:
@@ -238,6 +233,7 @@ func _on_replace_file_window_confirmed() -> void:
 	for preview : GridImage in previews:
 		if preview.current_media.id == replace_file_window.media.id:
 			preview.reload_thumbnail()
+	GlobalData.notify_db_collections_changed()
 
 func _on_popup_menu_delete(media : DBMedia) -> void:
 	delete_file.media = media

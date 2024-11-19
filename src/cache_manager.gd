@@ -20,7 +20,7 @@ var outline_material = load("res://ui/image_grid/outline_material.tres")
 var shader_minus_red = load("res://ui/side_bar/shader_button_minus/shader_material_minus_red.tres")
 var shader_minus_normal = load("res://ui/side_bar/shader_button_minus/shader_material_minus.tres")
 
-func _ready():
+func _ready() -> void:
 	db_media = DB.get_all_media()
 	load_thread_id = WorkerThreadPool.add_group_task(loader, db_media.size())
 
@@ -30,7 +30,7 @@ func loader(i : int) -> void:
 	thumb_cache[db_media[i].id] = tmp
 	thumb_mutex.unlock()
 
-func ensure_cache_preload():
+func ensure_cache_preload() -> void:
 	if cache_preload_complete:
 		return
 	WorkerThreadPool.wait_for_group_task_completion(load_thread_id)

@@ -31,7 +31,6 @@ func _ready() -> void:
 	tag_buttons.visible = show_add_delete_buttons
 
 func rebuild_tag_lists() -> void:
-	var sidebar_start = Time.get_ticks_msec()
 	all_tags = DB.get_all_tags()
 	all_tag_counts = DB.get_all_tag_counts()
 	for tag : DBTag in all_tags:
@@ -46,7 +45,6 @@ func rebuild_tag_lists() -> void:
 	
 	build_tag_items_all()
 	build_tag_items_selected()
-	print("sidebar load time: " + str(Time.get_ticks_msec() - sidebar_start))
 
 func build_tag_items_all() -> void:
 	for tag : DBTag in all_tags:
@@ -66,7 +64,6 @@ func build_tag_items_all() -> void:
 			item.remove.connect(_on_tag_item_remove)
 			item.visible = !(item.tag in GlobalData.included_tags || item.tag in GlobalData.excluded_tags)
 			all_tags_list.add_child(item)
-		#print("perf: " + str(Time.get_ticks_usec() - start))
 
 func build_tag_items_selected() -> void:
 	for tag in all_tags:

@@ -1,6 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://da2ycb4o4vxr3"]
+[gd_scene load_steps=2 format=3 uid="uid://cbv8agrp7vj6x"]
 
-[ext_resource type="Script" path="res://ui/media_viewer/video_player_controls/time_display.gd" id="1_i7mrp"]
+[sub_resource type="GDScript" id="GDScript_u0pvs"]
+script/source = "extends HBoxContainer
+
+var total : float :
+	set(time):
+		$TimeTotal.text = get_time_string_from_seconds(time)
+
+var current : int : 
+	set(time):
+		$TimeCurrent.text = get_time_string_from_seconds(time)
+
+func get_time_string_from_seconds(seconds : float) -> String:
+	var minutes : int = floor(seconds / 60)
+	return \"%02d:%02d\" % [minutes, seconds - (minutes * 60)]
+"
 
 [node name="TimeDisplay" type="HBoxContainer"]
 anchors_preset = 15
@@ -9,7 +23,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
-script = ExtResource("1_i7mrp")
+script = SubResource("GDScript_u0pvs")
 
 [node name="TimeCurrent" type="Label" parent="."]
 layout_mode = 2

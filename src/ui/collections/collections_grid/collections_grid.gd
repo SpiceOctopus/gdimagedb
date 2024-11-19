@@ -17,7 +17,6 @@ var tiles : Dictionary = {} # cached tiles for the grid
 
 func _ready() -> void:
 	CacheManager.ensure_cache_preload()
-	var start = Time.get_ticks_msec()
 	refresh_grid()
 	GlobalData.favorites_changed.connect(refresh_grid)
 	GlobalData.untagged_changed.connect(refresh_grid)
@@ -25,7 +24,6 @@ func _ready() -> void:
 	GlobalData.db_collections_changed.connect(refresh_grid)
 	GlobalData.collection_deleted.connect(_on_collection_deleted)
 	new_button_instance.custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
-	print("collection grid load time: " + str(Time.get_ticks_msec() - start))
 
 func _process(_delta : float) -> void:
 	if DisplayServer.window_get_size() != last_window_size:
