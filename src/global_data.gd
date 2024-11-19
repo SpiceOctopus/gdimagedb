@@ -11,7 +11,7 @@ signal collection_deleted
 @warning_ignore("unused_signal")
 signal help # signal is called from the main view
 @warning_ignore("unused_signal")
-signal sort_mode_changed
+signal sort_mode_changed # signal is called from main menu
 signal last_used_collection_changed(collection : DBCollection)
 
 enum DisplayMode {IMAGES, COLLECTIONS}

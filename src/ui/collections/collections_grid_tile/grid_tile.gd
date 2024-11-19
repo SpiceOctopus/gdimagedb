@@ -22,7 +22,7 @@ func _ready() -> void:
 	var stylebox = StyleBoxFlat.new()
 	stylebox.bg_color = Color("DARK_SLATE_GRAY", 0.9)
 	lbl_name.add_theme_stylebox_override("normal", stylebox)
-	GlobalData.db_collections_changed.connect(queue_thumbnail_refresh)
+	GlobalData.db_collections_changed.connect(thumbnail_refresh)
 	title_image.texture = CacheManager.loading_placeholder
 	custom_minimum_size = Vector2(Settings.grid_image_size, Settings.grid_image_size)
 	lbl_name.text = collection.name
@@ -56,9 +56,9 @@ func set_selected(is_selected : bool) -> void:
 	else:
 		title_image.material = null
 
-func queue_thumbnail_refresh() -> void:
+func thumbnail_refresh() -> void:
 	image = DB.get_first_image_in_collection(collection.id)
 	if not image == null:
-		CacheManager.get_thumbnail(image)
+		title_image.texture = CacheManager.get_thumbnail(image)
 	else:
 		title_image.texture = CacheManager.collection_placeholder
