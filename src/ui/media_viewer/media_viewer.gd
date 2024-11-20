@@ -12,7 +12,7 @@ enum MODE {PICTURE, VIDEO, GIF, UNKNOWN}
 
 var media_set : Array[DBMedia] 
 var current_image : int = 0
-var current_mode = MODE.PICTURE
+var current_mode : MODE = MODE.PICTURE
 var video_size : Vector2
 var video_playing : bool = false
 var dragging : bool = false
@@ -110,7 +110,7 @@ func _process(_delta : float) -> void:
 			gif_display.position = get_global_mouse_position() + drag_offset
 
 func _on_video_timer_tick() -> void:
-	video_player_controls.set_time_current($VideoStreamPlayer.stream_position)
+	video_player_controls.time_current = $VideoStreamPlayer.stream_position
 
 func set_next_image() -> void:
 	if preload_next_id > 0:
@@ -224,8 +224,8 @@ func set_display(media : DBMedia) -> void:
 		loading_label.show()
 		$VideoStreamPlayer.stream = null # Solves a hard crash.
 		$VideoStreamPlayer.stream = load(media.path)
-		video_player_controls.set_time_total($VideoStreamPlayer.get_stream_length())
-		video_player_controls.set_time_current(0)
+		video_player_controls.time_total = $VideoStreamPlayer.get_stream_length()
+		video_player_controls.time_current = 0
 		$VideoStreamPlayer.play()
 		video_time_update_timer.start()
 		video_playing = true
@@ -338,17 +338,20 @@ func fit_oversized_display_into_window(display, ratio : float) -> void:
 		display.position.y = (size.y / 2) - (display.size.y / 2)
 
 func _on_media_viewer_top_menu_original_size() -> void:
-	if not hotkeys_active:
+	if not hotkeys_active: # inactive for tag editor
 		return
 	
 	image_display.size = image_display.texture.get_size()
 	image_display.position = Vector2((size.x / 2) - (image_display.size.x / 2), (size.y / 2) - (image_display.size.y / 2))
 
 func _on_media_viewer_top_menu_stretch_mode_changed() -> void:
-	if current_mode == MODE.PICTURE:
-		set_image_display_rect()
-	else:
-		set_video_display_rect()
+	match current_mode:
+		MODE.PICTURE:
+			set_image_display_rect()
+		MODE.VIDEO:
+			set_video_display_rect()
+		MODE.GIF:
+			set_gif_display_rect()
 
 # Parameter is the target time in seconds.
 func _on_video_player_controls_time_selected(time : int) -> void:

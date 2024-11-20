@@ -8,10 +8,13 @@ var dragging : bool = false
 var time_total : float :
 	set(time):
 		time_total_label.text = get_time_string_from_seconds(time)
+		progress_bar.max_value = floor(time)
 
 var time_current : float : 
 	set(time):
 		time_current_label.text = get_time_string_from_seconds(time)
+		if !dragging:
+			progress_bar.value = floor(time)
 
 @onready var progress_bar = $MarginContainer/Controls/Progress
 @onready var time_total_label = $MarginContainer/Controls/TimeDisplay/TimeTotal
@@ -19,15 +22,6 @@ var time_current : float :
 
 func _on_play_pause_pressed() -> void:
 	play_pause.emit()
-
-func set_time_total(time : float) -> void:
-	time_total = time
-	progress_bar.max_value = floor(time)
-
-func set_time_current(time : float) -> void:
-	time_current = time
-	if !dragging:
-		progress_bar.value = floor(time)
 
 func _on_progress_drag_ended(_value_changed : bool) -> void:
 	dragging = false
