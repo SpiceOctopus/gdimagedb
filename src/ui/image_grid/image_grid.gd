@@ -210,7 +210,7 @@ func _on_popup_menu_replace_file(media : DBMedia) -> void:
 	replace_file_window.media = media
 	replace_file_window.popup_centered()
 
-func _on_replace_file_window_confirmed() -> void:
+func _on_replace_file_window_confirmed(_path : String = "") -> void:
 	var error : Error = ImportUtil.replace_file(replace_file_window.media, replace_file_window.current_path)
 	
 	import_log.clear_messages()
@@ -230,8 +230,11 @@ func _on_replace_file_window_confirmed() -> void:
 	
 	db_media = DB.get_all_media()
 	CacheManager.remove_thumbnail(replace_file_window.media.id)
+	CacheManager.remove_image(replace_file_window.media.id)
+	CacheManager.remove_gif(replace_file_window.media.id)
 	for preview : GridImage in previews:
 		if preview.current_media.id == replace_file_window.media.id:
+			preview.current_media = DB.get_media_for_id(preview.current_media.id)
 			preview.reload_thumbnail()
 	GlobalData.notify_db_collections_changed()
 

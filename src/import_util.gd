@@ -43,7 +43,7 @@ func replace_file(db_file_to_replace : DBMedia, replacement_path : String) -> Er
 	var target_path : String = db_file_to_replace.path
 	var dir : DirAccess = DirAccess.open(OS.get_executable_path().get_base_dir())
 	dir.remove(target_path) # remove original file
-	target_path = target_path.split(".")[0] + "." + replacement_path.get_extension()
+	target_path = target_path.rsplit(".", false, 1)[0] + "." + replacement_path.get_extension()
 	dir.copy(replacement_path, target_path)
 	create_thumbnail(target_path)
 	

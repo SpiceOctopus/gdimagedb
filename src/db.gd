@@ -97,6 +97,16 @@ func get_all_media() -> Array[DBMedia]:
 	db_access_mutex.unlock()
 	return retval
 
+func get_media_for_id(id : int) -> DBMedia:
+	var retval = DBMedia.new()
+	db_access_mutex.lock()
+	query_with_bindings("SELECT * FROM images WHERE id=?", [id])
+	retval.id = query_result[0]["id"]
+	retval.path = query_result[0]["path"]
+	retval.favorite = query_result[0]["fav"]
+	db_access_mutex.unlock()
+	return retval
+
 func get_all_tags() -> Array[DBTag]:
 	db_access_mutex.lock()
 	query("SELECT * FROM tags")
