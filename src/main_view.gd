@@ -82,6 +82,7 @@ func _on_menu_bar_switch_grids() -> void:
 		collections_grid.visible = false
 		image_grid.visible = true
 		GlobalData.current_display_mode = GlobalData.DisplayMode.IMAGES
+		image_grid.window_size_changed.call_deferred() # has to be called at the end of the frame apparently
 	
 	update_grid_info_panel()
 
