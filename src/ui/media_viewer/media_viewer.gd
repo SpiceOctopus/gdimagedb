@@ -37,12 +37,18 @@ func _ready() -> void:
 			var preload_id = current_image + 1
 			if preload_id > media_set.size() - 1:
 				preload_id = 0
+			
+			if OS.get_name() == "Windows": # fix crash on exit
+				return
 			if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
 				preload_next_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 		if media_set.size() > 2:
 			var preload_id = current_image - 1
 			if preload_id < 0:
 				preload_id = media_set.size() - 1
+			
+			if OS.get_name() == "Windows": # fix crash on exit
+				return
 			if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
 				preload_previous_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 
@@ -125,6 +131,9 @@ func set_next_image() -> void:
 	var preload_id = current_image + 1
 	if preload_id > media_set.size() - 1:
 		preload_id = 0
+	
+	if OS.get_name() == "Windows": # fix crash on exit
+		return
 	if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
 		preload_next_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 
@@ -142,6 +151,9 @@ func set_previous_image() -> void:
 	var preload_id = current_image - 1
 	if preload_id < 0:
 		preload_id = media_set.size() - 1
+	
+	if OS.get_name() == "Windows": # fix crash on exit
+		return
 	if !CacheManager.image_cache.has(media_set[preload_id].id) && (get_mode_for_file(media_set[preload_id].path) == MODE.PICTURE):
 		preload_next_id = WorkerThreadPool.add_task(preload_image.bind(media_set[preload_id]), true)
 
@@ -219,7 +231,10 @@ func set_display(media : DBMedia) -> void:
 	if current_mode == MODE.PICTURE:
 		image_display.hide()
 		loading_label.show()
-		WorkerThreadPool.add_task(async_load_display.bind(media), true)
+		if OS.get_name() == "Windows": # fix crash on exit
+			async_load_display(media)
+		else:
+			WorkerThreadPool.add_task(async_load_display.bind(media), true)
 	elif current_mode == MODE.VIDEO:
 		loading_label.show()
 		$VideoStreamPlayer.stream = null # Solves a hard crash.
