@@ -1,4 +1,4 @@
-extends RefCounted
+extends Object
 
 class_name DBMedia
 
