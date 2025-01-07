@@ -244,7 +244,10 @@ func set_display(media : DBMedia) -> void:
 		_on_MediaViewer_resized()
 
 func async_load_display(media : DBMedia) -> void:
-	image_display.set_texture.call_deferred(CacheManager.get_image(media))
+	var image = CacheManager.get_image(media)
+	if !image_display: # fixes crash when ui_cancel is called before get_image returns
+		return
+	image_display.set_texture.call_deferred(image)
 	loading_label.hide.call_deferred()
 	image_display.show.call_deferred()
 	_on_MediaViewer_resized.call_deferred()
