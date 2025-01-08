@@ -45,45 +45,60 @@ func get_thumbnail(media : DBMedia) -> ImageTexture:
 	if media == null:
 		return null
 	
+	thumb_mutex.lock()
 	if thumb_cache.has(media.id):
-		return thumb_cache[media.id]
+		var thumb : ImageTexture = thumb_cache[media.id]
+		thumb_mutex.unlock()
+		return thumb
 	else:
-		if dir.file_exists(media.thumb_path):
-			var tmp = ImageTexture.create_from_image(Image.load_from_file(media.thumb_path))
-			thumb_mutex.lock()
-			thumb_cache[media.id] = tmp
-			thumb_mutex.unlock()
-			return thumb_cache[media.id]
-		elif media.path.get_extension() in Settings.supported_video_files:
-			return video_placeholder
+		thumb_mutex.unlock()
+	
+	if dir.file_exists(media.thumb_path):
+		var tmp = ImageTexture.create_from_image(Image.load_from_file(media.thumb_path))
+		thumb_mutex.lock()
+		thumb_cache[media.id] = tmp
+		thumb_mutex.unlock()
+		return tmp
+	elif media.path.get_extension() in Settings.supported_video_files:
+		return video_placeholder
 	return null
 
 func get_image(media : DBMedia) -> ImageTexture:
 	if media == null:
 		return null
 	
+	image_mutex.lock()
 	if image_cache.has(media.id):
-		return image_cache[media.id]
+		var img : ImageTexture = image_cache[media.id]
+		image_mutex.unlock()
+		return img
 	else:
-		if dir.file_exists(media.path):
-			var tmp = ImageTexture.create_from_image(Image.load_from_file(media.path))
-			image_mutex.lock()
-			image_cache[media.id] = tmp
-			image_mutex.unlock()
-			return image_cache[media.id]
-		elif media.path.get_extension() in Settings.supported_video_files:
-			return video_placeholder
+		image_mutex.unlock()
+	
+	if dir.file_exists(media.path):
+		var tmp : ImageTexture = ImageTexture.create_from_image(Image.load_from_file(media.path))
+		image_mutex.lock()
+		image_cache[media.id] = tmp
+		image_mutex.unlock()
+		return tmp
+	elif media.path.get_extension() in Settings.supported_video_files:
+		return video_placeholder
 	return null
 
 func get_gif(media : DBMedia) -> SpriteFrames:
+	gif_mutex.lock()
 	if gif_cache.has(media.id):
-		return gif_cache[media.id]
-	else:
-		var frames = GifManager.sprite_frames_from_file(media.path)
-		gif_mutex.lock()
-		gif_cache[media.id] = frames
+		var gif : SpriteFrames = gif_cache[media.id]
 		gif_mutex.unlock()
-		return gif_cache[media.id]
+		return gif
+	else:
+		gif_mutex.unlock()
+	
+	var frames = GifManager.sprite_frames_from_file(media.path)
+	gif_mutex.lock()
+	gif_cache[media.id] = frames
+	gif_mutex.unlock()
+	return frames
 
 func remove_image(id : int) -> void:
 	image_mutex.lock()
