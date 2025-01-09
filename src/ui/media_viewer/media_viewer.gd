@@ -254,9 +254,7 @@ func async_load_display(media : DBMedia) -> void:
 
 func preload_image(media : DBMedia) -> void:
 	var texture = ImageTexture.create_from_image(Image.load_from_file(media.path))
-	CacheManager.image_mutex.lock()
-	CacheManager.image_cache[media.id] = texture
-	CacheManager.image_mutex.unlock()
+	CacheManager.add_image(media.id, texture)
 
 func set_mode(mode : MODE) -> void:
 	match mode:

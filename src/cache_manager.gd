@@ -100,6 +100,11 @@ func get_gif(media : DBMedia) -> SpriteFrames:
 	gif_mutex.unlock()
 	return frames
 
+func add_image(id : int, image : ImageTexture) -> void:
+	image_mutex.lock()
+	image_cache[id] = image
+	image_mutex.unlock()
+
 func remove_image(id : int) -> void:
 	image_mutex.lock()
 	image_cache.erase(id) # Does not fail if entry does not exists. Just returns false.
