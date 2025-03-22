@@ -44,6 +44,7 @@ layout_mode = 2
 [node name="Filter" type="LineEdit" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 placeholder_text = "Filter Tags"
+keep_editing_on_text_submit = true
 caret_blink = true
 caret_blink_interval = 0.5
 
