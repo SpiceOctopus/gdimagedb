@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://d0fnkvx35hyhg"]
 
-[ext_resource type="Script" path="res://ui/help/help.gd" id="1_5our0"]
+[ext_resource type="Script" uid="uid://dfbf4mwjynads" path="res://ui/help/help.gd" id="1_5our0"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1_7rnru"]
-[ext_resource type="Script" path="res://ui/help/godot_engine_license.gd" id="2_e662u"]
+[ext_resource type="Script" uid="uid://dt18pwhcke845" path="res://ui/help/godot_engine_license.gd" id="2_e662u"]
 
 [node name="Help" type="Window"]
 title = "Help"

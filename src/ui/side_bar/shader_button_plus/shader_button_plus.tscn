@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cs0k3k1ng3gon"]
 
 [ext_resource type="Material" uid="uid://6vdxary7rqsu" path="res://ui/side_bar/shader_button_plus/shader_button_plus.tres" id="1_ugn0k"]
-[ext_resource type="Script" path="res://ui/side_bar/shader_button_plus/shader_button_plus.gd" id="2_u7sra"]
+[ext_resource type="Script" uid="uid://ya114kmr6gyt" path="res://ui/side_bar/shader_button_plus/shader_button_plus.gd" id="2_u7sra"]
 
 [node name="ShaderButtonPlus" type="Panel"]
 material = ExtResource("1_ugn0k")

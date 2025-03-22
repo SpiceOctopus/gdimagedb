@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cffjww73hoc0w"]
 
-[ext_resource type="Script" path="res://ui/tag_buttons/tag_buttons.gd" id="1_6bsbb"]
+[ext_resource type="Script" uid="uid://btahgr5hokfin" path="res://ui/tag_buttons/tag_buttons.gd" id="1_6bsbb"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1_s3j38"]
 [ext_resource type="PackedScene" uid="uid://datbrq8xuommo" path="res://ui/add_tag_dlg/add_tag_dialog.tscn" id="3_m2le3"]
 [ext_resource type="PackedScene" uid="uid://duqp5jb7muyp2" path="res://ui/delete_tag_dlg/delete_tag_dialog.tscn" id="4_w0ha1"]

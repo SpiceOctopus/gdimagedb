@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://duqp5jb7muyp2"]
 
-[ext_resource type="Script" path="res://ui/delete_tag_dlg/delete_tag_dialog.gd" id="1"]
+[ext_resource type="Script" uid="uid://dov0aoedm7fxx" path="res://ui/delete_tag_dlg/delete_tag_dialog.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_xirsn"]
 [ext_resource type="Texture2D" uid="uid://ceabbpqtlxexo" path="res://gfx/dark_background.png" id="3_nkicc"]
 

@@ -1,14 +1,14 @@
 [gd_scene load_steps=12 format=3 uid="uid://86emblidbalh"]
 
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="1"]
-[ext_resource type="Script" path="res://ui/image_grid/image_grid.gd" id="2"]
-[ext_resource type="Script" path="res://ui/image_grid/popup_menu.gd" id="3"]
+[ext_resource type="Script" uid="uid://cgvcp58kmj32t" path="res://ui/image_grid/image_grid.gd" id="2"]
+[ext_resource type="Script" uid="uid://bac2sllkbi0co" path="res://ui/image_grid/popup_menu.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://c6wroaqhgwlbv" path="res://ui/collections/add_to_collection_dialog/add_to_collection.tscn" id="5_inbqb"]
 [ext_resource type="PackedScene" uid="uid://cf1sh28pl8bbu" path="res://ui/media_properties/media_properties.tscn" id="6_ge5n3"]
-[ext_resource type="Script" path="res://ui/image_grid/replace_file_window.gd" id="7_0wxrp"]
+[ext_resource type="Script" uid="uid://b5s7x1ix76h8x" path="res://ui/image_grid/replace_file_window.gd" id="7_0wxrp"]
 [ext_resource type="PackedScene" uid="uid://b5u3ncjp2ptt7" path="res://ui/import_log/import_log.tscn" id="8_bn58o"]
 [ext_resource type="PackedScene" uid="uid://v8t6vwawua50" path="res://ui/delete_file/delete_file.tscn" id="8_l7y63"]
-[ext_resource type="Script" path="res://ui/image_grid/export_file_dialog.gd" id="9_1r7am"]
+[ext_resource type="Script" uid="uid://b6pm7ftk3vpbb" path="res://ui/image_grid/export_file_dialog.gd" id="9_1r7am"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ygfgn"]
 bg_color = Color(0.156863, 0.180392, 0.2, 1)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dvfv1qsj4npmd"]
 
-[ext_resource type="Script" path="res://ui/collections/collection_editor_tile/collection_editor_tile.gd" id="1_m3qnu"]
+[ext_resource type="Script" uid="uid://dae8qeqrokn2o" path="res://ui/collections/collection_editor_tile/collection_editor_tile.gd" id="1_m3qnu"]
 
 [node name="CollectionEditorTile" type="Control"]
 layout_mode = 3

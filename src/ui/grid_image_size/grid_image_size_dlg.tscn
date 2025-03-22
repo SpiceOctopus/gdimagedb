@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://ds4otlse3cu13"]
 
-[ext_resource type="Script" path="res://ui/grid_image_size/grid_image_size_dlg.gd" id="1"]
+[ext_resource type="Script" uid="uid://h0tf5pn372ip" path="res://ui/grid_image_size/grid_image_size_dlg.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_3na2q"]
 
 [node name="GridImageSizeCtrl" type="Window"]

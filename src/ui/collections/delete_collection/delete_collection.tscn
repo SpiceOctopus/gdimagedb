@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://caw3e0r70wu5s"]
 
-[ext_resource type="Script" path="res://ui/collections/delete_collection/delete_collection.gd" id="1_kyplx"]
+[ext_resource type="Script" uid="uid://ccplqjcjsg7rn" path="res://ui/collections/delete_collection/delete_collection.gd" id="1_kyplx"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_vxktm"]
 
 [node name="DeleteCollection" type="Window"]

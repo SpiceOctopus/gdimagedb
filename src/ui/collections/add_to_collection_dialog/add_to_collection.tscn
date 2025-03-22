@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c6wroaqhgwlbv"]
 
-[ext_resource type="Script" path="res://ui/collections/add_to_collection_dialog/add_to_collection.gd" id="1_wkjjs"]
+[ext_resource type="Script" uid="uid://4yqow5jpufcl" path="res://ui/collections/add_to_collection_dialog/add_to_collection.gd" id="1_wkjjs"]
 [ext_resource type="Texture2D" uid="uid://cas13pywr4ltf" path="res://gfx/default_background.png" id="2_dagm2"]
 
 [node name="AddToCollection" type="Window"]
