@@ -1,4 +1,8 @@
-# GDImageDB
+# Notice
+This repository is frozen.
+Development continues on [codeberg](https://codeberg.org/SpaceOctopus/gdimagedb)
+
+## GDImageDB
 A simple media database implemented with godot.
 
 ## Supported media formats
